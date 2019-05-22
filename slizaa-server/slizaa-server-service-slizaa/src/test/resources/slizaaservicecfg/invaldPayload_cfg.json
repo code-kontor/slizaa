@@ -1,0 +1,14 @@
+{
+  "graphDatabases" : [ "java.util.ArrayList", [ {
+    "port" : 29885,
+    "identifier" : "test",
+    "running" : true,
+    "contentDefinition" : {
+      "factoryId" : "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+      "contentDefinition" : "KAPIZZ"
+    },
+    "hierarchicalGraphs" : [ "java.util.ArrayList", [ {
+      "identifier" : "01"
+    } ] ]
+  } ] ]
+}

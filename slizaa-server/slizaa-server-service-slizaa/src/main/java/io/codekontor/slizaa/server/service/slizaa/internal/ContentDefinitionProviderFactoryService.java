@@ -1,0 +1,60 @@
+/**
+ * slizaa-server-service-slizaa - Slizaa Static Software Analysis Tools
+ * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package io.codekontor.slizaa.server.service.slizaa.internal;
+
+import java.util.*;
+
+import javax.annotation.PostConstruct;
+
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * 
+ * @author Gerd W&uuml;therich (gw@code-kontor.io)
+ */
+@Component
+@SuppressWarnings("rawtypes")
+public class ContentDefinitionProviderFactoryService {
+
+  /** the IContentDefinitionProviderFactories */
+  private Map<String, IContentDefinitionProviderFactory<?>> _contentDefinitionProviderFactories;
+
+  @PostConstruct
+  public void initialize() throws Exception {
+
+    _contentDefinitionProviderFactories = new HashMap<String, IContentDefinitionProviderFactory<?>>();
+
+    ServiceLoader<IContentDefinitionProviderFactory> serviceLoader = ServiceLoader
+        .load(IContentDefinitionProviderFactory.class);
+    serviceLoader.forEach(fact -> _contentDefinitionProviderFactories.put(fact.getClass().getName(), fact));
+  }
+
+  public boolean containsContentDefinitionProviderFactory(String key) {
+    return _contentDefinitionProviderFactories.containsKey(key);
+  }
+
+  public IContentDefinitionProviderFactory getContentDefinitionProviderFactory(String key) {
+    return _contentDefinitionProviderFactories.get(key);
+  }
+
+  public Collection<IContentDefinitionProviderFactory<?>> getContentDefinitionProviderFactories() {
+    return _contentDefinitionProviderFactories.values();
+  }
+
+}

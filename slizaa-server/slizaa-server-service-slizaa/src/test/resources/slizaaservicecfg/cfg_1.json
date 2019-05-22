@@ -1,0 +1,14 @@
+{
+  "graphDatabases" : [ "java.util.ArrayList", [ {
+    "port" : 29885,
+    "identifier" : "test",
+    "running" : true,
+    "contentDefinition" : {
+      "factoryId" : "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+      "contentDefinition" : "ant4eclipse:ant4eclipse:jar:0.5.0.rc1"
+    },
+    "hierarchicalGraphs" : [ "java.util.ArrayList", [ {
+      "identifier" : "01"
+    } ] ]
+  } ] ]
+}

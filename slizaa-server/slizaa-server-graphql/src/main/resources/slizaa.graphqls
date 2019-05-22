@@ -1,0 +1,11 @@
+type MapEntry { key: String!, value: String }
+
+# The Query type
+type Query {
+
+}
+
+# The Mutation type
+type Mutation {
+
+}

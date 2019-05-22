@@ -1,0 +1,305 @@
+<!--
+
+    Slizaa Server Parent POM - Slizaa Static Software Analysis Tools
+    Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.3.RELEASE</version>
+    </parent>
+
+    <groupId>io.codekontor.slizaa</groupId>
+    <artifactId>slizaa-server-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Slizaa Server Parent POM</name>
+    <description>Slizaa Static Software Analysis Tools</description>
+    <url>http://www.slizaa.org</url>
+    <inceptionYear>2019</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License version 3.0</name>
+            <url>http://www.gnu.org/licenses/agpl-3.0.html</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>wuetherich</id>
+            <name>Gerd Wuetherich</name>
+            <email>gerd.wuetherich@codekontor.io</email>
+            <url>http://www.codekontor.io</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/code-kontor/slizaa.git</connection>
+        <developerConnection>git@github.com:code-kontor/slizaa.git</developerConnection>
+        <url>https://github.com/code-kontor/slizaa</url>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <kotlin.version>1.3.10</kotlin.version>
+        <version-guava>21.0</version-guava>
+        <version-graphql-java-kickstart>5.8.1</version-graphql-java-kickstart>
+        <version-spring-statemachine>2.0.2.RELEASE</version-spring-statemachine>
+        <version-classgraph>4.1.7</version-classgraph>
+        <version-spring-boot>2.1.4.RELEASE</version-spring-boot>
+        <version-hibernate-validator>5.4.1.Final</version-hibernate-validator>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- hibernate-validator -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${version-hibernate-validator}</version>
+            </dependency>
+
+            <!-- guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${version-guava}</version>
+            </dependency>
+
+            <!-- graphql-java -->
+            <dependency>
+                <groupId>com.graphql-java-kickstart</groupId>
+                <artifactId>graphql-spring-boot-starter</artifactId>
+                <version>${version-graphql-java-kickstart}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.graphql-java-kickstart</groupId>
+                <artifactId>graphiql-spring-boot-starter</artifactId>
+                <version>${version-graphql-java-kickstart}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.graphql-java-kickstart</groupId>
+                <artifactId>graphql-spring-boot-starter-test</artifactId>
+                <version>${version-graphql-java-kickstart}</version>
+            </dependency>
+
+            <!-- spring-boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${version-spring-boot}</version>
+            </dependency>
+
+            <!-- spring-statemachine -->
+            <dependency>
+                <groupId>org.springframework.statemachine</groupId>
+                <artifactId>spring-statemachine-core</artifactId>
+                <version>${version-spring-statemachine}</version>
+            </dependency>
+
+            <!-- classgraph -->
+            <dependency>
+                <groupId>io.github.classgraph</groupId>
+                <artifactId>classgraph</artifactId>
+                <version>${version-classgraph}</version>
+            </dependency>
+
+            <!-- slizaa -->
+            <dependency>
+                <groupId>io.codekontor.slizaa</groupId>
+                <artifactId>slizaa-core-mvnresolver-uber</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.codekontor.slizaa</groupId>
+                <artifactId>slizaa-core-boltclient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.codekontor.slizaa</groupId>
+                <artifactId>slizaa-scanner-spi-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.codekontor.slizaa</groupId>
+                <artifactId>slizaa-scanner-contentdefinition</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.codekontor.slizaa</groupId>
+                <artifactId>slizaa-scanner-cypherregistry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.codekontor.slizaa</groupId>
+                <artifactId>slizaa-hierarchicalgraph-graphdb-mapping-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <header>com/mycila/maven/plugin/license/templates/AGPL-3.txt</header>
+                    <properties>
+                        <owner>Code-Kontor GmbH and others</owner>
+                        <email>slizaa@codekontor.io</email>
+                    </properties>
+                    <excludes>
+                        <exclude>LICENSE.txt</exclude>
+                        <exclude>slizaa-work/**</exclude>
+                        <exclude>app/build/**</exclude>
+                        <exclude>app/node/**</exclude>
+                        <exclude>app/node_modules/**</exclude>
+                        <exclude>**/static/assets/slizaa/**</exclude>
+                    </excludes>
+                    <mapping>
+    					<tsx>SLASHSTAR_STYLE</tsx>
+    					<ts>SLASHSTAR_STYLE</ts>  
+					</mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkLicenseHeader</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-license</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <include>LICENSE.txt</include>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-enforcer-plugin</artifactId>
+		        <version>3.0.0-M2</version>
+		        <executions>
+		          <execution>
+		            <id>enforce-files-exist</id>
+		            <goals>
+		              <goal>enforce</goal>
+		            </goals>
+		            <configuration>
+		              <rules>
+		                <requireFilesExist>
+		                  <files>
+		                   <file>${project.basedir}/LICENSE.txt</file>
+		                  </files>
+		                </requireFilesExist>
+		              </rules>
+		              <fail>true</fail>
+		            </configuration>
+		          </execution>
+		        </executions>
+		      </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <configuration>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                </configuration>
+            </plugin>
+        </plugins>
+        
+        <pluginManagement>
+    		<plugins>
+    			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    			<plugin>
+    				<groupId>org.eclipse.m2e</groupId>
+    				<artifactId>lifecycle-mapping</artifactId>
+    				<version>1.0.0</version>
+    				<configuration>
+    					<lifecycleMappingMetadata>
+    						<pluginExecutions>
+    							<pluginExecution>
+    								<pluginExecutionFilter>
+    									<groupId>com.mycila</groupId>
+    									<artifactId>
+    										license-maven-plugin
+    									</artifactId>
+    									<versionRange>
+    										[3.0,)
+    									</versionRange>
+    									<goals>
+    										<goal>check</goal>
+    									</goals>
+    								</pluginExecutionFilter>
+    								<action>
+    									<ignore></ignore>
+    								</action>
+    							</pluginExecution>
+    						</pluginExecutions>
+    					</lifecycleMappingMetadata>
+    				</configuration>
+    			</plugin>
+    		</plugins>
+    	</pluginManagement>
+    	
+    </build>
+
+</project>

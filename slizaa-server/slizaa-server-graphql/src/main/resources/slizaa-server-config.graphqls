@@ -1,0 +1,43 @@
+# Represents a server extension
+type ServerExtension {
+
+    # the symbolic name of the extension
+    symbolicName: ID!
+
+    # the version of the extension
+    version: String!
+}
+
+type ServerConfiguration {
+
+    # Returns true if the backend contains installed extensions.
+    hasInstalledExtensions: Boolean!
+
+    # Returns the installed server extensions
+    installedExtensions: [ServerExtension]!
+}
+
+# The input type to specify server extensions
+input ServerExtensionIdentifier {
+
+    # the symbolic name of the extension
+    symbolicName: ID!
+
+    # the version of the extension
+    version: String!
+}
+
+extend type Query {
+
+    # Returns the server configuration
+    serverConfiguration: ServerConfiguration!
+
+    # Returns the available server extensions
+    availableServerExtensions: [ServerExtension]!
+}
+
+extend type Mutation {
+
+    # Installs the specified server extensions.
+    installServerExtensions(extensions: [ServerExtensionIdentifier]): [ServerExtension]!
+}

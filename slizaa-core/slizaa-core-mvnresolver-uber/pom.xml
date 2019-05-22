@@ -1,0 +1,138 @@
+<!--
+
+    slizaa-core-mvnresolver-uber - Slizaa Static Software Analysis Tools
+    Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.codekontor.slizaa</groupId>
+		<artifactId>slizaa-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../../slizaa-poms/slizaa-parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>slizaa-core-mvnresolver-uber</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.codekontor.slizaa</groupId>
+			<artifactId>slizaa-core-mvnresolver-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- -->
+			<plugin>
+				<groupId>io.codekontor.slizaa.mojos</groupId>
+				<artifactId>copydependencies-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<targetDirectory>target/classes/libs</targetDirectory>
+					<coords>
+						<coord>io.codekontor.slizaa:slizaa-core-mvnresolver-implementation:1.0.0-SNAPSHOT</coord>
+						<coord>org.slf4j:slf4j-nop:1.7.25</coord>
+						<coord>org.slf4j:slf4j-api:1.7.25</coord>
+					</coords>
+					<excludeArtifactIds>slizaa-core-mvnresolver-api,guava</excludeArtifactIds>
+				</configuration>
+				<executions>
+					<execution>
+						<id>copyDependencies</id>
+						<goals>
+							<goal>copyDependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<!-- put your configurations here -->
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>io.codekontor.slizaa.core:io.codekontor.slizaa.core.mvnresolver.api</include>
+									<include>org.slf4j:*</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>org.slf4j</pattern>
+									<shadedPattern>io.codekontor.slizaa.core.mvnresolver.org.slf4j</shadedPattern>
+								</relocation>
+							</relocations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- -->
+			<plugin>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>bnd-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>bnd-process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
+</project>

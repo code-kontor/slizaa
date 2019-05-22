@@ -1,0 +1,4 @@
+Bundle-SymbolicName: io.codekontor.slizaa.hierarchicalgraph.core.model;singleton:=true
+-exportcontents: io.codekontor.slizaa.hierarchicalgraph*
+-sources: true
+-sourcepath: src, target/workspace/io.codekontor.slizaa.hierarchicalgraph.core.model/src-gen

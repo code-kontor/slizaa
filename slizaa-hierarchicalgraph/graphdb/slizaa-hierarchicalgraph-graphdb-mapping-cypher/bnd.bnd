@@ -1,0 +1,3 @@
+-exportcontents: io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.cypher*
+-sources: true
+-sourcepath: src

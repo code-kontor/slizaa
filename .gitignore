@@ -1,0 +1,8 @@
+target/
+/.metadata/
+/.idea/workspace.xml
+/.project
+/.settings/
+.idea/
+*.iml
+application-dev.properties

@@ -1,0 +1,4 @@
+Export-Package: io.codekontor.slizaa.core.mvnresolver, io.codekontor.slizaa.core.mvnresolver.api
+Import-Package: com.google.common.base,com.google.common.collect,*
+Slizaa-SpiApi: true
+-snapshot: BUILD-${tstamp}

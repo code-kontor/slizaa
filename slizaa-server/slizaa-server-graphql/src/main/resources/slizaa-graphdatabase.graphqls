@@ -1,0 +1,67 @@
+type GraphDatabase {
+
+    identifier: ID!
+ 
+    state: String!
+    
+    availableActions: [String!]!
+    
+    port: Int!
+
+    contentDefinition: ContentDefinition
+    
+    hierarchicalGraphs: [HierarchicalGraph!]!
+    
+    hierarchicalGraph(identifier: ID!): HierarchicalGraph
+}
+
+type HierarchicalGraph {
+
+}
+
+type ContentDefinitionType {
+
+    identifier: ID!
+
+    name: String!
+
+    description: String
+}
+
+type ContentDefinition {
+
+    type: ContentDefinitionType!
+
+	definition: String!
+}
+
+
+# The Query type
+extend type Query {
+
+	contentDefinitionTypes: [ContentDefinitionType!]!
+
+    graphDatabases: [GraphDatabase!]!
+
+    graphDatabase(identifier: ID!): GraphDatabase
+    
+    hierarchicalGraph(databaseIdentifier: ID!, hierarchicalGraphIdentifier: ID!): HierarchicalGraph
+}
+
+# The Mutation type
+extend type Mutation {
+
+    createGraphDatabase(databaseId: ID!): GraphDatabase!
+    
+	parseGraphDatabase(databaseId: ID!): GraphDatabase!
+    
+    startGraphDatabase(databaseId: ID!): GraphDatabase!
+    
+    stopGraphDatabase(databaseId: ID!): GraphDatabase!
+    
+	deleteGraphDatabase(databaseId: ID!): GraphDatabase!
+
+    setGraphDatabaseContentDefinition(databaseId: ID!, contentDefinitionFactoryId: ID!, contentDefinition: String!): GraphDatabase!
+
+    createHierarchicalGraph(databaseId: ID!, hierarchicalGraphId: ID!): GraphDatabase!
+}

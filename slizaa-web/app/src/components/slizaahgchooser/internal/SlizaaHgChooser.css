@@ -1,0 +1,49 @@
+/**
+ * slizaa-web - Slizaa Static Software Analysis Tools
+ * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.slizaaHgChooser {
+    display: "inline-block";
+    float: "right";
+    margin-right: 15px; 
+}
+
+.slizaaHgChooser-dropdown-database {
+    margin-right: 15px; 
+}
+
+.slizaaHgChooser-button {
+    padding: 0px;
+    border-radius: 5px;
+}
+
+.slizaaHgChooser-button-key {
+    height: 100%;
+    padding: 5px 2px 5px 8px;
+    border-radius: 5px 0px 0px 5px;
+    background-color: transparent;
+    color: black;
+}
+
+.slizaaHgChooser-button-value {
+    height: 100%;
+    padding: 5px 8px 5px 2px;
+    border-radius: 5px 0px 0px 5px;
+    background-color: transparent;
+    color: black;
+}
+  

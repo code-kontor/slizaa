@@ -1,0 +1,99 @@
+extend type HierarchicalGraph {
+
+    # Returns the identifier
+    identifier: ID!
+
+	# Returns the identifier
+    globalIdentifier: ID!
+
+    # Returns the root node
+    rootNode: Node!
+
+    # Returns the node with the given id
+    node(id: ID!): Node
+
+    # Returns the nodes with the given ids
+    nodes(ids: [ID]!): NodeSet!
+}
+
+type NodeSet {
+
+	# contained nodes as node array
+	nodes: [Node!]!
+	
+	# the node ids as an array
+	nodeIds: [ID!]!
+	
+	# the dependency matrix
+	dependencyMatrix: DependencyMatrix!  
+	
+	#
+	referencedNodes(includePredecessors: Boolean): NodeSet!
+}
+
+type Node {
+
+    # The symbolicName for this node
+    id: ID!
+
+    # The text label
+    text: String!
+    iconIdentifier: String!
+
+    # The parent node
+    parent: Node
+    predecessors: [Node!]!
+
+    #
+    hasChildren: Boolean!
+
+    # The children
+    children: NodeSet!
+
+    #
+    properties: [MapEntry!]!
+
+    #
+    dependenciesTo(targetNodes: [ID!]!): [Dependency!]!
+}
+
+type Dependency {
+    id: ID!
+    sourceNode: Node!
+    targetNode: Node!
+    weight: Int
+}
+
+
+
+
+type DependencyMatrix {
+    orderedNodes: [Node!]!
+    cells: [Cell!]!
+    stronglyConnectedComponents: [StronglyConnectedComponent!]!
+}
+
+type Cell {
+    row: Int!
+    column: Int!
+    value: Int!
+}
+
+type StronglyConnectedComponent {
+
+	# contained nodes as node array
+	nodes: [Node!]!
+	
+	# the node ids as an array
+	nodeIds: [ID!]!
+	
+	#
+	nodePositions: [Int!]!
+}
+
+# The Query type
+extend type Query {
+
+    svg(identifier: ID!): String!
+}
+

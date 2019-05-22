@@ -1,0 +1,17 @@
+#
+app/node_modules
+app/node
+/target
+/bin
+
+.idea/libraries
+.idea/inspectionProfiles
+.idea/workspace.xml
+
+# production
+/app/build
+
+# misc
+.DS_Store
+
+/slizaa-work/

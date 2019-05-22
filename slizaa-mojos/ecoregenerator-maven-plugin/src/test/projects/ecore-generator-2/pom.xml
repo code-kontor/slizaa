@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    ecoregenerator-maven-plugin - Slizaa Static Software Analysis Tools
+    Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<prerequisites>
+		<maven>3.0.3</maven>
+	</prerequisites>
+
+	<groupId>io.codekontor.slizaa.test</groupId>
+	<artifactId>this-is-for-test-only</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>This is for Test ONLY</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>io.codekontor.slizaa.mojos</groupId>
+				<artifactId>ecoregenerator-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<executions>
+					<execution>
+						<id>generateFromEcore</id>
+						<goals>
+							<goal>generateFromEcore</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<genModel>model/hierarchicalgraph-neo4j.genmodel</genModel>
+					<ecoreModel>model/hierarchicalgraph-neo4j.ecore</ecoreModel>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
