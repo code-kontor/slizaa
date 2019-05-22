@@ -18,15 +18,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-	    <groupId>io.codekontor.slizaa</groupId>
-	    <artifactId>slizaa-server-parent</artifactId>
-	    <version>1.0.0-SNAPSHOT</version>
+		<groupId>io.codekontor.slizaa</groupId>
+		<artifactId>slizaa-server-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../slizaa-poms/slizaa-server-parent/pom.xml</relativePath>
 	</parent>
 
@@ -158,7 +157,19 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>io.codekontor.slizaa.server.web.SlizaaServerWeb</mainClass>
+				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 

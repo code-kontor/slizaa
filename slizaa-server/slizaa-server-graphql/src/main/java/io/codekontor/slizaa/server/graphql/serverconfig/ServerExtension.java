@@ -27,6 +27,10 @@ public class ServerExtension {
     this.symbolicName = symbolicName;
     this.version = version;
   }
+  
+  public ServerExtension() {
+    super();
+  }
 
   public String getSymbolicName() {
     return symbolicName;
@@ -35,4 +39,14 @@ public class ServerExtension {
   public String getVersion() {
     return version;
   }
+
+  void setSymbolicName(String symbolicName) {
+    this.symbolicName = symbolicName;
+  }
+
+  void setVersion(String version) {
+    this.version = version;
+  }
+  
+  
 }
