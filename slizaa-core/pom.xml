@@ -30,6 +30,10 @@
 		<relativePath>../slizaa-poms/slizaa-parent/pom.xml</relativePath>
 	</parent>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
 	<artifactId>slizaa-core</artifactId>
 	<packaging>pom</packaging>
 

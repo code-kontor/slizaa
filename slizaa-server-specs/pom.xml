@@ -32,6 +32,10 @@
     <artifactId>slizaa-server-specs</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <modules>
         <module>slizaa-server-specs-api</module>
     </modules>
