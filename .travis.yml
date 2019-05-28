@@ -15,7 +15,5 @@ env:
   - secure: Z4Z2cNLYwgDiLiATVDBwfoDRW4T8EUJCH+t+9qRN2wobAqI1pbBihO2pfmRh8hC+rAaiR9pBNso2C0RfkYmkpkNxECwp/fflzqlfn+H4doyJvx/lakGrFM0nR/TdhDu7HAhI+AVEuyArFhtWl/VKs7aQAo5qIzaOsVyGCQLnacHdYXbWAL13l/U0Z7k5rS410FA89TkuXH8HJFxiHIuY6vJMeAB07TWmj3Z4aRDx4LfJMtrz+bQnhekAEoGVwH00eolesFC4FWK+bPKUqHiUoAUJRtF1OGXBCkXcs4bbhxSfVt4YPz1YM9lOdX0UTU+dpfbigvFs82Bbs9TGoYIoIa7+Y6NY/uaom8l3D/6/ZBFxAdhzf9lsNCcDFLUTuqp7y5kxU7mFjkjwIC6+rbO/77HLn29gZSZKlLloIlTfSH8dsp8AMq0Dxlw93Xo69QrXtBXvo4xKs8WEojcZoueccdK9ehqxVc/b92yVTJ78cEmflSYFgftlLgcFNkygBajPda8GwNjb5ThWXMUe+wzdYVMP0iw4OToAnndgNQbBJtYkAOMapTjjDywpNe7hh1M7wVNO4Fg0Ume3NgGI6//7glveKQBZ0et0j77yRg2SlrFxxa18ze7b4GIdXQ8zu64v80XMyWp3ISDGsOsz8kiRVvNtcvhsZzELjO/C0x42yDU=
 before_install:
 - openssl aes-256-cbc -K $encrypted_f9ab858c35d9_key -iv $encrypted_f9ab858c35d9_iv
-  -in .travis/pubkey.asc.enc -out .travis/pubkey.asc -d
-- openssl aes-256-cbc -K $encrypted_f9ab858c35d9_key -iv $encrypted_f9ab858c35d9_iv
-  -in .travis/privkey.asc.enc -out .travis/privkey.asc -d
-
+  -in .travis/signingskeys.tar.enc -out .travis/signingskeys.tar -d
+- tar xvf .travis/signingskeys.tar
