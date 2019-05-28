@@ -1,8 +1,12 @@
 jdk:
 - oraclejdk8
 script:
+- gpg2 --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import .travis/signingkey.asc
+- gpg2 --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring
+  --import .travis/signingkey.asc
 - mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-  -P release -B --settings .travis/settings.xml clean deploy
+  -Dgpg.executable=gpg2 -Dgpg.keyname=AEF79D98 -Dgpg.passphrase=$PASSPHRASE -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg 
+  -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg -P release -B --settings .travis/settings.xml clean deploy
 env:
   global:
   - secure: JbiflNizH2nM9unxQzXG5SAaMczj3jYDNClTr3GHMrHslBB86LIlSUCQa/euCPk02rOgs4ZLcp8HgCF2ghVDW5MMfOpzZZ1TmKZHC8CwS4Lsc2rq1xJ4xbzSXg4DdI7zx26FpUVwPLIVhOtcSMDgRX2EDnYawH+okDujQIhryx7SkQSTHDOmy8DJQtcW0QNcYe5bSLIRhyLJcsZwetO1i7e7bxZE7cBAcsNZy2kV56hGpPulMwcjA1YoR1b8X7BukUUuGzleQ/23JmBzKFumnb6dECcdjtcETr3umR5V2accz9xkrpnBgsehZoqXWNDhziuf2ar9UrJX3rRooHaEU7U2BmAqwiVVD1Kl7EiTKEpaBQOHiWnsyngy3O7ayKMsZdnlx/JeJ3hyyrCczFYm8yrygG9V1dkM449B9H2t1eLHjY/u7wselsWiEB7UV++GGU7qa8eoNFqnL1YlhGw/9+p8VJzK8vbkEtc12cSAgcws8Q8rk5GEUEUbWB+HjnfWymPS0At63ADMUyew9Pkv2PPVerweY/fn/ugy1l7iejK0zAv/zWTszFQSg0wJz+i8jbJBrwU4KhuScIiME4Sxp1rBg9dJnKK6EUH23rVd73uar/xMnS7lMLOjsErD/ShOwYmBfJi5BtaXRlu75miyOs+dOAS+z0CD9wvC/6aBAZ8=
