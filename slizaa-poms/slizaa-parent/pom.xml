@@ -425,6 +425,9 @@
 								<configuration>
 									<excludePackageNames>*.internal.*</excludePackageNames>
 									<failOnError>false</failOnError>
+									<configuration>
+										<additionalJOption>-Xdoclint:none</additionalJOption>
+									</configuration>
 								</configuration>
 							</execution>
 						</executions>
