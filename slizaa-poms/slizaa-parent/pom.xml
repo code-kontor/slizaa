@@ -381,13 +381,13 @@
 
 	<profiles>
 		<profile>
-			<id>build-extras</id>
+			<id>release</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<plugins>
-					<plugin>
+					<!--plugin>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<executions>
 							<execution>
@@ -398,20 +398,11 @@
 								</goals>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin -->
 					<plugin>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -424,6 +415,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.1.0</version>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>
@@ -432,6 +424,7 @@
 								</goals>
 								<configuration>
 									<excludePackageNames>*.internal.*</excludePackageNames>
+									<failOnError>false</failOnError>
 								</configuration>
 							</execution>
 						</executions>
