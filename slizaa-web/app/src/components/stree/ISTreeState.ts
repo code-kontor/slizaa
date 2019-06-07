@@ -1,4 +1,4 @@
-/**
+/*
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-li.slizaa-focus > span.ant-tree-node-content-wrapper {
-  background-color: red;
-}
 
-.slizaa-tree {
-  font-size: 12px;
+import { ISlizaaNode } from 'src/model/ISlizaaNode';
+
+export interface ISTreeState {
+    rootNodes: ISlizaaNode[];
+    expandedKeys: string[]; 
+    checkedKeys: string[];
+    focusedNodes: string[];
 }

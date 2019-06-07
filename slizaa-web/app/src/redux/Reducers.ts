@@ -33,10 +33,14 @@ export function appReducer(state: IAppState = defaultState(), action: AppActions
             currentHierarchicalGraph: action.selectedHierarchicalGraphId
         }
     }
-    else if (action.type === "ACTION_SELECT_NODE_SELECTION") {
+    else if (action.type === "ACTION_SET_TREE_NODE_SELECTION_DEPENDENCIES_VIEW") {
         return {
             ...state,
-            currentNodeSelection: { nodeIds: action.selectedNodeIds }
+            currentTreeNodeSelection_DsmView: 
+                {   
+                    exapndedNodeIds: action.expandedNodeIds,
+                    selectedNodeIds: action.selectedNodeIds,
+                }
         }
     }
 

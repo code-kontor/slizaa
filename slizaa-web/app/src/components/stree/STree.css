@@ -1,4 +1,4 @@
-/*
+/**
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,26 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import gql from 'graphql-tag';
+ 
+li.slizaa-focus > span.ant-tree-node-content-wrapper {
+  background-color: red;
+}
 
-export const GQ_ALL_GRAPH_DATABASES = gql`
-  query AllGraphDatabases {
-    graphDatabases {
-      identifier
-      state
-      availableActions
-      port
-      contentDefinition {
-        type {
-          identifier
-          name
-          description
-        }
-        definition
-      }
-      hierarchicalGraphs {
-        identifier
-      }
-    }
-  }
-`;
+.slizaa-tree {
+  font-size: 12px;
+}
+
+.ant-tree-child-tree > li:first-child {
+  padding-top: 0px;
+}

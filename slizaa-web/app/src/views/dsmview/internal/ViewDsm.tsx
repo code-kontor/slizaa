@@ -23,10 +23,10 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Card } from 'src/components/card';
 import { DSM } from 'src/components/dsm';
+import { HierarchicalGraphTree } from 'src/components/hierarchicalgraphtree';
 import { HorizontalSplitLayout, ResizableBox } from 'src/components/layout';
-import SlizaaTree from 'src/components/slizaatree/internal/SlizaaTree';
-import { actionSelectNodeSelection } from 'src/redux/Actions';
-import { IAppState, INodeSelection } from 'src/redux/IAppState';
+import { actionSetTreeNodeSelection_DsmView } from 'src/redux/Actions';
+import { IAppState, ITreeNodeSelection } from 'src/redux/IAppState';
 import { DsmForNodeChildren, DsmForNodeChildrenVariables } from './__generated__/DsmForNodeChildren';
 import { GQ_DSM_FOR_NODE_CHILDREN } from './GqlQueries';
 import './ViewDsm.css';
@@ -34,8 +34,8 @@ import './ViewDsm.css';
 interface IProps {
     databaseId: string
     hierarchicalGraphId: string
-    nodeSelection?: INodeSelection
-    dispatchSelectNodeSelection: (selectedNodeIds: string[]) => void
+    nodeSelection?: ITreeNodeSelection
+    dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => void
 }
 
 interface IState {
@@ -66,12 +66,9 @@ export class ViewDsm extends React.Component<IProps, IState> {
         const queryVariables = {
             databaseId: this.props.databaseId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
-            nodeId: this.props.nodeSelection ? this.props.nodeSelection.nodeIds[0] : "-1"
+            nodeId: this.props.nodeSelection && this.props.nodeSelection.selectedNodeIds && this.props.nodeSelection.selectedNodeIds.length > 0 ? this.props.nodeSelection.selectedNodeIds[0] : "-1"
         };
-
-        // tslint:disable-next-line:no-console
-        console.log(this.props.nodeSelection);
-        const items = this.props.nodeSelection ? this.props.nodeSelection.nodeIds.map(id => <li key={id}>{id}</li>) : null;
+        const items = this.props.nodeSelection ? this.props.nodeSelection.selectedNodeIds.map(id => <li key={id}>{id}</li>) : null;
 
         return (
 
@@ -82,24 +79,28 @@ export class ViewDsm extends React.Component<IProps, IState> {
                             <Card title="Hierarchical Graph" >
                                 <ApolloConsumer>
                                     {cl =>
-                                        <SlizaaTree
+                                        <HierarchicalGraphTree
                                             client={cl}
                                             databaseId={this.props.databaseId}
                                             hierarchicalGraphId={this.props.hierarchicalGraphId}
                                             onSelect={this.onSelect}
                                             onExpand={this.onExpand}
-                                            expandedKeys={[]} />
+                                            expandedKeys={this.props.nodeSelection ? this.props.nodeSelection.exapndedNodeIds : [] } />
                                     }
                                 </ApolloConsumer>
                             </Card>
                         }
                         right={
                             <Card title="Dependencies Overview" >
-                                <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables} fetchPolicy="no-cache">
-                                    {({ loading, data }) => {
+                                <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables} fetchPolicy="no-cache" >
+                                    {({ loading, data, error }) => {
 
                                         if (loading) {
                                             return <Spin size="large" />;
+                                        }
+
+                                        if (error) {
+                                            return <h1>{error.message}</h1>
                                         }
 
                                         if (!data || !data.hierarchicalGraph || !data.hierarchicalGraph.node) {
@@ -132,14 +133,17 @@ export class ViewDsm extends React.Component<IProps, IState> {
     }
 
     private onSelect = (selectedKeys: string[]): void => {
+        
         // tslint:disable-next-line:no-console
-        console.log("selectedKeys Keys: " + selectedKeys);
-        this.props.dispatchSelectNodeSelection(selectedKeys);
+        console.log("selectedKeys" + selectedKeys);
+        
+        const exapndedNodeIds = this.props.nodeSelection ? this.props.nodeSelection.exapndedNodeIds : [];
+        this.props.dispatchSelectNodeSelection(exapndedNodeIds, selectedKeys);
     }
 
     private onExpand = (expandedKeys: string[]): void => {
-        // tslint:disable-next-line:no-console
-        console.log("expanded Keys: " + expandedKeys);
+        const selectedNodeIds = this.props.nodeSelection ? this.props.nodeSelection.selectedNodeIds : [];
+        this.props.dispatchSelectNodeSelection(expandedKeys, selectedNodeIds);
     }
 
     private onWidthChanged = (id: string, newWidth: number): void => {
@@ -160,14 +164,14 @@ const mapStateToProps = (state: IAppState) => {
     return {
         databaseId: state.currentDatabase,
         hierarchicalGraphId: state.currentHierarchicalGraph,
-        nodeSelection: state.currentNodeSelection
+        nodeSelection: state.currentTreeNodeSelection_DsmView
     }
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
-        dispatchSelectNodeSelection: (selectedNodeIds: string[]) => {
-            dispatch(actionSelectNodeSelection(selectedNodeIds));
+        dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => {
+            dispatch(actionSetTreeNodeSelection_DsmView(expandedNodeIds, selectedNodeIds));
         }
     };
 };

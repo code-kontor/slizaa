@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-export interface INodeSelection {
-    nodeIds: string[];
+export interface ITreeNodeSelection {
+    selectedNodeIds: string[];
+    exapndedNodeIds: string[];
 }
 
 export interface IAppState {
     currentDatabase?: string;
     currentHierarchicalGraph?: string;
-    currentNodeSelection?: INodeSelection;
+    currentTreeNodeSelection_DsmView?: ITreeNodeSelection;
 }
 
 export function defaultState() : IAppState {

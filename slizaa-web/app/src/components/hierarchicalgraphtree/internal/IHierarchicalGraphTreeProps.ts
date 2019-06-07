@@ -15,14 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { storiesOf } from '@storybook/react';
-import * as React from 'react';
-import { GraphDbConfigurationEditor } from '../src/components/graphdbconfigurationeditor';
 
-const database = JSON.parse('{  "identifier": "test",  "state": "NOT_RUNNING",  "port": 12806,  "contentDefinition": {    "contentDefinitionType": {      "factoryId": "org.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",      "name": "Maven Based",      "description": ""    },    "definition": "io.vavr:vavr:jar:0.10.0"  },  "hierarchicalGraphs": [ {"identifier": "01"} ]}')
-
-storiesOf('GraphDbConfigurationEditor', module)
-  .add('GraphDbConfigurationEditor', () => (
-      <GraphDbConfigurationEditor graphdatabase={database}/>
-  )
-);
+export interface IHierarchicalGraphTreeProps {
+  databaseId: string
+  hierarchicalGraphId: string
+  expandedKeys?: string[]
+  checkedKeys?: string[]
+  onSelect:  (selectedKeys: string[]) => void
+  onExpand: (expandedKeys: string[]) => void
+}

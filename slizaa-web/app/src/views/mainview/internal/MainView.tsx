@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import { Icon, Layout, Menu } from 'antd';
-import Sider from 'antd/lib/layout/Sider';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter, Link, Route } from 'react-router-dom';
@@ -27,7 +26,6 @@ import { IAppState } from 'src/redux/IAppState';
 import ViewDsm from 'src/views/dsmview/internal/ViewDsm';
 
 import { SelectParam } from 'antd/lib/menu';
-import { SettingsView } from 'src/views/settingsview';
 import './MainView.css';
 import { DependencyVisualisation, SlizaaSvg } from './SlizaaIcons';
 
@@ -78,7 +76,7 @@ export class MainView extends React.Component<IProps, IState> {
             />
           </Layout.Header>
           <Layout>
-            <Sider
+            <Layout.Sider
               theme="dark"
               collapsible={true}
               collapsed={this.state.collapsed}
@@ -96,16 +94,10 @@ export class MainView extends React.Component<IProps, IState> {
                   <span>Dependencies</span>
                   <Link to="/" />
                 </Menu.Item>
-                <Menu.Item key="2">
-                  <Icon type="setting" />
-                  <span>Settings</span>
-                  <Link to="/settings" />
-                </Menu.Item>
               </Menu>
-            </Sider>
+            </Layout.Sider>
             <Layout.Content style={{ padding: 8, minHeight: 280 }}>
               <Route exact={true} path="/" component={ViewDsm} />
-              <Route path="/settings" component={SettingsView} />
             </Layout.Content>
           </Layout>
         </Layout>

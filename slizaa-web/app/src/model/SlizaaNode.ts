@@ -16,12 +16,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface ISlizaaNode {
-    key: string;
-    title: string;
-    iconId: string;
-    hasChildren: boolean;
-    expanded?: boolean;
-    parent?: ISlizaaNode;
-    children?: ISlizaaNode[];
+import { ISlizaaNode } from './ISlizaaNode';
+
+/**
+ * Represents a tree node.
+ */
+export class SlizaaNode implements ISlizaaNode {
+
+    public static createRoot(title: string, iconId: string): SlizaaNode {
+        return new SlizaaNode("-1", title, iconId, true);
+    }
+
+    public static createNode(id: string, title: string, iconId: string, hasChildren: boolean): SlizaaNode {
+        return new SlizaaNode(id, title, iconId, hasChildren);
+    }
+
+    public expanded?: boolean;
+
+    public internalChildren: SlizaaNode[] | undefined;
+
+    private constructor(public key: string, public title: string, public iconId: string, public hasChildren: boolean) { }
+
+    public children(): SlizaaNode[] {
+        return this.internalChildren ? this.internalChildren : [];
+    }
 }

@@ -15,4 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-export { GraphDbConfigurationEditor } from './internal/GraphDbConfigurationEditor';
+
+/**
+ * Represents a tree node.
+ */
+ export interface ISlizaaNode {
+    readonly key: string;
+    readonly title: string;
+    readonly iconId: string;
+    readonly hasChildren: boolean;
+    children(): ISlizaaNode[];
+}
