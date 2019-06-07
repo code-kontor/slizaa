@@ -30,6 +30,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import io.codekontor.slizaa.server.service.slizaa.GraphDatabaseState;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
@@ -39,11 +40,9 @@ import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
  */
 public class GraphDatabaseImpl implements IGraphDatabase {
 
-  public static final String                                     START_DATABASE_AFTER_PARSING  = "START_DATABASE_AFTER_PARSING";
+  public static final String                                     START_DATABASE_AFTER_PARSING = "START_DATABASE_AFTER_PARSING";
 
-  public static final String                                     CONTENT_DEFINITION_FACTORY_ID = "CONTENT_DEFINITION_FACTORY_ID";
-
-  public static final String                                     CONTENT_DEFINITION            = "CONTENT_DEFINITION";
+  public static final String                                     CONTENT_DEFINITION_PROVIDER  = "CONTENT_DEFINITION_PROVIDER";
 
   /** the state machine **/
   private StateMachine<GraphDatabaseState, GraphDatabaseTrigger> _stateMachine;
@@ -79,10 +78,18 @@ public class GraphDatabaseImpl implements IGraphDatabase {
   public void setContentDefinition(String contentDefinitionFactoryId, String contentDefinition) {
 
     //
+    IContentDefinitionProvider<?> contentDefinitionProvider = _stateMachineContext.createContentDefinitionProvider(contentDefinitionFactoryId, contentDefinition);
+
+    //
+    if (contentDefinitionProvider == null) {
+     throw new InvalidContentDefinitionException(String.format("Invalid content definition ('%s', '%s').", contentDefinitionFactoryId, contentDefinition)); 
+    }
+    
+    //
     Message<GraphDatabaseTrigger> triggerMessage = MessageBuilder
         .withPayload(GraphDatabaseTrigger.SET_CONTENT_DEFINITION)
-        .setHeader(CONTENT_DEFINITION_FACTORY_ID, checkNotNull(contentDefinitionFactoryId))
-        .setHeader(CONTENT_DEFINITION, checkNotNull(contentDefinition)).build();
+        .setHeader(CONTENT_DEFINITION_PROVIDER, contentDefinitionProvider)
+        .build();
 
     trigger(triggerMessage);
   }

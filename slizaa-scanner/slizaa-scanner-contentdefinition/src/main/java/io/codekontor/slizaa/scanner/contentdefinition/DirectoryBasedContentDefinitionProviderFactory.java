@@ -17,10 +17,16 @@
  */
 package io.codekontor.slizaa.scanner.contentdefinition;
 
+import java.io.File;
+import java.util.stream.Collectors;
+
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 
 public class DirectoryBasedContentDefinitionProviderFactory implements IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> {
 
+  private final static String PATH_SEPARATOR = File.pathSeparator; 
+  
   @Override
   public String getFactoryId() {
     return DirectoryBasedContentDefinitionProviderFactory.class.getName();
@@ -43,14 +49,29 @@ public class DirectoryBasedContentDefinitionProviderFactory implements IContentD
 
   @Override
   public String toExternalRepresentation(DirectoryBasedContentDefinitionProvider contentDefinitionProvider) {
-    // TODO Auto-generated method stub
-    return null;
+    return contentDefinitionProvider.getDirectoriesWithBinaryArtifacts().stream().map(file -> file.getAbsolutePath()).collect(Collectors.joining(PATH_SEPARATOR));
   }
 
   @Override
   public DirectoryBasedContentDefinitionProvider fromExternalRepresentation(String externalRepresentation) {
-    // TODO Auto-generated method stub
-    return null;
+    
+    //
+    if (externalRepresentation == null) {
+      throw new InvalidContentDefinitionException("Invalid content definition 'null'.");
+    }
+    
+    //
+    String[] filePaths = externalRepresentation.split(PATH_SEPARATOR);
+    
+    //
+    DirectoryBasedContentDefinitionProvider contentDefinitionProvider = new DirectoryBasedContentDefinitionProvider(this);
+    for (String filePath : filePaths) {
+      File file = new File(filePath); 
+      contentDefinitionProvider.add(file);
+    }
+    
+    //
+    return contentDefinitionProvider;
   }
 
   

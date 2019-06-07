@@ -37,9 +37,12 @@ public interface IGraphDatabaseStateMachineContext {
 
   boolean hasPopulatedDatabaseDirectory();
 
+  IContentDefinitionProvider<?> createContentDefinitionProvider(String contentDefinitionFactoryId,
+      String contentDefinition);
+  
   boolean hasContentDefinitionProvider();
-
-  void setContentDefinition(String factoryId, String contentDefinition);
+  
+  void setContentDefinition(IContentDefinitionProvider<?> contentDefinitionProvider);
 
   IContentDefinitionProvider<?> getContentDefinitionProvider();
   

@@ -20,8 +20,6 @@ package io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.factor
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.core.progressmonitor.DefaultProgressMonitor;

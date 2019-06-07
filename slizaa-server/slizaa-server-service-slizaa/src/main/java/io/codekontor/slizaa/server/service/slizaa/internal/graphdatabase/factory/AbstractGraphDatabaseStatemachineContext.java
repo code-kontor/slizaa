@@ -30,8 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinition;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl;
@@ -41,16 +46,19 @@ import io.codekontor.slizaa.server.service.slizaa.internal.hierarchicalgraph.Hie
 
 public abstract class AbstractGraphDatabaseStatemachineContext implements IGraphDatabaseStateMachineContext {
 
+  private static Logger                  LOGGER = LoggerFactory
+      .getLogger(AbstractGraphDatabaseStatemachineContext.class);
+
   private String                         _identifier;
 
   private File                           _databaseDirectory;
 
-  private int                            _port = -1;
+  private int                            _port  = -1;
 
-  private IGraphDatabase                _graphDatabase;
+  private IGraphDatabase                 _graphDatabase;
 
-  private IContentDefinitionProvider<?> _contentDefinitionProvider;
-  
+  private IContentDefinitionProvider<?>  _contentDefinitionProvider;
+
   private SlizaaServiceImpl              _slizaaService;
 
   private Map<String, HierarchicalGraph> _hierarchicalGraphs;
@@ -73,7 +81,7 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   public int getPort() {
     return _port;
   }
-  
+
   public File getDatabaseDirectory() {
     return _databaseDirectory;
   }
@@ -81,26 +89,40 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   public boolean hasPopulatedDatabaseDirectory() {
     return _databaseDirectory.isDirectory() && _databaseDirectory.list().length > 0;
   }
-  
+
   public void setSlizaaService(SlizaaServiceImpl slizaaService) {
     _slizaaService = slizaaService;
   }
-  
-  
+
   public void setGraphDatabase(IGraphDatabase structureDatabase) {
     _graphDatabase = structureDatabase;
   }
-  
+
   public IGraphDatabase getGraphDatabase() {
     return _graphDatabase;
   }
 
-  public void setContentDefinition(String contentDefinitionFactoryId, String contentDefinition) {
-
+  
+  
+  @Override
+  public IContentDefinitionProvider<?> createContentDefinitionProvider(String contentDefinitionFactoryId,
+      String contentDefinition) {
+    
     IContentDefinitionProviderFactory<?> factory = slizaaService()
         .getContentDefinitionProviderFactory(contentDefinitionFactoryId);
 
-    IContentDefinitionProvider<?> contentDefinitionProvider = factory.fromExternalRepresentation(contentDefinition);
+    if (factory == null) {
+      throw new InvalidContentDefinitionException(
+          String.format("Unknown content definintion provider factory '%s'.", contentDefinitionFactoryId));
+    }
+
+    return factory.fromExternalRepresentation(contentDefinition);
+  }
+
+  @Override
+  public void setContentDefinition(IContentDefinitionProvider<?> contentDefinitionProvider) {
+
+    LOGGER.debug("setContentDefinition({})", contentDefinitionProvider);
 
     this._contentDefinitionProvider = contentDefinitionProvider;
   }
@@ -112,13 +134,13 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   public IContentDefinitionProvider<?> getContentDefinitionProvider() {
     return _contentDefinitionProvider;
   }
-  
+
   public void terminate() {
     stop();
     slizaaService().structureDatabases().remove(getIdentifier());
     clearDatabaseDirectory();
   }
-  
+
   public void disposeHierarchicalGraph(String identifier) {
     hierarchicalGraphs().remove(identifier);
   }
@@ -134,13 +156,13 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   public void storeConfiguration() {
     slizaaService().storeConfig();
   }
-  
+
   protected void recomputePort() {
     if (_port == -1 || !SlizaaSocketUtils.available(_port)) {
       _port = SlizaaSocketUtils.findAvailableTcpPort();
     }
   }
-  
+
   protected Map<String, HierarchicalGraph> hierarchicalGraphs() {
     return _hierarchicalGraphs;
   }
@@ -148,7 +170,7 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   protected SlizaaServiceImpl slizaaService() {
     return _slizaaService;
   }
-  
+
   protected void clearDatabaseDirectory() {
     try {
       Files.walk(_databaseDirectory.toPath(), FileVisitOption.FOLLOW_LINKS).sorted(Comparator.reverseOrder())

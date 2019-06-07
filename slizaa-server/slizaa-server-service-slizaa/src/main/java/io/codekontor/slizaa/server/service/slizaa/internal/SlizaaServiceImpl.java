@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.codekontor.slizaa.core.boltclient.IBoltClientFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingService;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
@@ -136,9 +137,11 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
           if (dbConfig.getContentDefinition() != null) {
 
             // set the content definition...
-            graphDatabase.stateMachineContext().setContentDefinition(dbConfig.getContentDefinition().getFactoryId(),
+            IContentDefinitionProvider<?> contentDefinitionProvider = graphDatabase.stateMachineContext().createContentDefinitionProvider(dbConfig.getContentDefinition().getFactoryId(),
                 dbConfig.getContentDefinition().getContentDefinition());
 
+            graphDatabase.stateMachineContext().setContentDefinition(contentDefinitionProvider);
+            
             // ...and start the database
             if (dbConfig.isRunning()) {
               graphDatabase.start();

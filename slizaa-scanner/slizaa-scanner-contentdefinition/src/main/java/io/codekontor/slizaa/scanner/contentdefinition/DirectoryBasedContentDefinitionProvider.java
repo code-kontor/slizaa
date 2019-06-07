@@ -58,7 +58,7 @@ public class DirectoryBasedContentDefinitionProvider extends AbstractContentDefi
   
   @Override
   public String toExternalRepresentation() {
-    return null;
+    return this._contentDefinitionProviderFactory.toExternalRepresentation(this);
   }
 
   /**
@@ -90,6 +90,14 @@ public class DirectoryBasedContentDefinitionProvider extends AbstractContentDefi
   @Override
   protected void onDisposeProjectContent() {
     //
+  }
+
+  /**
+   * 
+   * @return
+   */
+  List<File> getDirectoriesWithBinaryArtifacts() {
+    return _directoriesWithBinaryArtifacts;
   }
 
   /**

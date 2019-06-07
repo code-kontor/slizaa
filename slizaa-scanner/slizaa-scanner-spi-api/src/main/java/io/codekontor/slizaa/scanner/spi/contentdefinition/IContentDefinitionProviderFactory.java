@@ -37,5 +37,5 @@ public interface IContentDefinitionProviderFactory<T extends IContentDefinitionP
   
   String toExternalRepresentation(T contentDefinitionProvider);
   
-  T fromExternalRepresentation(String externalRepresentation);
+  T fromExternalRepresentation(String externalRepresentation) throws InvalidContentDefinitionException;
 }

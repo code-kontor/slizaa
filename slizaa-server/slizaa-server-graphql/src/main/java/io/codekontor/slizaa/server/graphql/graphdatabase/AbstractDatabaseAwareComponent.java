@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.graphql.graphdatabase;
 
+import io.codekontor.slizaa.server.graphql.ErrorMessages;
 import io.codekontor.slizaa.server.graphql.SlizaaGraphQLError;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
@@ -51,16 +52,14 @@ public abstract class AbstractDatabaseAwareComponent {
 
     // check exists
     if (database == null) {
-      // TODO:
+      throw ErrorMessages.newException(ErrorMessages.ERR_NON_EXISTING_DATABASE, databaseId);
     }
 
     //
     try {
       consumer.accept(database);
     } catch (Exception e) {
-      e.printStackTrace();
-      // TODO: ERROR HANDLING
-      // environment.addError(new SlizaaGraphQLError(e.getMessage(), null, null));
+      throw ErrorMessages.newException(e.getMessage());
     }
 
     // return the result

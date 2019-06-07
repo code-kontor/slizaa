@@ -33,6 +33,7 @@ import org.springframework.statemachine.config.builders.StateMachineStateConfigu
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 import org.springframework.statemachine.guard.Guard;
 
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.server.service.slizaa.GraphDatabaseState;
 
 @EnableStateMachineFactory
@@ -158,10 +159,9 @@ public class GraphDatabaseStateMachine
 
   private void setContentDefinition(StateContext<GraphDatabaseState, GraphDatabaseTrigger> stateCtx,
       IGraphDatabaseStateMachineContext ctx) {
-    String contentDefinitionFactoryId = stateCtx.getMessageHeaders()
-        .get(GraphDatabaseImpl.CONTENT_DEFINITION_FACTORY_ID, String.class);
-    String contentDefinition = stateCtx.getMessageHeaders().get(GraphDatabaseImpl.CONTENT_DEFINITION, String.class);
-    ctx.setContentDefinition(contentDefinitionFactoryId, contentDefinition);
+        
+    IContentDefinitionProvider<?> contentDefinitionProvider = stateCtx.getMessageHeaders().get(GraphDatabaseImpl.CONTENT_DEFINITION_PROVIDER, IContentDefinitionProvider.class);
+    ctx.setContentDefinition(contentDefinitionProvider);
   }
 
   private Action<GraphDatabaseState, GraphDatabaseTrigger> actionWithCtx(
