@@ -20,10 +20,71 @@ package io.codekontor.slizaa.server.specs.internal.api;
 import io.codekontor.slizaa.server.specs.api.IServerExtensionSpec;
 import io.codekontor.slizaa.server.specs.internal.model.serverconfig.ServerExtension;
 
-public class ServerExtensionSpec extends ServerExtension implements IServerExtensionSpec {
+public class ServerExtensionSpec {
 
-  public ServerExtensionSpec(String symbolicName, String version) {
-    super(symbolicName, version);
+  private String symbolicName;
+
+  private String version;
+  
+  @SuppressWarnings("unused")
+  private ServerExtension() {
+    //
+  }
+
+  public ServerExtension(String symbolicName, String version) {
+    this.symbolicName = checkNotNull(symbolicName);
+    this.version = checkNotNull(version);
+  }
+
+  public String getSymbolicName() {
+    return symbolicName;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+  
+  @Override
+  public String toString() {
+    return this.getClass().getSimpleName() + " [symbolicName=" + symbolicName + ", version=" + version + "]";
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((symbolicName == null) ? 0 : symbolicName.hashCode());
+    result = prime * result + ((version == null) ? 0 : version.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (! (obj instanceof ServerExtension )) {
+      return false;
+    }
+    ServerExtension other = (ServerExtension) obj;
+    if (symbolicName == null) {
+      if (other.symbolicName != null) {
+        return false;
+      }
+    } else if (!symbolicName.equals(other.symbolicName)) {
+      return false;
+    }
+    if (version == null) {
+      if (other.version != null) {
+        return false;
+      }
+    } else if (!version.equals(other.version)) {
+      return false;
+    }
+    return true;
   }
 
 }

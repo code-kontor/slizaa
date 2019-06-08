@@ -41,9 +41,11 @@
 		<module>slizaa-server-service-backend</module>
 		<module>slizaa-server-service-svg</module>
 		<module>slizaa-server-service-slizaa</module>
+		<module>slizaa-server-service-spec</module>
 		<module>slizaa-server-staticcontent</module>
 		<module>slizaa-server-graphql</module>
 		<module>slizaa-server-main</module>
+		<module>slizaa-server-spec</module>
 	</modules>
 
 </project>
