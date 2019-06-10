@@ -17,26 +17,7 @@
  */
 package io.codekontor.slizaa.server.service.backend.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-
-import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
-
 import com.google.common.io.ByteStreams;
-
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
@@ -45,22 +26,34 @@ import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
+import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import io.codekontor.slizaa.server.service.backend.impl.dao.ISlizaaServerBackendDao;
 import io.codekontor.slizaa.server.service.extensions.IExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * <p>
  * </p>
  */
 @Component
-@Profile("!offline")
-public class SlizaaServerBackendImpl implements IModifiableBackendService, IBackendServiceInstanceProvider {
-
-  @Autowired
-  private ISlizaaServerBackendDao     _slizaaServerBackendDao;
-
-  @Autowired(required = false)
-  private IBackendServiceCallback     _backendServiceCallback;
+@Profile("offline")
+public class OfflineSlizaaServerBackendImpl implements IBackendService, IBackendServiceInstanceProvider {
 
   /* the dynamically loaded extensions */
   private DynamicallyLoadedExtensions _dynamicallyLoadedExtensions;
@@ -69,12 +62,15 @@ public class SlizaaServerBackendImpl implements IModifiableBackendService, IBack
   public void initialize() {
 
     //
-    List<IExtension> installedExtensions = _slizaaServerBackendDao.getInstalledExtensions();
+    Path workingDirectory = Paths.get("").toAbsolutePath();
 
-    //
-    if (!installedExtensions.isEmpty()) {
-      configureBackendFromDao();
-    }
+    System.out.println("Offline installation:");
+    System.out.println(workingDirectory);
+
+//    //
+//    if (!installedExtensions.isEmpty()) {
+//      configureBackendFromDao();
+//    }
   }
 
   @Override
@@ -84,19 +80,7 @@ public class SlizaaServerBackendImpl implements IModifiableBackendService, IBack
 
   @Override
   public List<IExtension> getInstalledExtensions() {
-    return _slizaaServerBackendDao.getInstalledExtensions();
-  }
-
-  @Override
-  public void installExtensions(List<IExtension> extensionsToInstall) {
-
-    checkNotNull(extensionsToInstall);
-
-    if (_backendServiceCallback != null) {
-      _backendServiceCallback.beforeInstallExtensions(extensionsToInstall);
-    }
-
-    updateBackendConfiguration(extensionsToInstall);
+    return Collections.EMPTY_LIST;
   }
 
   @Override
@@ -164,50 +148,50 @@ public class SlizaaServerBackendImpl implements IModifiableBackendService, IBack
     return null;
   }
 
-  protected boolean configureBackendFromDao() {
+//  protected boolean configureBackendFromDao() {
+//
+//    try {
+//
+//      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
+//          dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
+//
+//      this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
+//      this._dynamicallyLoadedExtensions.initialize();
+//
+//      return true;
+//
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      return false;
+//    }
+//  }
 
-    try {
-
-      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-          dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
-
-      this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-      this._dynamicallyLoadedExtensions.initialize();
-
-      return true;
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-  }
-
-  protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
-
-    try {
-
-      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = null;
-
-      if (!extensionsToInstall.isEmpty()) {
-        newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-            dynamicallyLoadExtensions(extensionsToInstall));
-      }
-
-      if (this._dynamicallyLoadedExtensions != null) {
-        this._dynamicallyLoadedExtensions.dispose();
-        this._dynamicallyLoadedExtensions = null;
-      }
-
-      if (!extensionsToInstall.isEmpty()) {
-        this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-        this._dynamicallyLoadedExtensions.initialize();
-      }
-
-      _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
+//  protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
+//
+//    try {
+//
+//      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = null;
+//
+//      if (!extensionsToInstall.isEmpty()) {
+//        newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
+//            dynamicallyLoadExtensions(extensionsToInstall));
+//      }
+//
+//      if (this._dynamicallyLoadedExtensions != null) {
+//        this._dynamicallyLoadedExtensions.dispose();
+//        this._dynamicallyLoadedExtensions = null;
+//      }
+//
+//      if (!extensionsToInstall.isEmpty()) {
+//        this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
+//        this._dynamicallyLoadedExtensions.initialize();
+//      }
+//
+//      _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+//  }
 
   /**
    * <p>
@@ -220,6 +204,6 @@ public class SlizaaServerBackendImpl implements IModifiableBackendService, IBack
     List<URL> urlList = checkNotNull(extensionToDynamicallyLoad).stream()
         .flatMap(ext -> ext.resolvedArtifactsToInstall().stream()).distinct().collect(Collectors.toList());
 
-    return new URLClassLoader(urlList.toArray(new URL[0]), SlizaaServerBackendImpl.class.getClassLoader());
+    return new URLClassLoader(urlList.toArray(new URL[0]), OfflineSlizaaServerBackendImpl.class.getClassLoader());
   }
 }

@@ -193,6 +193,7 @@
 					</properties>
 					<excludes>
 						<exclude>LICENSE.txt</exclude>
+						<exclude>src/main/resources/banner.txt</exclude>
 						<exclude>**/content-mapstruct.txt</exclude>
 						<exclude>slizaa-work/**</exclude>
 						<exclude>app/build/**</exclude>

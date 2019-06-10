@@ -17,39 +17,15 @@
  */
 package io.codekontor.slizaa.server.service.backend;
 
-import java.util.List;
-
 import io.codekontor.slizaa.server.service.extensions.IExtension;
 
-/**
- *
- */
-public interface IBackendService {
+import java.util.List;
 
-  /**
-   *
-   * @return
-   */
-  boolean hasInstalledExtensions();
+public interface IModifiableBackendService extends IBackendService {
 
-  /**
-   *
-   * @return
-   */
-  List<IExtension> getInstalledExtensions();
-
-
-
-  /**
-   *
-   * @return
-   */
-  ClassLoader getCurrentExtensionClassLoader();
-
-  /**
-   * 
-   * @param path
-   * @return
-   */
-  byte[] loadResourceFromExtensions(String path);
+    /**
+     *
+     * @param extensions
+     */
+    void installExtensions(List<IExtension> extensions);
 }

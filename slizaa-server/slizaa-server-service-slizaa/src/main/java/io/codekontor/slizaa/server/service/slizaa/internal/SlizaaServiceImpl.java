@@ -227,11 +227,14 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
       throw new RuntimeException();
     }
 
-    //
+    // create the result
+    IGraphDatabase result = createStructureDatabaseIfAbsent(identifier, SlizaaSocketUtils.findAvailableTcpPort());
+
+    // store the configuration
     storeConfig();
 
-    //
-    return createStructureDatabaseIfAbsent(identifier, SlizaaSocketUtils.findAvailableTcpPort());
+    // and return the result
+    return result;
   }
 
   @Override

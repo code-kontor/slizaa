@@ -41,7 +41,7 @@ public class ServerBackend_InstallExtensionsTest extends AbstractServerBackendTe
       .withDependency(new MvnDependency("NOT_THERE:NOT_THERE:1.0.0-SNAPSHOT"));
 
   //
-  private IBackendService  _backend;
+  private SlizaaServerBackendImpl  _backend;
 
   @Before
   public void before() {

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import org.springframework.core.io.FileSystemResource;
 
 import com.google.common.io.ByteStreams;
@@ -35,7 +36,7 @@ import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
 import io.codekontor.slizaa.server.service.extensions.IExtension;
 
-public class DummyBackendService implements IBackendService, IBackendServiceInstanceProvider {
+public class DummyBackendService implements IModifiableBackendService, IBackendServiceInstanceProvider {
 
   @Override
   public boolean hasInstalledExtensions() {
@@ -49,11 +50,6 @@ public class DummyBackendService implements IBackendService, IBackendServiceInst
 
   @Override
   public void installExtensions(List<IExtension> extensions) {
-    // ignore
-  }
-
-  @Override
-  public void installAllExtensions() {
     // ignore
   }
 

@@ -20,6 +20,8 @@ package io.codekontor.slizaa.server.graphql.serverconfig;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.server.service.backend.IBackendService;
+import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,7 +53,11 @@ public class ServerConfigMutation implements GraphQLMutationResolver {
     List<IExtension> extensions = slizaaService.getExtensionService().getExtensions(extensionIds);
 
     // ... and install it
-    slizaaService.getBackendService().installExtensions(extensions);
+    IBackendService backendService = slizaaService.getBackendService();
+
+    if (backendService  instanceof IModifiableBackendService) {
+      ((IModifiableBackendService) backendService).installExtensions(extensions);
+    }
 
     //
     return extensions.stream().map(ext -> new ServerExtension(ext.getSymbolicName(), ext.getVersion().toString()))
