@@ -6,3 +6,5 @@ target/
 .idea/
 *.iml
 application-dev.properties
+spring-shell.log
+slizaa-work/

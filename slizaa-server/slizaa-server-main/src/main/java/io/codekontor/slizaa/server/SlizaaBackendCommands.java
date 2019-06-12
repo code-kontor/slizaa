@@ -51,7 +51,7 @@ public class SlizaaBackendCommands {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Available Backend Extensions:\n");
         _extensionService.getExtensions().forEach(extension -> {
-            stringBuffer.append(String.format(" - %1$s_%2$s (Symbolic name: %1$s, version: %2$s)\n", extension.getSymbolicName(), extension.getVersion()));
+            stringBuffer.append(format(extension));
         });
         return stringBuffer.toString();
     }
@@ -62,7 +62,7 @@ public class SlizaaBackendCommands {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Installed Backend Extensions:\n");
         _backendService.getInstalledExtensions().forEach(extension -> {
-            stringBuffer.append(extension +  "\n");
+            stringBuffer.append(format(extension));
         });
 
 
@@ -96,7 +96,7 @@ public class SlizaaBackendCommands {
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Installed Backend Extensions:\n");
         _modifiableBackendService.getInstalledExtensions().forEach(extension -> {
-            stringBuffer.append(extension +  "\n");
+            stringBuffer.append(format(extension));
         });
 
 
@@ -120,5 +120,9 @@ public class SlizaaBackendCommands {
         stringBuffer.append("Can not execute command.\n");
         stringBuffer.append(msg + "\n");
         return stringBuffer.toString();
+    }
+
+    private String format(IExtension extension) {
+        return String.format(" - %1$s_%2$s (Symbolic name: %1$s, version: %2$s)\n", extension.getSymbolicName(), extension.getVersion());
     }
 }

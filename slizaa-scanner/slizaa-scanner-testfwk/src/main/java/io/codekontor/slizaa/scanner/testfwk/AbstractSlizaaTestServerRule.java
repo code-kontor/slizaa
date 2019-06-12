@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import io.codekontor.mvnresolver.api.IMvnResolverService;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverService.IMvnResolverJob;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
@@ -59,7 +59,7 @@ public abstract class AbstractSlizaaTestServerRule implements TestRule {
   private ITestFwkBackEnd           _testFwkBackEnd;
 
   /** - */
-  private Consumer<IMvnResolverJob> _backEndLoaderConfigurer;
+  private Consumer<IMvnResolverService.IMvnResolverJob> _backEndLoaderConfigurer;
 
   /**
    * <p>
@@ -68,7 +68,7 @@ public abstract class AbstractSlizaaTestServerRule implements TestRule {
    *
    * @param backendLoaderConfigurer
    */
-  public AbstractSlizaaTestServerRule(Consumer<IMvnResolverJob> backendLoaderConfigurer) {
+  public AbstractSlizaaTestServerRule(Consumer<IMvnResolverService.IMvnResolverJob> backendLoaderConfigurer) {
     this(createDatabaseDirectory(), backendLoaderConfigurer);
   }
 
@@ -80,7 +80,7 @@ public abstract class AbstractSlizaaTestServerRule implements TestRule {
    * @param workingDirectory
    * @param backendLoaderConfigurer
    */
-  public AbstractSlizaaTestServerRule(File workingDirectory, Consumer<IMvnResolverJob> backendLoaderConfigurer) {
+  public AbstractSlizaaTestServerRule(File workingDirectory, Consumer<IMvnResolverService.IMvnResolverJob> backendLoaderConfigurer) {
     this._databaseDirectory = checkNotNull(workingDirectory);
     this._backEndLoaderConfigurer = backendLoaderConfigurer;
     this._extensionClasses = new ArrayList<Class<?>>();

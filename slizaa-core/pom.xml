@@ -40,10 +40,6 @@
 	<modules>
 		<module>slizaa-core-boltclient</module>
 		<module>slizaa-core-boltclient-testfwk</module>
-		<module>slizaa-core-mvnresolver-api</module>
-		<module>slizaa-core-mvnresolver-implementation</module>
-		<module>slizaa-core-mvnresolver-uber</module>
-		<module>slizaa-core-mvnresolver-itest</module>
 		<module>slizaa-core-progressmonitor</module>
 	</modules>
 

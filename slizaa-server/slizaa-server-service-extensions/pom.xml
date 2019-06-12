@@ -47,8 +47,8 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
         <dependency>
-            <groupId>io.codekontor.slizaa</groupId>
-            <artifactId>slizaa-core-mvnresolver-uber</artifactId>
+            <groupId>io.codekontor.mvnresolver</groupId>
+            <artifactId>mvnresolver-uber</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

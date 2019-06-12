@@ -17,7 +17,7 @@
  */
 package io.codekontor.slizaa.scanner.testfwk;
 
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverService.IMvnResolverJob;
+import io.codekontor.mvnresolver.api.IMvnResolverService;
 import io.codekontor.slizaa.core.progressmonitor.DefaultProgressMonitor;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
@@ -58,7 +58,7 @@ public class SlizaaTestServerRule extends AbstractSlizaaTestServerRule {
    * @param backEndLoaderConfigurer
    */
   public SlizaaTestServerRule(IContentDefinitionProvider contentDefinitionProvider,
-      Consumer<IMvnResolverJob> backEndLoaderConfigurer) {
+      Consumer<IMvnResolverService.IMvnResolverJob> backEndLoaderConfigurer) {
 
     //
     super(backEndLoaderConfigurer);
@@ -77,7 +77,7 @@ public class SlizaaTestServerRule extends AbstractSlizaaTestServerRule {
    * @param backEndLoaderConfigurer
    */
   public SlizaaTestServerRule(File workingDirectory, IContentDefinitionProvider contentDefinitionProvider,
-      Consumer<IMvnResolverJob> backEndLoaderConfigurer) {
+      Consumer<IMvnResolverService.IMvnResolverJob> backEndLoaderConfigurer) {
 
     //
     super(workingDirectory, backEndLoaderConfigurer);

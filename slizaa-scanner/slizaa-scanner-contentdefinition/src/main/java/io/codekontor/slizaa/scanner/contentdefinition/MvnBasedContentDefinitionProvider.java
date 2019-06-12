@@ -24,9 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.codekontor.slizaa.core.mvnresolver.MvnResolverServiceFactoryFactory;
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnCoordinate;
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverService;
+import io.codekontor.mvnresolver.MvnResolverServiceFactoryFactory;
+import io.codekontor.mvnresolver.api.IMvnCoordinate;
+import io.codekontor.mvnresolver.api.IMvnResolverService;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
@@ -44,7 +44,7 @@ public class MvnBasedContentDefinitionProvider
   private List<IMvnCoordinate>                                                       _mavenCoordinates;
 
   /** - */
-  private final IMvnResolverService                                                  resolverService;
+  private final IMvnResolverService resolverService;
 
   /** - */
   private final IContentDefinitionProviderFactory<MvnBasedContentDefinitionProvider> _contentDefinitionProviderFactory;

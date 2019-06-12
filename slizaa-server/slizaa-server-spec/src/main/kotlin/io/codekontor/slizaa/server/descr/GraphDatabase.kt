@@ -20,7 +20,7 @@ package io.codekontor.slizaa.server.descr
 data class GraphDatabase(
         val identifier: String,
         val contentDefinition: ContentDefinition?,
-        val hierarchicalGraphSpec: List<HierarchicalGraph>,
+        val hierarchicalGraphs: List<HierarchicalGraph>,
         val state: String,
         val port : Int,
         val availableActions : List<String>) {

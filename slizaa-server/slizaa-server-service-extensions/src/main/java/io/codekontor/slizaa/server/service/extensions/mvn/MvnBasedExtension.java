@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import io.codekontor.slizaa.core.mvnresolver.MvnResolverServiceFactoryFactory;
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverService;
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverServiceFactory;
+import io.codekontor.mvnresolver.MvnResolverServiceFactoryFactory;
+import io.codekontor.mvnresolver.api.IMvnResolverService;
+import io.codekontor.mvnresolver.api.IMvnResolverServiceFactory;
 import io.codekontor.slizaa.server.service.extensions.ExtensionIdentifier;
 import io.codekontor.slizaa.server.service.extensions.IExtension;
 import io.codekontor.slizaa.server.service.extensions.Version;

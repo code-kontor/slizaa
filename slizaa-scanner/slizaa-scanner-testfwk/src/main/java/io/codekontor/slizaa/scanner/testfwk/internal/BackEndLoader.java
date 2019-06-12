@@ -18,8 +18,8 @@
 package io.codekontor.slizaa.scanner.testfwk.internal;
 
 
-import io.codekontor.slizaa.core.mvnresolver.MvnResolverServiceFactoryFactory;
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverService;
+import io.codekontor.mvnresolver.MvnResolverServiceFactoryFactory;
+import io.codekontor.mvnresolver.api.IMvnResolverService;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
