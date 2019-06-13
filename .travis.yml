@@ -1,8 +1,8 @@
 jdk:
 - openjdk8
 script:
-- gpg2 --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --no-default-keyring --import .travis/pubkey.asc
-- gpg2 --allow-secret-key-import --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring
+- gpg2 --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --batch --passphrase $PASSPHRASE --no-default-keyring --import .travis/pubkey.asc
+- gpg2 --allow-secret-key-import --batch --passphrase $PASSPHRASE --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring
   --import .travis/privkey.asc
 - mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
   -Dgpg.executable=gpg2 -Dgpg.keyname=AEF79D98 -Dgpg.passphrase=$PASSPHRASE -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg
