@@ -27,7 +27,8 @@
 				</repository>
 			</repositories>
 		</profile>      
-	</profile>
+	</profiles>
+	
 	<activeProfiles>
     	<activeProfile>release</activeProfile>
   	</activeProfiles>
