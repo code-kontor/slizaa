@@ -17,35 +17,25 @@
  */
 package io.codekontor.slizaa.server.service.backend.impl;
 
-import com.google.common.io.ByteStreams;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
-import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
-import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
-import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
-import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
-import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
-import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
-import io.codekontor.slizaa.server.service.backend.impl.dao.ISlizaaServerBackendDao;
 import io.codekontor.slizaa.server.service.extensions.IExtension;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.codekontor.slizaa.server.service.extensions.directory.DirectoryBasedExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  * <p>
@@ -53,157 +43,43 @@ import static com.google.common.base.Preconditions.checkState;
  */
 @Component
 @Profile("offline")
-public class OfflineSlizaaServerBackendImpl implements IBackendService, IBackendServiceInstanceProvider {
+public class OfflineSlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl implements IBackendService, IBackendServiceInstanceProvider {
 
-  /* the dynamically loaded extensions */
-  private DynamicallyLoadedExtensions _dynamicallyLoadedExtensions;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OfflineSlizaaServerBackendImpl.class);
 
-  @PostConstruct
-  public void initialize() {
+    private List<IExtension> _directoryBasedExtensions;
 
-    //
-    Path workingDirectory = Paths.get("").toAbsolutePath();
+    @PostConstruct
+    public void initialize() {
 
-    System.out.println("Offline installation:");
-    System.out.println(workingDirectory);
+        //
+        _directoryBasedExtensions = new ArrayList<>();
 
-//    //
-//    if (!installedExtensions.isEmpty()) {
-//      configureBackendFromDao();
-//    }
-  }
+        Path workingDirectory = Paths.get("backend-extensions").toAbsolutePath();
+        if (workingDirectory.toFile().exists() && workingDirectory.toFile().isDirectory()) {
 
-  @Override
-  public ClassLoader getCurrentExtensionClassLoader() {
-    return _dynamicallyLoadedExtensions != null ? _dynamicallyLoadedExtensions.getClassLoader() : null;
-  }
+            try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(workingDirectory)) {
 
-  @Override
-  public List<IExtension> getInstalledExtensions() {
-    return Collections.EMPTY_LIST;
-  }
+                //
+                for (Path path : directoryStream) {
+                    DirectoryBasedExtension directoryBasedExtension = DirectoryBasedExtension.createDirectoryBasedExtension(path.toFile());
+                    if (directoryBasedExtension != null) {
+                        _directoryBasedExtensions.add(directoryBasedExtension);
+                    }
+                }
 
-  @Override
-  public boolean hasInstalledExtensions() {
-    return _dynamicallyLoadedExtensions != null;
-  }
+                // finally update the configuration
+                this.updateBackendConfiguration(_directoryBasedExtensions);
 
-  @Override
-  public boolean hasModelImporterFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.hasModelImporterFactory();
-  }
-
-  @Override
-  public IModelImporterFactory getModelImporterFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getModelImporterFactory();
-  }
-
-  @Override
-  public boolean hasGraphDbFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.hasGraphDbFactory();
-  }
-
-  @Override
-  public IGraphDbFactory getGraphDbFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getGraphDbFactory();
-  }
-
-  @Override
-  public ICypherStatementRegistry getCypherStatementRegistry() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getCypherStatementRegistry();
-  }
-
-  @Override
-  public List<IParserFactory> getParserFactories() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getParserFactories();
-  }
-
-  @Override
-  public List<IMappingProvider> getMappingProviders() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getMappingProviders();
-  }
-
-  @Override
-  public byte[] loadResourceFromExtensions(String path) {
-
-    if (hasInstalledExtensions()) {
-
-      ClassPathResource imgFile = new ClassPathResource(path, getCurrentExtensionClassLoader());
-
-      if (imgFile.exists()) {
-        try {
-          return ByteStreams.toByteArray(imgFile.getInputStream());
-        } catch (IOException e) {
-          e.printStackTrace();
+            } catch (IOException ex) {
+                LOGGER.warn("Could not load extensions form extension directory.", ex);
+            }
         }
-      }
+
     }
-    return null;
-  }
 
-//  protected boolean configureBackendFromDao() {
-//
-//    try {
-//
-//      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-//          dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
-//
-//      this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-//      this._dynamicallyLoadedExtensions.initialize();
-//
-//      return true;
-//
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      return false;
-//    }
-//  }
-
-//  protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
-//
-//    try {
-//
-//      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = null;
-//
-//      if (!extensionsToInstall.isEmpty()) {
-//        newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-//            dynamicallyLoadExtensions(extensionsToInstall));
-//      }
-//
-//      if (this._dynamicallyLoadedExtensions != null) {
-//        this._dynamicallyLoadedExtensions.dispose();
-//        this._dynamicallyLoadedExtensions = null;
-//      }
-//
-//      if (!extensionsToInstall.isEmpty()) {
-//        this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-//        this._dynamicallyLoadedExtensions.initialize();
-//      }
-//
-//      _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
-//  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  private static ClassLoader dynamicallyLoadExtensions(List<IExtension> extensionToDynamicallyLoad) {
-
-    List<URL> urlList = checkNotNull(extensionToDynamicallyLoad).stream()
-        .flatMap(ext -> ext.resolvedArtifactsToInstall().stream()).distinct().collect(Collectors.toList());
-
-    return new URLClassLoader(urlList.toArray(new URL[0]), OfflineSlizaaServerBackendImpl.class.getClassLoader());
-  }
+    @Override
+    public List<IExtension> getInstalledExtensions() {
+        return Collections.unmodifiableList(_directoryBasedExtensions);
+    }
 }

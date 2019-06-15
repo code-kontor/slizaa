@@ -194,7 +194,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   @Override
   public boolean hasGraphDatabases() {
     checkConfigured();
-    return _structureDatabases != null;
+    return _structureDatabases != null && !_structureDatabases.isEmpty();
   }
 
   @Override

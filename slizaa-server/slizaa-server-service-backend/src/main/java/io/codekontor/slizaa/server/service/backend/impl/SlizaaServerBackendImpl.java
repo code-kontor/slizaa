@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
@@ -54,172 +56,74 @@ import io.codekontor.slizaa.server.service.extensions.IExtension;
  */
 @Component
 @Profile("!offline")
-public class SlizaaServerBackendImpl implements IModifiableBackendService, IBackendServiceInstanceProvider {
+public class SlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl implements IModifiableBackendService, IBackendServiceInstanceProvider {
 
-  @Autowired
-  private ISlizaaServerBackendDao     _slizaaServerBackendDao;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlizaaServerBackendImpl.class);
 
-  @Autowired(required = false)
-  private IBackendServiceCallback     _backendServiceCallback;
+    @Autowired
+    private ISlizaaServerBackendDao _slizaaServerBackendDao;
 
-  /* the dynamically loaded extensions */
-  private DynamicallyLoadedExtensions _dynamicallyLoadedExtensions;
+    @Autowired(required = false)
+    private IBackendServiceCallback _backendServiceCallback;
 
-  @PostConstruct
-  public void initialize() {
+    /* the dynamically loaded extensions */
+    private DynamicallyLoadedExtensions _dynamicallyLoadedExtensions;
 
-    //
-    List<IExtension> installedExtensions = _slizaaServerBackendDao.getInstalledExtensions();
+    @PostConstruct
+    public void initialize() {
 
-    //
-    if (!installedExtensions.isEmpty()) {
-      configureBackendFromDao();
-    }
-  }
+        //
+        List<IExtension> installedExtensions = _slizaaServerBackendDao.getInstalledExtensions();
 
-  @Override
-  public ClassLoader getCurrentExtensionClassLoader() {
-    return _dynamicallyLoadedExtensions != null ? _dynamicallyLoadedExtensions.getClassLoader() : null;
-  }
-
-  @Override
-  public List<IExtension> getInstalledExtensions() {
-    return _slizaaServerBackendDao.getInstalledExtensions();
-  }
-
-  @Override
-  public void installExtensions(List<IExtension> extensionsToInstall) {
-
-    checkNotNull(extensionsToInstall);
-
-    if (_backendServiceCallback != null) {
-      _backendServiceCallback.beforeInstallExtensions(extensionsToInstall);
-    }
-
-    updateBackendConfiguration(extensionsToInstall);
-  }
-
-  @Override
-  public boolean hasInstalledExtensions() {
-    return _dynamicallyLoadedExtensions != null;
-  }
-
-  @Override
-  public boolean hasModelImporterFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.hasModelImporterFactory();
-  }
-
-  @Override
-  public IModelImporterFactory getModelImporterFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getModelImporterFactory();
-  }
-
-  @Override
-  public boolean hasGraphDbFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.hasGraphDbFactory();
-  }
-
-  @Override
-  public IGraphDbFactory getGraphDbFactory() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getGraphDbFactory();
-  }
-
-  @Override
-  public ICypherStatementRegistry getCypherStatementRegistry() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getCypherStatementRegistry();
-  }
-
-  @Override
-  public List<IParserFactory> getParserFactories() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getParserFactories();
-  }
-
-  @Override
-  public List<IMappingProvider> getMappingProviders() {
-    checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
-    return _dynamicallyLoadedExtensions.getMappingProviders();
-  }
-
-  @Override
-  public byte[] loadResourceFromExtensions(String path) {
-
-    if (hasInstalledExtensions()) {
-
-      ClassPathResource imgFile = new ClassPathResource(path, getCurrentExtensionClassLoader());
-
-      if (imgFile.exists()) {
-        try {
-          return ByteStreams.toByteArray(imgFile.getInputStream());
-        } catch (IOException e) {
-          e.printStackTrace();
+        //
+        if (!installedExtensions.isEmpty()) {
+            configureBackendFromDao();
         }
-      }
     }
-    return null;
-  }
 
-  protected boolean configureBackendFromDao() {
-
-    try {
-
-      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-          dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
-
-      this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-      this._dynamicallyLoadedExtensions.initialize();
-
-      return true;
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
+    @Override
+    public List<IExtension> getInstalledExtensions() {
+        return _slizaaServerBackendDao.getInstalledExtensions();
     }
-  }
 
-  protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
+    @Override
+    public void installExtensions(List<IExtension> extensionsToInstall) {
 
-    try {
+        checkNotNull(extensionsToInstall);
 
-      DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = null;
+        if (_backendServiceCallback != null) {
+            _backendServiceCallback.beforeInstallExtensions(extensionsToInstall);
+        }
 
-      if (!extensionsToInstall.isEmpty()) {
-        newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-            dynamicallyLoadExtensions(extensionsToInstall));
-      }
-
-      if (this._dynamicallyLoadedExtensions != null) {
-        this._dynamicallyLoadedExtensions.dispose();
-        this._dynamicallyLoadedExtensions = null;
-      }
-
-      if (!extensionsToInstall.isEmpty()) {
-        this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-        this._dynamicallyLoadedExtensions.initialize();
-      }
-
-      _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
-    } catch (Exception e) {
-      e.printStackTrace();
+        updateBackendConfiguration(extensionsToInstall);
     }
-  }
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  private static ClassLoader dynamicallyLoadExtensions(List<IExtension> extensionToDynamicallyLoad) {
+    @Override
+    public boolean hasInstalledExtensions() {
+        return _dynamicallyLoadedExtensions != null;
+    }
 
-    List<URL> urlList = checkNotNull(extensionToDynamicallyLoad).stream()
-        .flatMap(ext -> ext.resolvedArtifactsToInstall().stream()).distinct().collect(Collectors.toList());
+    protected boolean configureBackendFromDao() {
 
-    return new URLClassLoader(urlList.toArray(new URL[0]), SlizaaServerBackendImpl.class.getClassLoader());
-  }
+        try {
+
+            DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
+                    dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
+
+            this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
+            this._dynamicallyLoadedExtensions.initialize();
+
+            return true;
+
+        } catch (Exception ex) {
+            LOGGER.error("Could not load extensions from backend data store.", ex);
+            return false;
+        }
+    }
+
+    @Override
+    protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
+        super.updateBackendConfiguration(extensionsToInstall);
+        _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
+    }
 }

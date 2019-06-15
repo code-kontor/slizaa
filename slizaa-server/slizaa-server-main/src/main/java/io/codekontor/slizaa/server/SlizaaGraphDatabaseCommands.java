@@ -20,6 +20,7 @@ package io.codekontor.slizaa.server;
 import io.codekontor.slizaa.server.descr.ContentDefinition;
 import io.codekontor.slizaa.server.descr.GraphDatabase;
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
+import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class SlizaaGraphDatabaseCommands {
     @Autowired
     private ISlizaaService _slizaaService;
 
-    @ShellMethod(value = "List all configured graph databases.", key="listDBs")
+    @ShellMethod(value = "List all configured graph databases.", key = "listDBs")
     public String listDBs() {
 
         // check the backend configuration
@@ -52,13 +53,19 @@ public class SlizaaGraphDatabaseCommands {
         return dumpGraphDatabases();
     }
 
-    @ShellMethod(value = "Create a new graph databases.", key="createDB")
+    @ShellMethod(value = "Create a new graph databases.", key = "createDB")
     public String createDB(String identifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
         if (checkBackendConfigured != null) {
             return checkBackendConfigured;
+        }
+
+        // check that the requested database exists
+        String checkDatabaseDoesNotExist = checkDatabaseDoesNotExist(identifier);
+        if (checkDatabaseDoesNotExist != null) {
+            return checkDatabaseDoesNotExist;
         }
 
         //
@@ -69,31 +76,62 @@ public class SlizaaGraphDatabaseCommands {
 
     }
 
+    @ShellMethod(value = "Delete an existing graph database.", key = "deleteDB")
+    public String deleteDB(String identifier) {
+
+        // check the backend configuration
+        String checkBackendConfigured = checkBackendConfigured();
+        if (checkBackendConfigured != null) {
+            return checkBackendConfigured;
+        }
+
+        // check that the requested database exists
+        String checkDatabaseExists = checkDatabaseExists(identifier);
+        if (checkDatabaseExists != null) {
+            return checkDatabaseExists;
+        }
+
+        //
+        IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
+        graphDatabase.terminate();
+
+        // return the result
+        StringBuffer result = new StringBuffer();
+        result.append(String.format("Successfully deleted graph database '%s'.\n", identifier));
+        result.append(dumpGraphDatabases());
+        return result.toString();
+
+    }
+
     @NotNull
     private String dumpGraphDatabases() {
         //
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Graph Databases:\n");
+        StringBuffer stringBuffer = new StringBuffer("Graph Databases:\n");
 
-        _slizaaService.getGraphDatabases().forEach(db -> {
+        if (_slizaaService.hasGraphDatabases()) {
 
-            ContentDefinition contentDefinition =
-                    db.getContentDefinition() != null ?
-                        new ContentDefinition(
-                            db.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId(),
-                            db.getContentDefinition().toExternalRepresentation()) :
-                        null;
+            _slizaaService.getGraphDatabases().forEach(db -> {
 
-            GraphDatabase graphDatabase = new GraphDatabase(
-                    db.getIdentifier(),
-                    contentDefinition,
-                    Collections.emptyList(),
-                    db.getState().name(),
-                    db.getPort(),
-                    Collections.emptyList());
+                ContentDefinition contentDefinition =
+                        db.getContentDefinition() != null ?
+                                new ContentDefinition(
+                                        db.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId(),
+                                        db.getContentDefinition().toExternalRepresentation()) :
+                                null;
 
-            stringBuffer.append(" - " + graphDatabase.toString() + "\n");
-        });
+                GraphDatabase graphDatabase = new GraphDatabase(
+                        db.getIdentifier(),
+                        contentDefinition,
+                        Collections.emptyList(),
+                        db.getState().name(),
+                        db.getPort(),
+                        Collections.emptyList());
+
+                stringBuffer.append(" - " + graphDatabase.toString() + "\n");
+            });
+        } else {
+            stringBuffer.append("No database configured.\n");
+        }
 
         return stringBuffer.toString();
     }
@@ -106,6 +144,22 @@ public class SlizaaGraphDatabaseCommands {
     private String checkBackendConfigured() {
         if (!_slizaaService.getBackendService().hasInstalledExtensions()) {
             return cannotExecuteCommand("The Slizaa Server has not been configured properly: There are not installed backend extensions.\n");
+        }
+        return null;
+    }
+
+    private String checkDatabaseExists(String identifier) {
+        IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
+        if (graphDatabase == null) {
+            return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", identifier));
+        }
+        return null;
+    }
+
+    private String checkDatabaseDoesNotExist(String identifier) {
+        IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
+        if (graphDatabase != null) {
+            return cannotExecuteCommand(String.format("The specified database '%s' already exists.\n", identifier));
         }
         return null;
     }

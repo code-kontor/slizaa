@@ -23,10 +23,8 @@ import io.codekontor.slizaa.server.service.extensions.IExtension;
 import io.codekontor.slizaa.server.service.extensions.IExtensionIdentifier;
 import io.codekontor.slizaa.server.service.extensions.IExtensionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.shell.standard.ShellCommandGroup;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.Availability;
+import org.springframework.shell.standard.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +43,7 @@ public class SlizaaBackendCommands {
     private IExtensionService _extensionService;
 
     @ShellMethod(value = "List all available backend extensions.", key="listAvailableExtensions")
+    @ShellMethodAvailability("availabilityCheck")
     public String listAvailableExtensions() {
 
         //
@@ -70,6 +69,7 @@ public class SlizaaBackendCommands {
     }
 
     @ShellMethod(value = "Install backend extensions.", key="installExtensions")
+    @ShellMethodAvailability("availabilityCheck")
     public String installExtensions(@ShellOption({"-e", "--extensions"}) String[] extensions) {
 
         // fail fast
@@ -101,6 +101,12 @@ public class SlizaaBackendCommands {
 
 
         return stringBuffer.toString();
+    }
+
+    public Availability availabilityCheck() {
+        return _modifiableBackendService != null
+                ? Availability.available()
+                : Availability.unavailable("an offline backend is not modifiable.");
     }
 
     /**

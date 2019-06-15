@@ -3,6 +3,7 @@ target/
 /.idea/workspace.xml
 /.project
 /.settings/
+/backend-extensions
 .idea/
 *.iml
 application-dev.properties
