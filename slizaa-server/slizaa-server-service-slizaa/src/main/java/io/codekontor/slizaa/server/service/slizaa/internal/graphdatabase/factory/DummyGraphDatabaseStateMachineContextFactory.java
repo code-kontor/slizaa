@@ -33,9 +33,6 @@ public class DummyGraphDatabaseStateMachineContextFactory implements IGraphDatab
   @Override
   public IGraphDatabaseStateMachineContext createGraphDatabaseStateMachineContext(String id, File databaseDirectory,
       int port) {
-    
-    System.out.println("************************ USING DummyGraphDatabaseStateMachineContextFactory ");
-    
     return new DummyGraphDatabaseStateMachineContext(id, databaseDirectory, port, _slizaaService);
   }
 }

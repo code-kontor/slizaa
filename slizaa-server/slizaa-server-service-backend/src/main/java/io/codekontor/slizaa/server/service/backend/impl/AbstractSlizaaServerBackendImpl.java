@@ -151,21 +151,25 @@ public abstract class AbstractSlizaaServerBackendImpl implements IBackendService
 
         checkNotNull(extensionsToInstall);
 
-        DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = null;
+        try {
+            DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = null;
 
-        if (!extensionsToInstall.isEmpty()) {
-            newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-                    dynamicallyLoadExtensions(extensionsToInstall));
-        }
+            if (!extensionsToInstall.isEmpty()) {
+                newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
+                        dynamicallyLoadExtensions(extensionsToInstall));
+            }
 
-        if (this._dynamicallyLoadedExtensions != null) {
-            this._dynamicallyLoadedExtensions.dispose();
-            this._dynamicallyLoadedExtensions = null;
-        }
+            if (this._dynamicallyLoadedExtensions != null) {
+                this._dynamicallyLoadedExtensions.dispose();
+                this._dynamicallyLoadedExtensions = null;
+            }
 
-        if (!extensionsToInstall.isEmpty()) {
-            this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-            this._dynamicallyLoadedExtensions.initialize();
+            if (!extensionsToInstall.isEmpty()) {
+                this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
+                this._dynamicallyLoadedExtensions.initialize();
+            }
+        } catch (Exception exception) {
+            LOGGER.error("Could not load extensions.", exception);
         }
     }
 }

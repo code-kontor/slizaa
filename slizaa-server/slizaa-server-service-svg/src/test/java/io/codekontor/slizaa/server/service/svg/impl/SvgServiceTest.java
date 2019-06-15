@@ -76,9 +76,9 @@ public class SvgServiceTest {
     document = XMLWriterDOM.read(_backendService.loadResourceFromExtensions("icons/private_ovr.svg"));
     overlaySvgIcon.setUpperLeftNodes(document.getDocumentElement().getChildNodes());
 
-    System.out.println();
+/*    System.out.println();
     System.out.println(overlaySvgIcon.create());
-    System.out.println();
+    System.out.println();*/
 
 //    for (int i = 0; i < nodeList.getLength(); i++) {
 //      

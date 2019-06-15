@@ -66,18 +66,13 @@ public class SlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl imp
     @Autowired(required = false)
     private IBackendServiceCallback _backendServiceCallback;
 
-    /* the dynamically loaded extensions */
-    private DynamicallyLoadedExtensions _dynamicallyLoadedExtensions;
-
     @PostConstruct
     public void initialize() {
 
         //
         List<IExtension> installedExtensions = _slizaaServerBackendDao.getInstalledExtensions();
-
-        //
         if (!installedExtensions.isEmpty()) {
-            configureBackendFromDao();
+            updateBackendConfiguration(installedExtensions);
         }
     }
 
@@ -98,28 +93,23 @@ public class SlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl imp
         updateBackendConfiguration(extensionsToInstall);
     }
 
-    @Override
-    public boolean hasInstalledExtensions() {
-        return _dynamicallyLoadedExtensions != null;
-    }
-
-    protected boolean configureBackendFromDao() {
-
-        try {
-
-            DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
-                    dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
-
-            this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
-            this._dynamicallyLoadedExtensions.initialize();
-
-            return true;
-
-        } catch (Exception ex) {
-            LOGGER.error("Could not load extensions from backend data store.", ex);
-            return false;
-        }
-    }
+//    protected boolean configureBackendFromDao() {
+//
+//        try {
+//
+//            DynamicallyLoadedExtensions newDynamicallyLoadedExtensions = new DynamicallyLoadedExtensions(
+//                    dynamicallyLoadExtensions(_slizaaServerBackendDao.getInstalledExtensions()));
+//
+//            this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
+//            this._dynamicallyLoadedExtensions.initialize();
+//
+//            return true;
+//
+//        } catch (Exception ex) {
+//            LOGGER.error("Could not load extensions from backend data store.", ex);
+//            return false;
+//        }
+//    }
 
     @Override
     protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {

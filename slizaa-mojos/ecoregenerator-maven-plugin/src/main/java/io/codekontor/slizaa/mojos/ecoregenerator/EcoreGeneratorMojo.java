@@ -154,7 +154,7 @@ public class EcoreGeneratorMojo extends AbstractMojo {
 
         // Generator model code.
         generator.generate(genModel, GenBaseGeneratorAdapter.MODEL_PROJECT_TYPE,
-            new MonitorToMavenLogAdapter(this.getLog()));
+            new NullMonitor());
 
         // add the model directory
         String modelDirectory = new File(this.project.getBuild().getDirectory()).getName() + File.separator

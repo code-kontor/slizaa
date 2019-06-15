@@ -44,6 +44,6 @@ public class SpecTest {
         ByteArrayOutputStream byteArrayOutputStream  = new ByteArrayOutputStream();
         YamlMapper.INSTANCE.writeYml(byteArrayOutputStream, slizaaServerSpec);
 
-        System.out.println(byteArrayOutputStream);
+//        System.out.println(byteArrayOutputStream);
     }
 }
