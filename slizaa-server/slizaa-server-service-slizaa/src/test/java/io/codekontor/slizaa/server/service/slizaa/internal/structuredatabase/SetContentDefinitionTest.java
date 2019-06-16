@@ -62,7 +62,7 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
         // create a new database and parse with start
         database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
 
-        database.setContentDefinition(
+        database.setContentDefinitionProvider(
                 "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
                 "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
@@ -70,12 +70,12 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
         await().atMost(60, TimeUnit.SECONDS).until(() -> GraphDatabaseState.NOT_RUNNING.equals(database.getState()));
 
         // reset the content is allowed
-        database.setContentDefinition(
+        database.setContentDefinitionProvider(
                 "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
                 "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
         // reset the content is allowed
-        database.setContentDefinition(
+        database.setContentDefinitionProvider(
                 "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
                 "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
@@ -83,7 +83,7 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
         await().atMost(60, TimeUnit.SECONDS).until(() -> GraphDatabaseState.RUNNING.equals(database.getState()));
 
         try {
-            database.setContentDefinition(
+            database.setContentDefinitionProvider(
                     "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
                     "ant4eclipse:ant4eclipse:0.5.0.rc1");
             Assert.fail();

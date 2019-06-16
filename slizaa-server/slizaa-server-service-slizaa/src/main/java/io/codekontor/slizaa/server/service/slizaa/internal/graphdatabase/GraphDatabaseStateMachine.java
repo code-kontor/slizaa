@@ -70,7 +70,6 @@ public class GraphDatabaseStateMachine
       .withExternal()
         .source(GraphDatabaseState.INITIAL)
         .target(GraphDatabaseState.NOT_RUNNING)
-        // TODO: CONTENT DEFINITION SET?
         .guard(guardWithCtx(ctx -> ctx.hasPopulatedDatabaseDirectory()))
         .and()
       .withExternal()

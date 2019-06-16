@@ -70,7 +70,7 @@ public class SlizaaBackendCommands {
 
     @ShellMethod(value = "Install backend extensions.", key="installExtensions")
     @ShellMethodAvailability("availabilityCheck")
-    public String installExtensions(@ShellOption({"-e", "--extensions"}) String[] extensions) {
+    public String installExtensions(String[] extensions) {
 
         // fail fast
         if (_modifiableBackendService == null) {

@@ -75,7 +75,7 @@ public class GraphDatabaseImpl implements IGraphDatabase {
   }
 
   @Override
-  public void setContentDefinition(String contentDefinitionFactoryId, String contentDefinition) {
+  public void setContentDefinitionProvider(String contentDefinitionFactoryId, String contentDefinition) {
 
     //
     IContentDefinitionProvider<?> contentDefinitionProvider = _stateMachineContext.createContentDefinitionProvider(contentDefinitionFactoryId, contentDefinition);

@@ -54,7 +54,7 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
 
     // create a new database and parse with start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-    structureDatabase.setContentDefinition(
+    structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
     structureDatabase.parse(true);
@@ -68,7 +68,7 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
 
     // create a new database and parse without start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-    structureDatabase.setContentDefinition(
+    structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
     structureDatabase.parse(false);
@@ -82,7 +82,7 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
 
     // create a new database and parse without start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-    structureDatabase.setContentDefinition(
+    structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
     structureDatabase.parse(true);
@@ -98,7 +98,7 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
 
     // create a new database and parse without start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-    structureDatabase.setContentDefinition(
+    structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
     structureDatabase.parse(true);

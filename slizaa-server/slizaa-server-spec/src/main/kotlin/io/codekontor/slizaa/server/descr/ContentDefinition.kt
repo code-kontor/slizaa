@@ -17,4 +17,4 @@
  */
 package io.codekontor.slizaa.server.descr
 
-data class ContentDefinition(val type: String, val definition: String)
+data class ContentDefinition(val factoryId: String, val definition: String)

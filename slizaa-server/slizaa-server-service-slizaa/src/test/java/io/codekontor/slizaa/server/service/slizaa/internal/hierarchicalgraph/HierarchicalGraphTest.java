@@ -53,7 +53,7 @@ public class HierarchicalGraphTest extends AbstractSlizaaServiceTest {
       _structureDatabase = _slizaaService.newGraphDatabase(STRUCTURE_DATABASE_NAME);
 
       // configure
-      _structureDatabase.setContentDefinition(
+      _structureDatabase.setContentDefinitionProvider(
           "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
           "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
 

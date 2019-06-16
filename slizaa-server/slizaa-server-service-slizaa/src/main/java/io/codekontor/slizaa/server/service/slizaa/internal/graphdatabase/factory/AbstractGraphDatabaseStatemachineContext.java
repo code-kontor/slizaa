@@ -121,7 +121,7 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   @Override
   public void setContentDefinition(IContentDefinitionProvider<?> contentDefinitionProvider) {
 
-    LOGGER.debug("setContentDefinition({})", contentDefinitionProvider);
+    LOGGER.debug("setContentDefinitionProvider({})", contentDefinitionProvider);
 
     this._contentDefinitionProvider = contentDefinitionProvider;
   }

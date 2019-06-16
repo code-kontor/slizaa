@@ -72,7 +72,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
     // create a new database and parse with start
     database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
 
-    database.setContentDefinition("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+    database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(IGraphDatabase.GraphDatabaseAction.PARSE, IGraphDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION,
@@ -85,7 +85,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
     // create a new database and parse with start
     database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
 
-    database.setContentDefinition("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+    database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     database.parse(true);
@@ -102,7 +102,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
     // create a new database and parse with start
     database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
 
-    database.setContentDefinition("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+    database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     database.parse(false);

@@ -63,7 +63,7 @@ public interface IGraphDatabase extends IHierarchicalGraphContainer {
    * @param contentDefinitionFactoryId
    * @param contentDefinition
    */
-  void setContentDefinition(String contentDefinitionFactoryId, String contentDefinition);
+  void setContentDefinitionProvider(String contentDefinitionFactoryId, String contentDefinition);
 
   /**
    * <p>
@@ -107,7 +107,7 @@ public interface IGraphDatabase extends IHierarchicalGraphContainer {
    */
   public enum GraphDatabaseAction {
 
-    SET_CONTENT_DEFINITION("setContentDefinition"), PARSE("parse"), START("start"), STOP("stop"), DELETE(
+    SET_CONTENT_DEFINITION("setContentDefinitionProvider"), PARSE("parse"), START("start"), STOP("stop"), DELETE(
         "delete");
 
     public String getName() {

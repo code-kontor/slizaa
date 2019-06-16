@@ -63,7 +63,7 @@ public class GraphDatabaseMutation extends AbstractDatabaseAwareComponent implem
       String contentDefinition, DataFetchingEnvironment environment) {
 
     return executeOnDatabase(environment, databaseId, database -> {
-      database.setContentDefinition(contentDefinitionFactoryId, contentDefinition);
+      database.setContentDefinitionProvider(contentDefinitionFactoryId, contentDefinition);
     });
   }
 
