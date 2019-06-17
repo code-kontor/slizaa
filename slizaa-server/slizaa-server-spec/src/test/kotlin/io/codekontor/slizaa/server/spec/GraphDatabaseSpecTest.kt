@@ -37,7 +37,7 @@ class TestSource() {
                  """---
                     |identifier: "hello"
                     |contentDefinition:
-                    |  type: "Type"
+                    |  factoryId: "Type"
                     |  definition: "Definition"
                     |running: true
                     |forceRebuild: true
@@ -58,7 +58,7 @@ class TestSource() {
                 """---
                     |identifier: "hello"
                     |contentDefinition:
-                    |  type: "Type"
+                    |  factoryId: "Type"
                     |  definition: "Definition"
                     |running: true
                     |forceRebuild: true
