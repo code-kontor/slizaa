@@ -82,7 +82,7 @@ public class SlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl imp
     }
 
     @Override
-    public void installExtensions(List<IExtension> extensionsToInstall) {
+    public boolean installExtensions(List<IExtension> extensionsToInstall) {
 
         checkNotNull(extensionsToInstall);
 
@@ -90,7 +90,7 @@ public class SlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl imp
             _backendServiceCallback.beforeInstallExtensions(extensionsToInstall);
         }
 
-        updateBackendConfiguration(extensionsToInstall);
+        return updateBackendConfiguration(extensionsToInstall);
     }
 
 //    protected boolean configureBackendFromDao() {
@@ -112,8 +112,11 @@ public class SlizaaServerBackendImpl extends AbstractSlizaaServerBackendImpl imp
 //    }
 
     @Override
-    protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
-        super.updateBackendConfiguration(extensionsToInstall);
-        _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
+    protected boolean updateBackendConfiguration(List<IExtension> extensionsToInstall) {
+        boolean result = super.updateBackendConfiguration(extensionsToInstall);
+        if (result) {
+            _slizaaServerBackendDao.saveInstalledExtensions(extensionsToInstall);
+        }
+        return result;
     }
 }

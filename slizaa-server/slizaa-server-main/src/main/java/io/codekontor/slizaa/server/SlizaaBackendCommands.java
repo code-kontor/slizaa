@@ -17,12 +17,8 @@
  */
 package io.codekontor.slizaa.server;
 
-import io.codekontor.slizaa.server.service.backend.IBackendService;
-import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import io.codekontor.slizaa.server.service.extensions.IExtension;
 import io.codekontor.slizaa.server.service.extensions.IExtensionIdentifier;
-import io.codekontor.slizaa.server.service.extensions.IExtensionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.*;
 
@@ -31,16 +27,7 @@ import java.util.List;
 
 @ShellComponent
 @ShellCommandGroup("Slizaa Backend Commands")
-public class SlizaaBackendCommands {
-
-    @Autowired(required = false)
-    private IModifiableBackendService _modifiableBackendService;
-
-    @Autowired
-    private IBackendService _backendService;
-
-    @Autowired
-    private IExtensionService _extensionService;
+public class SlizaaBackendCommands extends AbstractGraphDatabaseCommandComponent{
 
     @ShellMethod(value = "List all available backend extensions.", key="listAvailableExtensions")
     @ShellMethodAvailability("availabilityCheck")
@@ -49,8 +36,8 @@ public class SlizaaBackendCommands {
         //
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Available Backend Extensions:\n");
-        _extensionService.getExtensions().forEach(extension -> {
-            stringBuffer.append(format(extension));
+        extensionService().getExtensions().forEach(extension -> {
+            stringBuffer.append(formatExtension(extension));
         });
         return stringBuffer.toString();
     }
@@ -60,8 +47,8 @@ public class SlizaaBackendCommands {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Installed Backend Extensions:\n");
-        _backendService.getInstalledExtensions().forEach(extension -> {
-            stringBuffer.append(format(extension));
+        backendService().getInstalledExtensions().forEach(extension -> {
+            stringBuffer.append(formatExtension(extension));
         });
 
 
@@ -73,7 +60,7 @@ public class SlizaaBackendCommands {
     public String installExtensions(String[] extensions) {
 
         // fail fast
-        if (_modifiableBackendService == null) {
+        if (!hasModifiableBackendService()) {
             return cannotExecuteCommand("Backend is not modifiable.");
         }
 
@@ -90,13 +77,13 @@ public class SlizaaBackendCommands {
         }
 
        //
-       List<IExtension> extensionsToInstall = _extensionService.getExtensions(extensionIdList);
-       _modifiableBackendService.installExtensions(extensionsToInstall);
+       List<IExtension> extensionsToInstall = extensionService().getExtensions(extensionIdList);
+       modifiableBackendService().installExtensions(extensionsToInstall);
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Installed Backend Extensions:\n");
-        _modifiableBackendService.getInstalledExtensions().forEach(extension -> {
-            stringBuffer.append(format(extension));
+        modifiableBackendService().getInstalledExtensions().forEach(extension -> {
+            stringBuffer.append(formatExtension(extension));
         });
 
 
@@ -104,31 +91,12 @@ public class SlizaaBackendCommands {
     }
 
     public Availability availabilityCheck() {
-        return _modifiableBackendService != null
+        return modifiableBackendService() != null
                 ? Availability.available()
                 : Availability.unavailable("an offline backend is not modifiable.");
     }
 
-    /**
-     * Checks if the backend is configured properly.
-     *
-     * @return <code>true</code> if the backend is configured properly.
-     */
-    private String checkBackendConfigured() {
-        if (!_backendService.hasInstalledExtensions()) {
-            return cannotExecuteCommand("The Slizaa Server has not been configured properly: There are not installed backend extensions.\n");
-        }
-        return null;
-    }
-
-    private String cannotExecuteCommand(String msg) {
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Can not execute command.\n");
-        stringBuffer.append(msg + "\n");
-        return stringBuffer.toString();
-    }
-
-    private String format(IExtension extension) {
+    private String formatExtension(IExtension extension) {
         return String.format(" - %1$s_%2$s (Symbolic name: %1$s, version: %2$s)\n", extension.getSymbolicName(), extension.getVersion());
     }
 }

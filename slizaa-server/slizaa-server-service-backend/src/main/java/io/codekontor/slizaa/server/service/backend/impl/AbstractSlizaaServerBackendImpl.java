@@ -147,7 +147,7 @@ public abstract class AbstractSlizaaServerBackendImpl implements IBackendService
      *
      * @param extensionsToInstall
      */
-    protected void updateBackendConfiguration(List<IExtension> extensionsToInstall) {
+    protected boolean updateBackendConfiguration(List<IExtension> extensionsToInstall) {
 
         checkNotNull(extensionsToInstall);
 
@@ -168,8 +168,10 @@ public abstract class AbstractSlizaaServerBackendImpl implements IBackendService
                 this._dynamicallyLoadedExtensions = newDynamicallyLoadedExtensions;
                 this._dynamicallyLoadedExtensions.initialize();
             }
+            return true;
         } catch (Exception exception) {
             LOGGER.error("Could not load extensions.", exception);
+            return false;
         }
     }
 }

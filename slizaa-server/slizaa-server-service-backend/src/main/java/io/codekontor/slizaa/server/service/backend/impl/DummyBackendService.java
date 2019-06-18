@@ -49,8 +49,9 @@ public class DummyBackendService implements IModifiableBackendService, IBackendS
   }
 
   @Override
-  public void installExtensions(List<IExtension> extensions) {
+  public boolean installExtensions(List<IExtension> extensions) {
     // ignore
+    return false;
   }
 
   @Override

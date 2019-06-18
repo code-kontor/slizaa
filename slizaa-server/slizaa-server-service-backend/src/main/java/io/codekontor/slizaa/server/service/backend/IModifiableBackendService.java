@@ -27,5 +27,5 @@ public interface IModifiableBackendService extends IBackendService {
      *
      * @param extensions
      */
-    void installExtensions(List<IExtension> extensions);
+    boolean installExtensions(List<IExtension> extensions);
 }
