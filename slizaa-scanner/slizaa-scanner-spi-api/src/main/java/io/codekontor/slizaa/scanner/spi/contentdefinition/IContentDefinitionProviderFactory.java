@@ -25,8 +25,10 @@ public interface IContentDefinitionProviderFactory<T extends IContentDefinitionP
    */
   String getFactoryId();
   
+  String getShortForm();
+
   String getName();
-  
+
   /**
    * 
    * @return

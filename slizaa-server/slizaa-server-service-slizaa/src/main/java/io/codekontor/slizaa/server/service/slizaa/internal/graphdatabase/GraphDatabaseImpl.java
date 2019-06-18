@@ -80,6 +80,10 @@ public class GraphDatabaseImpl implements IGraphDatabase {
     //
     IContentDefinitionProvider<?> contentDefinitionProvider = _stateMachineContext.createContentDefinitionProvider(contentDefinitionFactoryId, contentDefinition);
 
+    if (contentDefinitionProvider == null) {
+      contentDefinitionProvider = _stateMachineContext.createContentDefinitionProvider(contentDefinitionFactoryId, contentDefinition);
+    }
+
     //
     if (contentDefinitionProvider == null) {
      throw new InvalidContentDefinitionException(String.format("Invalid content definition ('%s', '%s').", contentDefinitionFactoryId, contentDefinition)); 

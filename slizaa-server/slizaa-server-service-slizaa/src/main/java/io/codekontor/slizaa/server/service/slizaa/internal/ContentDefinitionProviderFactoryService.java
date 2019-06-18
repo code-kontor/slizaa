@@ -25,36 +25,51 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProv
 import org.springframework.stereotype.Component;
 
 /**
- * 
  * @author Gerd W&uuml;therich (gw@code-kontor.io)
  */
 @Component
 @SuppressWarnings("rawtypes")
 public class ContentDefinitionProviderFactoryService {
 
-  /** the IContentDefinitionProviderFactories */
-  private Map<String, IContentDefinitionProviderFactory<?>> _contentDefinitionProviderFactories;
+    // the IContentDefinitionProviderFactories
+    private Map<String, IContentDefinitionProviderFactory<?>> _contentDefinitionProviderFactories;
 
-  @PostConstruct
-  public void initialize() throws Exception {
+    // the IContentDefinitionProviderFactories
+    private Map<String, IContentDefinitionProviderFactory<?>> _contentDefinitionProviderFactoriesByShortForm;
 
-    _contentDefinitionProviderFactories = new HashMap<String, IContentDefinitionProviderFactory<?>>();
+    @PostConstruct
+    public void initialize() throws Exception {
 
-    ServiceLoader<IContentDefinitionProviderFactory> serviceLoader = ServiceLoader
-        .load(IContentDefinitionProviderFactory.class);
-    serviceLoader.forEach(fact -> _contentDefinitionProviderFactories.put(fact.getClass().getName(), fact));
-  }
+        _contentDefinitionProviderFactories = new HashMap<String, IContentDefinitionProviderFactory<?>>();
+        _contentDefinitionProviderFactoriesByShortForm = new HashMap<String, IContentDefinitionProviderFactory<?>>();
 
-  public boolean containsContentDefinitionProviderFactory(String key) {
-    return _contentDefinitionProviderFactories.containsKey(key);
-  }
+        ServiceLoader<IContentDefinitionProviderFactory> serviceLoader = ServiceLoader
+                .load(IContentDefinitionProviderFactory.class);
 
-  public IContentDefinitionProviderFactory getContentDefinitionProviderFactory(String key) {
-    return _contentDefinitionProviderFactories.get(key);
-  }
+        serviceLoader.forEach(fact -> {
+            _contentDefinitionProviderFactories.put(fact.getClass().getName(), fact);
+            _contentDefinitionProviderFactoriesByShortForm.put(fact.getShortForm(), fact);
+        });
+    }
 
-  public Collection<IContentDefinitionProviderFactory<?>> getContentDefinitionProviderFactories() {
-    return _contentDefinitionProviderFactories.values();
-  }
+    public boolean containsContentDefinitionProviderFactory(String key) {
+        return _contentDefinitionProviderFactories.containsKey(key);
+    }
+
+    public IContentDefinitionProviderFactory getContentDefinitionProviderFactory(String key) {
+        return _contentDefinitionProviderFactories.get(key);
+    }
+
+    public boolean containsContentDefinitionProviderFactoryByShortForm(String key) {
+        return _contentDefinitionProviderFactories.containsKey(key);
+    }
+
+    public IContentDefinitionProviderFactory getContentDefinitionProviderFactoryByShortForm(String key) {
+        return _contentDefinitionProviderFactoriesByShortForm.get(key);
+    }
+
+    public Collection<IContentDefinitionProviderFactory<?>> getContentDefinitionProviderFactories() {
+        return _contentDefinitionProviderFactories.values();
+    }
 
 }

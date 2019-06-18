@@ -35,6 +35,11 @@ public class MvnBasedContentDefinitionProviderFactory
   }
 
   @Override
+  public String getShortForm() {
+    return "mvn";
+  }
+
+  @Override
   public String getName() {
     return "Maven Based";
   }

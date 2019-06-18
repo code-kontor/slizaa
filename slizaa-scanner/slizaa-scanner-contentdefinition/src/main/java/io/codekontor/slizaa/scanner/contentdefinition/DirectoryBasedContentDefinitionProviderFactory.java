@@ -33,6 +33,11 @@ public class DirectoryBasedContentDefinitionProviderFactory implements IContentD
   }
 
   @Override
+  public String getShortForm() {
+    return "directory";
+  }
+
+  @Override
   public String getName() {
     return "Directory based";
   }

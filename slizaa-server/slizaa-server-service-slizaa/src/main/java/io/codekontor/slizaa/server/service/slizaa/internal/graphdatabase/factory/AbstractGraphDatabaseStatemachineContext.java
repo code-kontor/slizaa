@@ -101,8 +101,6 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
     return _graphDatabase;
   }
 
-  
-  
   @Override
   public IContentDefinitionProvider<?> createContentDefinitionProvider(String contentDefinitionFactoryId,
       String contentDefinition) {

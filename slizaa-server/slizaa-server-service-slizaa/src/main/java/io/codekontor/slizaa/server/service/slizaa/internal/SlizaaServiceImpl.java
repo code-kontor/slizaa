@@ -34,6 +34,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.swing.text.GapContent;
 
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.codekontor.slizaa.core.boltclient.IBoltClientFactory;
@@ -140,8 +141,19 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
             IContentDefinitionProvider<?> contentDefinitionProvider = graphDatabase.stateMachineContext().createContentDefinitionProvider(dbConfig.getContentDefinition().getFactoryId(),
                 dbConfig.getContentDefinition().getContentDefinition());
 
+            if (contentDefinitionProvider == null) {
+              contentDefinitionProvider = graphDatabase.stateMachineContext().createContentDefinitionProvider(dbConfig.getContentDefinition().getFactoryId(),
+                      dbConfig.getContentDefinition().getContentDefinition());
+            }
+
+            //
+            if (contentDefinitionProvider == null) {
+              throw new InvalidContentDefinitionException(String.format("Invalid content definition ('%s', '%s').", dbConfig.getContentDefinition().getFactoryId(),
+                      dbConfig.getContentDefinition().getContentDefinition()));
+            }
+
             graphDatabase.stateMachineContext().setContentDefinition(contentDefinitionProvider);
-            
+
             // ...and start the database
             if (dbConfig.isRunning()) {
               graphDatabase.start();
@@ -272,7 +284,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   }
 
   /**
-   * 
+   *
    * @return
    */
   public IBackendServiceInstanceProvider getInstanceProvider() {
@@ -280,7 +292,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   }
 
   /**
-   * 
+   *
    * @return
    */
   public IBoltClientFactory getBoltClientFactory() {
@@ -288,7 +300,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   }
 
   /**
-   * 
+   *
    * @return
    */
   public IMappingService getMappingService() {
@@ -297,6 +309,19 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
   public ConcurrentHashMap<String, IGraphDatabase> structureDatabases() {
     return _structureDatabases;
+  }
+
+  public IContentDefinitionProviderFactory<?> getContentDefinitionProviderFactory(String contentDefinitionFactoryId) {
+
+    IContentDefinitionProviderFactory<?> result = _contentDefinitionProviderFactoryService
+            .getContentDefinitionProviderFactory(checkNotNull(contentDefinitionFactoryId));
+
+    if (result == null) {
+      result = _contentDefinitionProviderFactoryService
+        .getContentDefinitionProviderFactoryByShortForm(contentDefinitionFactoryId);
+    }
+
+    return result;
   }
 
   private GraphDatabaseImpl createStructureDatabaseIfAbsent(String identifier, int port) {
@@ -308,10 +333,5 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     if (!this._backendService.hasInstalledExtensions()) {
       throw new RuntimeException("NOT CONFIGURED");
     }
-  }
-
-  public IContentDefinitionProviderFactory<?> getContentDefinitionProviderFactory(String contentDefinitionFactoryId) {
-    return _contentDefinitionProviderFactoryService
-        .getContentDefinitionProviderFactory(checkNotNull(contentDefinitionFactoryId));
   }
 }

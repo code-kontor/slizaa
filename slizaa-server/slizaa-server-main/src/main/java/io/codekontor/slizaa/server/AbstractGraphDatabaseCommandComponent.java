@@ -1,17 +1,17 @@
 /**
  * slizaa-server-main - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
- * <p>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * <p>
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -19,15 +19,18 @@ package io.codekontor.slizaa.server;
 
 import io.codekontor.slizaa.server.descr.ContentDefinition;
 import io.codekontor.slizaa.server.descr.GraphDatabase;
+import io.codekontor.slizaa.server.descr.HierarchicalGraph;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import io.codekontor.slizaa.server.service.extensions.IExtensionService;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
+import io.codekontor.slizaa.server.spec.HierarchicalGraphSpec;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 public abstract class AbstractGraphDatabaseCommandComponent {
 
@@ -76,16 +79,21 @@ public abstract class AbstractGraphDatabaseCommandComponent {
                         db.getContentDefinition() != null ?
                                 new ContentDefinition(
                                         db.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId(),
+                                        db.getContentDefinition().getContentDefinitionProviderFactory().getShortForm(),
                                         db.getContentDefinition().toExternalRepresentation()) :
                                 null;
+
+
 
                 GraphDatabase graphDatabase = new GraphDatabase(
                         db.getIdentifier(),
                         contentDefinition,
-                        Collections.emptyList(),
+                        db.getHierarchicalGraphs().stream().map(hierarchicalGraph -> {
+                            return new HierarchicalGraph(hierarchicalGraph.getIdentifier());
+                        }).collect(Collectors.toList()),
                         db.getState().name(),
                         db.getPort(),
-                        Collections.emptyList());
+                        db.getAvailableActions().stream().map(action -> action.getName()).collect(Collectors.toList()));
 
                 stringBuffer.append(" - " + graphDatabase.toString() + "\n");
             });
