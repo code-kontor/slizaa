@@ -44,6 +44,11 @@
 		</dependency>
 		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
+			<artifactId>slizaa-server-command</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-server-graphql</artifactId>
 			<version>${project.version}</version>
 		</dependency>

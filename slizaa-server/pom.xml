@@ -46,6 +46,7 @@
 		<module>slizaa-server-graphql</module>
 		<module>slizaa-server-main</module>
 		<module>slizaa-server-spec</module>
-	</modules>
+        <module>slizaa-server-command</module>
+    </modules>
 
 </project>

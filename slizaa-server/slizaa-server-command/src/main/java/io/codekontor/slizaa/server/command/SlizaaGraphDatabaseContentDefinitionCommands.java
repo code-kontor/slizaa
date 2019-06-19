@@ -1,5 +1,5 @@
 /**
- * slizaa-server-main - Slizaa Static Software Analysis Tools
+ * slizaa-server-command - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server;
+package io.codekontor.slizaa.server.command;
 
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.filebased.IFileBasedContentDefinition;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import org.springframework.shell.standard.ShellCommandGroup;
@@ -25,7 +27,7 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
-@ShellCommandGroup("Slizaa Graph Databases Commands")
+@ShellCommandGroup("Slizaa Graph Databases Commands - Content Definition")
 public class SlizaaGraphDatabaseContentDefinitionCommands extends AbstractGraphDatabaseCommandComponent {
 
     @ShellMethod(value = "List available content definition provider factories.", key = {"listContentDefinitionProviderFactories"}, group = "Slizaa Graph Databases Commands - Content Definition")
@@ -48,13 +50,44 @@ public class SlizaaGraphDatabaseContentDefinitionCommands extends AbstractGraphD
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }
 
-        // TODO:
-        // slizaaService().getContentDefinitionProviderFactories();
-
         //
         graphDatabase.setContentDefinitionProvider(contentDefinitionProviderFactoryId, contentDefinition);
 
         // return the result
         return dumpGraphDatabases();
+    }
+
+    @ShellMethod(value = "List the content definitions for the specified database.", key = "showResolvedContentDefinitions")
+    public String showResolvedContentDefinitions(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption(defaultValue = "false", value = {"-f", "--showFiles"}) boolean showFiles) {
+
+        // check the backend configuration
+        String checkBackendConfigured = checkBackendConfigured();
+        if (checkBackendConfigured != null) {
+            return checkBackendConfigured;
+        }
+
+        // check that the requested database exists
+        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
+        if (graphDatabase == null) {
+            return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
+        }
+
+        //
+        IContentDefinitionProvider<?> contentDefinitionProvider = graphDatabase.getContentDefinition();
+
+        StringBuffer result = new StringBuffer("Content Definitions:\n");
+        contentDefinitionProvider.getContentDefinitions().forEach(contentDefinition -> {
+            result.append(String.format(" - %s_%s\n", contentDefinition.getName(), contentDefinition.getVersion()));
+            if (contentDefinition instanceof IFileBasedContentDefinition) {
+                IFileBasedContentDefinition fileBasedContentDefinition = (IFileBasedContentDefinition) contentDefinition;
+                fileBasedContentDefinition.getBinaryRootPaths().forEach(file -> result.append(String.format("    - %s\n", file.getPath())));
+                if (showFiles) {
+                    fileBasedContentDefinition.getBinaryFiles().stream().sorted((f1, f2) -> f1.getPath().compareTo(f2.getPath())).forEach(file -> result.append(String.format("      - %s\n", file.getPath())));
+                }
+            }
+        });
+
+        // return the result
+        return result.toString();
     }
 }
