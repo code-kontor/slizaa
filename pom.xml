@@ -39,7 +39,6 @@
         <module>slizaa-scanner</module>
         <module>slizaa-hierarchicalgraph</module>
         <module>slizaa-server</module>
-        <module>slizaa-server-specs</module>
         <module>slizaa-web</module>
     </modules>
 
