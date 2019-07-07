@@ -35,23 +35,23 @@ public class DependencySet {
      */
     public static class ReferencedNodes {
 
-        private Collection<HGNode> _selectedNodes;
+        private Collection<HGNode> _selectedNodesWithSuccessorsAndPredecessors;
 
         private SourceOrTarget _selectedNodesType;
 
         private Set<HGCoreDependency> _filteredCoreDependencies;
 
-        private Set<HGNode> _filteredNodesWithPredecessors;
+        private Set<HGNode> _filteredNodes;
 
-        public ReferencedNodes(Collection<HGNode> selectedNodes, SourceOrTarget selectedNodesType, Set<HGCoreDependency> filteredCoreDependencies, Set<HGNode> filteredNodesWithPredecessors) {
-            this._selectedNodes = checkNotNull(selectedNodes);
+        public ReferencedNodes(Collection<HGNode> selectedNodesWithSuccessorsAndPredecessors, SourceOrTarget selectedNodesType, Set<HGCoreDependency> filteredCoreDependencies, Set<HGNode> filteredNodes) {
+            this._selectedNodesWithSuccessorsAndPredecessors = checkNotNull(selectedNodesWithSuccessorsAndPredecessors);
             this._selectedNodesType = checkNotNull(selectedNodesType);
             this._filteredCoreDependencies = checkNotNull(filteredCoreDependencies);
-            this._filteredNodesWithPredecessors = checkNotNull(filteredNodesWithPredecessors);
+            this._filteredNodes = checkNotNull(filteredNodes);
         }
 
         public Collection<HGNode> getSelectedNodesWithSuccessorsAndPredecessors() {
-            return Collections.unmodifiableCollection(_selectedNodes);
+            return Collections.unmodifiableCollection(_selectedNodesWithSuccessorsAndPredecessors);
         }
 
         public SourceOrTarget getSelectedNodesType() {
@@ -62,8 +62,10 @@ public class DependencySet {
             return _filteredCoreDependencies;
         }
 
-        public Set<HGNode> getFilteredNodesWithSuccessorsAndPredecessors() {
-            return _filteredNodesWithPredecessors;
+        public Set<HGNode> getFilteredNodes(boolean includePredecessors) {
+            return includePredecessors ?
+                    _filteredNodes.stream().flatMap(node -> Stream.concat(node.getPredecessors().stream(), Stream.of(node))).collect(Collectors.toSet()) :
+                    _filteredNodes;
         }
     }
 
@@ -73,9 +75,13 @@ public class DependencySet {
 
     private final Map<HGNode, Set<HGCoreDependency>> _targetNode2CoreDependenciesMap;
 
-    private Set<HGNode> _unfilteredSourceNodesWithPredecessors;
+    private Set<HGNode> _unfilteredSourceNodes;
 
-    private Set<HGNode> _unfilteredTargetNodesWithPredecessors;
+    private Set<HGNode> _unfilteredSourceNodePredecessors;
+
+    private Set<HGNode> _unfilteredTargetNodes;
+
+    private Set<HGNode> _unfilteredTargetNodePredecessors;
 
     public DependencySet(Collection<HGCoreDependency> dependencies) {
 
@@ -85,17 +91,19 @@ public class DependencySet {
         //
         _sourceNode2CoreDependenciesMap = new HashMap<>();
         _targetNode2CoreDependenciesMap = new HashMap<>();
-        _unfilteredSourceNodesWithPredecessors = new HashSet<HGNode>();
-        _unfilteredTargetNodesWithPredecessors = new HashSet<HGNode>();
+        _unfilteredSourceNodes = new HashSet<HGNode>();
+        _unfilteredSourceNodePredecessors = new HashSet<HGNode>();
+        _unfilteredTargetNodes = new HashSet<HGNode>();
+        _unfilteredTargetNodePredecessors = new HashSet<HGNode>();
 
         //
         getResolvedCoreDependenciesOrProxyDependencyOtherwise(_unfilteredCoreDependencies).forEach(dep -> {
             _sourceNode2CoreDependenciesMap.computeIfAbsent(dep.getFrom(), key -> new HashSet<>()).add(dep);
             _targetNode2CoreDependenciesMap.computeIfAbsent(dep.getTo(), key -> new HashSet<>()).add(dep);
-            _unfilteredSourceNodesWithPredecessors.add(dep.getFrom());
-            _unfilteredSourceNodesWithPredecessors.addAll(dep.getFrom().getPredecessors());
-            _unfilteredTargetNodesWithPredecessors.add(dep.getTo());
-            _unfilteredTargetNodesWithPredecessors.addAll(dep.getTo().getPredecessors());
+            _unfilteredSourceNodes.add(dep.getFrom());
+            _unfilteredSourceNodePredecessors.addAll(dep.getFrom().getPredecessors());
+            _unfilteredTargetNodes.add(dep.getTo());
+            _unfilteredTargetNodePredecessors.addAll(dep.getTo().getPredecessors());
         });
     }
 
@@ -120,26 +128,33 @@ public class DependencySet {
         Set<HGCoreDependency> filteredCoreDependencies = keys.stream().flatMap(key -> dependenciesMap.get(key).stream()).collect(Collectors.toSet());
 
         // resolve the filtered nodes
-        Set<HGNode> filterNodesWithSuccessorsAndPredecessors = keys.stream().flatMap(key -> {
+        Set<HGNode> filterNodes = keys.stream().flatMap(key -> {
             return dependenciesMap.get(key).stream()
-                    .map(dep -> selectedNodesType == SourceOrTarget.SOURCE ? dep.getTo() : dep.getFrom())
-                    .flatMap(node -> Stream.concat(NodeSelections.getSuccessors(node, true).stream(), node.getPredecessors().stream()));
+                    .map(dep -> selectedNodesType == SourceOrTarget.SOURCE ? dep.getTo() : dep.getFrom());
         }).collect(Collectors.toSet());
 
         // return the result
-        return new ReferencedNodes(selectedNodesWithSuccessorsAndPredecessors, selectedNodesType, filteredCoreDependencies, filterNodesWithSuccessorsAndPredecessors);
+        return new ReferencedNodes(selectedNodesWithSuccessorsAndPredecessors, selectedNodesType, filteredCoreDependencies, filterNodes);
     }
 
     public Collection<HGCoreDependency> getUnfilteredCoreDependencies() {
         return _unfilteredCoreDependencies;
     }
 
-    public Set<HGNode> getUnfilteredSourceNodesWithPredecessors() {
-        return _unfilteredSourceNodesWithPredecessors;
+    public Set<HGNode> getUnfilteredSourceNodes(boolean includePredecessors) {
+        return  includePredecessors ?
+                Stream.of(_unfilteredSourceNodes, _unfilteredSourceNodePredecessors)
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet()) :
+                _unfilteredSourceNodes;
     }
 
-    public Set<HGNode> getUnfilteredTargetNodesWithPredecessors() {
-        return _unfilteredTargetNodesWithPredecessors;
+    public Set<HGNode> getUnfilteredTargetNodes(boolean includePredecessors) {
+        return  includePredecessors ?
+                Stream.of(_unfilteredTargetNodes, _unfilteredTargetNodePredecessors)
+                        .flatMap(Set::stream)
+                        .collect(Collectors.toSet()) :
+                _unfilteredTargetNodes;
     }
 
     /**

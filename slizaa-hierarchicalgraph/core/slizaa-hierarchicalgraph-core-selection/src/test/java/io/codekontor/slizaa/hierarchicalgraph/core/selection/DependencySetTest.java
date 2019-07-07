@@ -44,20 +44,22 @@ public class DependencySetTest extends AbstractSelectionsTest {
         Set<HGNode> sourceNodesWithPredecessors = aggregatedDependency.getCoreDependencies().stream()
                 .flatMap(dep -> NodeSelections.getPredecessors(dep.getFrom(), true).stream())
                 .collect(Collectors.toSet());
-        assertThat(dependencySet.getUnfilteredSourceNodesWithPredecessors()).containsAll(sourceNodesWithPredecessors);
+        assertThat(dependencySet.getUnfilteredSourceNodes(true)).containsAll(sourceNodesWithPredecessors);
 
         // test unfiltered target nodes
         Set<HGNode> targetNodesWithPredecessors = aggregatedDependency.getCoreDependencies().stream()
                 .flatMap(dep -> NodeSelections.getPredecessors(dep.getTo(), true).stream())
                 .collect(Collectors.toSet());
-        assertThat(dependencySet.getUnfilteredTargetNodesWithPredecessors()).containsAll(targetNodesWithPredecessors);
+        assertThat(dependencySet.getUnfilteredTargetNodes(true)).containsAll(targetNodesWithPredecessors);
 
         // test filtered dependencies
         DependencySet.ReferencedNodes referencedNodes = dependencySet.computeReferencedNodes(node(7193), SourceOrTarget.SOURCE);
         assertThat(referencedNodes.getFilteredCoreDependencies()).containsOnlyElementsOf(dependencySet.getUnfilteredCoreDependencies().stream().filter(dep -> dep.getFrom().getIdentifier().equals(Long.valueOf(7193))).collect(Collectors.toList()));
         assertThat(referencedNodes.getSelectedNodesWithSuccessorsAndPredecessors()).containsExactlyInAnyOrder(node(7193),
                 node(20483),node(577), rootNode());
-        assertThat(referencedNodes.getFilteredNodesWithSuccessorsAndPredecessors()).containsExactlyInAnyOrder(node(6518),
-                node(577),node(7544),node(7676),node(8075), rootNode());
+
+        referencedNodes.getFilteredNodes(false).forEach(node -> System.out.println(" - " + node.getIdentifier()));
+
+        assertThat(referencedNodes.getFilteredNodes(false)).containsExactlyInAnyOrder(node(6518),node(7544),node(8075));
     }
 }
