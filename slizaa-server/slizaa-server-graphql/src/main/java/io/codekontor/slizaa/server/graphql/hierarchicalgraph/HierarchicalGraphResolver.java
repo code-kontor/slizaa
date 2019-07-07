@@ -21,8 +21,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.server.service.selection.ISelectionService;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
@@ -34,65 +36,77 @@ import com.coxautodev.graphql.tools.GraphQLResolver;
 @Component
 public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGraph> {
 
-  //
-  @Autowired
-  private ISlizaaService slizaaService;
+    @Autowired
+    private ISlizaaService _slizaaService;
 
-  /**
-   * @return
-   */
-  public Node rootNode(HierarchicalGraph hierarchicalGraph) {
-    return nullSafe(hierarchicalGraph, hgRootNode -> new Node(hgRootNode));
-  }
+    @Autowired
+    private ISelectionService _selectionService;
 
-  /**
-   * @param id
-   * @return
-   */
-  public Node node(HierarchicalGraph hierarchicalGraph, String id) {
-    return nullSafe(hierarchicalGraph, hgRootNode -> {
-      HGNode hgNode = "-1".equals(id) ? hgRootNode : hgRootNode.lookupNode(Long.parseLong(id));
-      return hgNode != null ? new Node(hgNode) : null;
-    });
-  }
-
-  /**
-   * @param ids
-   * @return
-   */
-  public NodeSet nodes(HierarchicalGraph hierarchicalGraph, List<String> ids) {
-
-    List<HGNode> nodes = ids.stream().map(id -> hgNode(hierarchicalGraph, id)).filter(node -> node != null)
-        .collect(Collectors.toList());
-
-    return new NodeSet(nodes);
-  }
-
-  private HGNode hgNode(HierarchicalGraph hierarchicalGraph, String id) {
-    return nullSafe(hierarchicalGraph, hgRootNode -> {
-      return "-1".equals(id) ? hgRootNode : hgRootNode.lookupNode(Long.parseLong(id));
-    });
-  }
-
-  /**
-   * @param function
-   * @param <T>
-   * @return
-   */
-  private <T> T nullSafe(HierarchicalGraph hierarchicalGraph, Function<HGRootNode, T> function) {
-
-    // lookup the root node
-    IGraphDatabase graphDatabase = slizaaService.getGraphDatabase(hierarchicalGraph.getDatabaseIdentifier());
-    if (graphDatabase != null) {
-      IHierarchicalGraph hg = graphDatabase.getHierarchicalGraph(hierarchicalGraph.getIdentifier());
-      if (hg != null) {
-        HGRootNode rootNode = hg.getRootNode();
-        if (rootNode != null) {
-          return function.apply(rootNode);
-        }
-      }
+    /**
+     * @return
+     */
+    public Node rootNode(HierarchicalGraph hierarchicalGraph) {
+        return nullSafe(hierarchicalGraph, hgRootNode -> new Node(hgRootNode));
     }
 
-    return null;
-  }
+    /**
+     * @param id
+     * @return
+     */
+    public Node node(HierarchicalGraph hierarchicalGraph, String id) {
+        return nullSafe(hierarchicalGraph, hgRootNode -> {
+            HGNode hgNode = "-1".equals(id) ? hgRootNode : hgRootNode.lookupNode(Long.parseLong(id));
+            return hgNode != null ? new Node(hgNode) : null;
+        });
+    }
+
+    /**
+     * @param ids
+     * @return
+     */
+    public NodeSet nodes(HierarchicalGraph hierarchicalGraph, List<String> ids) {
+
+        List<HGNode> nodes = ids.stream().map(id -> hgNode(hierarchicalGraph, id)).filter(node -> node != null)
+                .collect(Collectors.toList());
+
+        return new NodeSet(nodes);
+    }
+
+    public DependencySet dependencySetForAggregatedDependency(HierarchicalGraph hierarchicalGraph, String sourceNodeId, String targetNodeId) {
+        return nullSafe(hierarchicalGraph, hgRootNode -> {
+            HGNode toNode = hgRootNode.lookupNode(Long.parseLong(sourceNodeId));
+            HGNode fromNode =  hgRootNode.lookupNode(Long.parseLong(targetNodeId));
+            // TODO NULL CHECK!
+            HGAggregatedDependency aggregatedDependency = toNode.getOutgoingDependenciesTo(fromNode);
+            return new DependencySet(_selectionService, aggregatedDependency);
+        });
+    }
+
+    private HGNode hgNode(HierarchicalGraph hierarchicalGraph, String id) {
+        return nullSafe(hierarchicalGraph, hgRootNode -> {
+            return "-1".equals(id) ? hgRootNode : hgRootNode.lookupNode(Long.parseLong(id));
+        });
+    }
+
+    /**
+     * @param function
+     * @param <T>
+     * @return
+     */
+    private <T> T nullSafe(HierarchicalGraph hierarchicalGraph, Function<HGRootNode, T> function) {
+
+        // lookup the root node
+        IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(hierarchicalGraph.getDatabaseIdentifier());
+        if (graphDatabase != null) {
+            IHierarchicalGraph hg = graphDatabase.getHierarchicalGraph(hierarchicalGraph.getIdentifier());
+            if (hg != null) {
+                HGRootNode rootNode = hg.getRootNode();
+                if (rootNode != null) {
+                    return function.apply(rootNode);
+                }
+            }
+        }
+
+        return null;
+    }
 }

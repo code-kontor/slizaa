@@ -14,6 +14,14 @@ extend type HierarchicalGraph {
 
     # Returns the nodes with the given ids
     nodes(ids: [ID]!): NodeSet!
+
+    # Returns a dependency set based on an aggregated dependency
+    dependencySetForAggregatedDependency(sourceNodeId: ID!, targetNodeId: ID!): DependencySet
+}
+
+enum NodeType {
+    SOURCE
+    TARGET
 }
 
 type NodeSet {
@@ -55,17 +63,16 @@ type Node {
 
     #
     dependenciesTo(targetNodes: [ID!]!): [Dependency!]!
+
+    #
+    dependenciesFrom(sourceNodes: [ID!]!): [Dependency!]!
 }
 
 type Dependency {
-    id: ID!
     sourceNode: Node!
     targetNode: Node!
     weight: Int
 }
-
-
-
 
 type DependencyMatrix {
     orderedNodes: [Node!]!
@@ -86,9 +93,28 @@ type StronglyConnectedComponent {
 	
 	# the node ids as an array
 	nodeIds: [ID!]!
-	
-	#
+
 	nodePositions: [Int!]!
+}
+
+type DependencySet{
+
+    dependencies: [Dependency!]!
+
+    size: Int!
+
+    nodes(nodeType: NodeType!, includedPredecessors: Boolean): [Node!]!
+
+    nodeIds(nodeType: NodeType!, includedPredecessors: Boolean): [String!]!
+
+    referencedNodes(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [Node!]!
+
+    referencedNodeIds(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [String!]!
+
+    filteredDependencies(selectedNodes: [ID!]!, selectedNodesType: NodeType!): DependencySet!
+
+    # Returns a set of nodes filtered by the specified node type.
+    filteredChildren(selectedNode: ID!, selectedNodeType: NodeType!): NodeSet!
 }
 
 # The Query type

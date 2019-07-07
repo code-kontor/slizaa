@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
@@ -103,7 +105,24 @@ public class NodeResolver implements GraphQLResolver<Node> {
 
   public List<Dependency> getDependenciesTo(Node node, List<String> targetNodeIds) {
 
-    // TODO!
-    return Collections.singletonList(new Dependency(null, null, 1));
+    //
+    HGRootNode rootNode = node.getHgNode().getRootNode();
+    List<HGNode> targetNodes = targetNodeIds.stream().map(id -> rootNode.lookupNode(Long.parseLong(id))).filter(n -> n != null).collect(Collectors.toList());
+    List<HGAggregatedDependency> dependenciesTo =  node.getHgNode().getOutgoingDependenciesTo(targetNodes);
+
+    //
+    return dependenciesTo.stream().map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getAggregatedWeight())).collect(Collectors.toList());
+  }
+
+  public List<Dependency> getDependenciesFrom(Node node, List<String> sourceNodeIds) {
+
+    //
+    HGRootNode rootNode = node.getHgNode().getRootNode();
+    List<HGNode> sourceNodes = sourceNodeIds.stream().map(id -> rootNode.lookupNode(Long.parseLong(id))).filter(n -> n != null).collect(Collectors.toList());
+    List<HGAggregatedDependency> dependenciesFrom =  node.getHgNode().getIncomingDependenciesFrom(sourceNodes);
+
+    //
+    return dependenciesFrom
+            .stream().map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getAggregatedWeight())).collect(Collectors.toList());
   }
 }

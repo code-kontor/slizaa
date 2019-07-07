@@ -38,6 +38,10 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-server-service-slizaa</artifactId>
 			<version>${project.version}</version>
@@ -50,6 +54,11 @@
 		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-server-graphql</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa</groupId>
+			<artifactId>slizaa-server-service-selection</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

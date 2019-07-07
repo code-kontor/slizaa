@@ -23,6 +23,7 @@ import java.util.List;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.extensions.IExtensionService;
+import io.codekontor.slizaa.server.service.selection.ISelectionService;
 import io.codekontor.slizaa.server.service.svg.ISvgService;
 
 /**
@@ -32,6 +33,8 @@ import io.codekontor.slizaa.server.service.svg.ISvgService;
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 public interface ISlizaaService {
+
+	ISelectionService getSelectionService();
 
 	IExtensionService getExtensionService();
 

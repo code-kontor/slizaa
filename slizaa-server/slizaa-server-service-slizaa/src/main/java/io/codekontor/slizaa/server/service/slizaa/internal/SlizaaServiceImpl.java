@@ -35,6 +35,8 @@ import javax.annotation.PreDestroy;
 import javax.swing.text.GapContent;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
+import io.codekontor.slizaa.server.service.selection.IModifiableSelectionService;
+import io.codekontor.slizaa.server.service.selection.ISelectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.codekontor.slizaa.core.boltclient.IBoltClientFactory;
@@ -80,6 +82,9 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
   private static final Logger                       LOGGER              = LoggerFactory
       .getLogger(SlizaaServiceImpl.class);
+
+  @Autowired
+  private IModifiableSelectionService               _selectionService;
 
   @Autowired
   private SlizaaServiceDatabaseProperties           _serviceProperties;
@@ -204,6 +209,11 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   }
 
   @Override
+  public IModifiableSelectionService getSelectionService() {
+    return _selectionService;
+  }
+
+    @Override
   public boolean hasGraphDatabases() {
     checkConfigured();
     return _structureDatabases != null && !_structureDatabases.isEmpty();

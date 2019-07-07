@@ -139,7 +139,8 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   }
 
   public void disposeHierarchicalGraph(String identifier) {
-    hierarchicalGraphs().remove(identifier);
+    HierarchicalGraph hierarchicalGraph = hierarchicalGraphs().remove(identifier);
+    this.slizaaService().getSelectionService().dropSelections(hierarchicalGraph.getRootNode());
   }
 
   public List<IHierarchicalGraph> getHierarchicalGraphs() {

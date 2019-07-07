@@ -19,6 +19,7 @@ package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,7 +30,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 
 public class NodeSet extends AbstractNodeSet {
 
-  public NodeSet(List<HGNode> hgNodeSet) {
+  public NodeSet(Collection<HGNode> hgNodeSet) {
     super(hgNodeSet);
   }
 

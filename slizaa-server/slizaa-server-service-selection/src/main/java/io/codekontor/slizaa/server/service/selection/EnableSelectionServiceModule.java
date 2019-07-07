@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-spec - Slizaa Static Software Analysis Tools
+ * slizaa-server-service-selection - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -27,5 +27,5 @@ import java.lang.annotation.*;
 @Documented
 @Import(SelectionServiceModuleConfiguration.class)
 @Configuration
-public @interface EnableSpecServiceModule {
+public @interface EnableSelectionServiceModule {
 }

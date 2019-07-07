@@ -19,6 +19,7 @@ package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,21 +27,29 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 
 public abstract class AbstractNodeSet {
 
-  private List<HGNode> _hgNodeSet;
+  private Collection<HGNode> _hgNodeSet;
 
-  public AbstractNodeSet(List<HGNode> hgNodeSet) {
+  public AbstractNodeSet(Collection<HGNode> hgNodeSet) {
     this._hgNodeSet = checkNotNull(hgNodeSet);
   }
 
   public List<Node> getNodes() {
-    return _hgNodeSet.stream().map(hgNode -> new Node(hgNode)).collect(Collectors.toList());
+    return toNodes(_hgNodeSet);
   }
 
   public List<String> getNodeIds() {
-    return _hgNodeSet.stream().map(hgNode -> hgNode.getIdentifier().toString()).collect(Collectors.toList());
+    return toNodeIds(_hgNodeSet);
   }
   
-  protected List<HGNode> hgNodeSet() {
+  protected Collection<HGNode> hgNodeSet() {
     return _hgNodeSet;
+  }
+
+  public static List<Node> toNodes(Collection<HGNode> nodes) {
+    return checkNotNull(nodes).stream().map(hgNode -> new Node(hgNode)).collect(Collectors.toList());
+  }
+
+  public static List<String> toNodeIds(Collection<HGNode> nodes) {
+    return checkNotNull(nodes).stream().map(hgNode -> hgNode.getIdentifier().toString()).collect(Collectors.toList());
   }
 }

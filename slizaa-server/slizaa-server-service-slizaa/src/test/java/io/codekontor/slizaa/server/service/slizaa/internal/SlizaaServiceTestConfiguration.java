@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.service.slizaa.internal;
 
+import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModule;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,7 @@ import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
 @EnableConfigurationModule
 @EnableSlizaaServiceModule
 @EnableSvgServiceModule
+@EnableSelectionServiceModule
 @TestConfiguration
 public class SlizaaServiceTestConfiguration { 
   
