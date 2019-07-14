@@ -79,7 +79,9 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
 
   public loadData = (treeNode: AntTreeNode) => {
 
-    return new Promise(async (resolve) => {
+
+
+    return Promise.resolve(true).then(async (resolve) => {
       if (this.props.loadData) {
 
         await this.props.loadData(treeNode.props.dataRef, () => {
@@ -87,11 +89,6 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
             rootNodes: [...this.state.rootNodes]
           });
         });
-
-        resolve();
-      }
-      else {
-        resolve();
       }
     });
   }
