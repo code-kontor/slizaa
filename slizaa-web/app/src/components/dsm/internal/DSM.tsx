@@ -35,6 +35,8 @@ export interface IProps {
     verticalBoxSize?: number;
     initialHorizontalSideMarkerHeight?: number;
     intialVerticalSideMarkerWidth?: number;
+    onHover?: (column: number | undefined, row: number | undefined) => void;
+    onSelect?: (column: number | undefined, row: number | undefined) => void;
 }
 
 export interface IDsmLabel {
@@ -66,7 +68,10 @@ export class DSM extends React.Component<IProps, IState> {
 
     private colorScheme: IDsmColorScheme = new DefaultColorScheme;
 
-    private mouseDown: boolean;
+    private mouseOver: boolean;
+    private mouseDragging: boolean;
+    private verticalResize: boolean;
+    private horizontalResize: boolean;
     private currentMarkedX: number | undefined;
     private currentMarkedY: number | undefined;
     private newMarkedX: number | undefined;
@@ -93,13 +98,22 @@ export class DSM extends React.Component<IProps, IState> {
 
             if (this.markedCellLayerrenderingContext) {
 
+                this.markedCellLayerrenderingContext.canvas.onmousedown = ((event: MouseEvent) => {
+                    this.mouseDragging = true;
+                }).bind(this)
+
+                this.markedCellLayerrenderingContext.canvas.onmouseup = ((event: MouseEvent) => {
+                    this.mouseDragging = false;
+                }).bind(this)
+
                 this.markedCellLayerrenderingContext.canvas.onmouseenter = ((event: MouseEvent) => {
-                    this.mouseDown = true;
+                    this.mouseOver = true;
                     requestAnimationFrame(this.updateMarkedLayer);
                 }).bind(this)
 
                 this.markedCellLayerrenderingContext.canvas.onmouseleave = ((event: MouseEvent) => {
-                    this.mouseDown = false;
+                    this.mouseDragging = false;
+                    this.mouseOver = false;
                     this.newMarkedX = undefined;
                     this.newMarkedY = undefined;
                     requestAnimationFrame(this.updateMarkedLayer);
@@ -107,15 +121,56 @@ export class DSM extends React.Component<IProps, IState> {
 
                 this.markedCellLayerrenderingContext.canvas.onmousemove = ((event: MouseEvent) => {
 
-                    let x: number | undefined = Math.floor((event.offsetX - this.state.verticalSideMarkerWidth) / this.getBoxSize().getHorizontalBoxSize())
-                    let y: number | undefined = Math.floor((event.offsetY - this.state.horizontalSideMarkerHeight) / this.getBoxSize().getVerticalBoxSize())
+                    // handle the resize dragging...
+                    if (this.mouseDragging && (this.verticalResize || this.horizontalResize)) {
 
-                    if (x < 0 || x >= this.props.labels.length) { x = undefined }
-                    if (y < 0 || y >= this.props.labels.length) { y = undefined }
+                        if (this.verticalResize && event.offsetX !== this.state.verticalSideMarkerWidth && 
+                            this.horizontalResize && event.offsetY !== this.state.horizontalSideMarkerHeight) {
+                            this.setState({ verticalSideMarkerWidth: event.offsetX, horizontalSideMarkerHeight: event.offsetY });
+                        } else if (this.verticalResize && event.offsetX !== this.state.verticalSideMarkerWidth) {
+                            this.setState({ verticalSideMarkerWidth: event.offsetX });
+                        } else if (this.horizontalResize && event.offsetY !== this.state.horizontalSideMarkerHeight) {
+                            this.setState({ horizontalSideMarkerHeight: event.offsetY });   
+                        } 
+                    }
+                    else {
 
-                    if (this.currentMarkedX !== x || this.currentMarkedY !== y) {
-                        this.newMarkedX = x;
-                        this.newMarkedY = y;
+                        // check if we are in a 'resize' area
+                        this.verticalResize = event.offsetX > this.state.verticalSideMarkerWidth - 2 * this.SEP_SIZE &&
+                                         event.offsetX < this.state.verticalSideMarkerWidth + this.SEP_SIZE;
+                        
+                        this.horizontalResize = event.offsetY > this.state.horizontalSideMarkerHeight - 2 * this.SEP_SIZE &&
+                                         event.offsetY < this.state.horizontalSideMarkerHeight + this.SEP_SIZE;
+                        
+                        // change the cursor
+                        if ( this.markedCellLayerrenderingContext) {
+                            if (this.verticalResize && this.horizontalResize) {
+                                this.markedCellLayerrenderingContext.canvas.style.cursor = "nwse-resize";
+                            } else if (this.horizontalResize) {
+                                this.markedCellLayerrenderingContext.canvas.style.cursor = "ns-resize";
+                            } else if (this.verticalResize) {
+                                this.markedCellLayerrenderingContext.canvas.style.cursor = "ew-resize";
+                            } else {
+                                this.markedCellLayerrenderingContext.canvas.style.cursor = "initial";
+                            }
+                        }
+
+                        let x: number | undefined = 
+                            Math.floor((event.offsetX - this.state.verticalSideMarkerWidth) / this.getBoxSize().getHorizontalBoxSize())
+                        let y: number | undefined = 
+                            Math.floor((event.offsetY - this.state.horizontalSideMarkerHeight) / this.getBoxSize().getVerticalBoxSize())
+                        
+                        if (x < 0 || x >= this.props.labels.length) { x = undefined }
+                        if (y < 0 || y >= this.props.labels.length) { y = undefined }
+                        
+                        if (this.currentMarkedX !== x || this.currentMarkedY !== y) {
+                            this.newMarkedX = x;
+                            this.newMarkedY = y;
+
+                            if (this.props.onHover) {
+                                this.props.onHover(this.newMarkedX, this.newMarkedY);
+                            }
+                        }
                     }
                 }).bind(this)
             }
@@ -223,8 +278,8 @@ export class DSM extends React.Component<IProps, IState> {
                     renderingContext2D.textAlign = "center";
                     renderingContext2D.textBaseline = "middle";
                     renderingContext2D.fillText('' + item.value,
-                        this.state.verticalSideMarkerWidth + horizontalSliceSize(item.column) + this.getBoxSize().getHorizontalBoxSize() / 2,
-                        this.state.horizontalSideMarkerHeight + verticalSliceSize(item.row) + this.getBoxSize().getVerticalBoxSize() / 2);
+                        this.state.verticalSideMarkerWidth + horizontalSliceSize(item.row) + this.getBoxSize().getHorizontalBoxSize() / 2,
+                        this.state.horizontalSideMarkerHeight + verticalSliceSize(item.column) + this.getBoxSize().getVerticalBoxSize() / 2);
                 }
             }
         });
@@ -307,7 +362,7 @@ export class DSM extends React.Component<IProps, IState> {
             }
         }
 
-        if (this.mouseDown) {
+        if (this.mouseOver) {
             requestAnimationFrame(this.updateMarkedLayer);
         }
     }

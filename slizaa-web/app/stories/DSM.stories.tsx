@@ -37,31 +37,41 @@ function createLabels(count: number): Array<{ id: string, text: string }> {
   return result;
 }
 
+function handleOnHover(column: number | undefined, row: number | undefined) {
+  // tslint:disable-next-line
+  console.log("Row: " + row + " , Column: " + column);
+}
+
 storiesOf('DSM', module)
   .add('4x4 with cycle', () => (
     <DSM labels={createLabels(4)}
       cells={createCells(4)}
-      stronglyConnectedComponents={[{ nodePositions: [1, 2] }]} />
+      stronglyConnectedComponents={[{ nodePositions: [1, 2] }]} 
+      onHover={handleOnHover}/>
   ))
   .add('4x4 without cycle', () => (
     <DSM labels={createLabels(4)}
       cells={createCells(4)}
-      stronglyConnectedComponents={[]} />
+      stronglyConnectedComponents={[]} 
+      onHover={handleOnHover}/>
   ))
   .add('20x20 with custom box size', () => (
     <DSM labels={createLabels(20)}
       cells={createCells(20)}
       stronglyConnectedComponents={[]} 
       horizontalBoxSize={50}
-      verticalBoxSize={30}/>
+      verticalBoxSize={30}
+      onHover={handleOnHover}/>
   ))
   .add('40x40 without cycle', () => (
     <DSM labels={createLabels(40)}
       cells={createCells(40)}
-      stronglyConnectedComponents={[]} />
+      stronglyConnectedComponents={[]}
+      onHover={handleOnHover} />
   ))
   .add('10x10 with cycles', () => (
     <DSM labels={createLabels(10)}
       cells={createCells(10)}
-      stronglyConnectedComponents={ [{ nodePositions: [1, 2] }, { nodePositions: [7, 8, 9] } ]} />
+      stronglyConnectedComponents={ [{ nodePositions: [1, 2] }, { nodePositions: [7, 8, 9] } ]} 
+      onHover={handleOnHover}/>
   )); 
