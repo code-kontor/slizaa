@@ -69,8 +69,11 @@ public class HierarchicalGraph implements IHierarchicalGraph {
     return _hierarchicalGraphDefinition.getIdentifier();
   }
 
-  public void initialize() {
+  public void initialize(boolean initializeCaches) {
     _rootNode = _creatorFunction.apply(_hierarchicalGraphDefinition);
+    if (initializeCaches) {
+      _rootNode.initializeCaches(_rootNode.getChildren());
+    }
   }
   
   public void dispose() {

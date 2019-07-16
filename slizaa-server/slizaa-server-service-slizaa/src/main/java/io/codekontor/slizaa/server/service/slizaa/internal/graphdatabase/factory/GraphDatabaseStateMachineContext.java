@@ -60,7 +60,7 @@ public class GraphDatabaseStateMachineContext extends AbstractGraphDatabaseState
 
     connectBoltClient();
 
-    hierarchicalGraphs().values().forEach(hierarchicalGraph -> hierarchicalGraph.initialize());
+    hierarchicalGraphs().values().forEach(hierarchicalGraph -> hierarchicalGraph.initialize(true));
   }
 
   public void stop() {
@@ -108,7 +108,7 @@ public class GraphDatabaseStateMachineContext extends AbstractGraphDatabaseState
 
         connectBoltClient();
 
-        hierarchicalGraphs().values().forEach(hierarchicalGraph -> hierarchicalGraph.initialize());
+        hierarchicalGraphs().values().forEach(hierarchicalGraph -> hierarchicalGraph.initialize(true));
 
         return modelImporter.getGraphDb();
       }
@@ -141,7 +141,7 @@ public class GraphDatabaseStateMachineContext extends AbstractGraphDatabaseState
               new DefaultProgressMonitor("Mapping", 100, DefaultProgressMonitor.consoleLogger()));
         });
 
-    hierarchicalGraph.initialize();
+    hierarchicalGraph.initialize(true);
 
     hierarchicalGraphs().put(identifier, hierarchicalGraph);
 
