@@ -47,13 +47,17 @@ storiesOf('DSM', module)
     <DSM labels={createLabels(4)}
       cells={createCells(4)}
       stronglyConnectedComponents={[{ nodePositions: [1, 2] }]} 
-      onHover={handleOnHover}/>
+      onHover={handleOnHover}
+      verticalSideMarkerWidth={30}
+      horizontalSideMarkerHeight={30}/>
   ))
   .add('4x4 without cycle', () => (
     <DSM labels={createLabels(4)}
       cells={createCells(4)}
       stronglyConnectedComponents={[]} 
-      onHover={handleOnHover}/>
+      onHover={handleOnHover}
+      verticalSideMarkerWidth={30}
+      horizontalSideMarkerHeight={30}/>
   ))
   .add('20x20 with custom box size', () => (
     <DSM labels={createLabels(20)}
@@ -61,17 +65,23 @@ storiesOf('DSM', module)
       stronglyConnectedComponents={[]} 
       horizontalBoxSize={50}
       verticalBoxSize={30}
-      onHover={handleOnHover}/>
+      onHover={handleOnHover}
+      verticalSideMarkerWidth={30}
+      horizontalSideMarkerHeight={30}/>
   ))
   .add('40x40 without cycle', () => (
     <DSM labels={createLabels(40)}
       cells={createCells(40)}
       stronglyConnectedComponents={[]}
-      onHover={handleOnHover} />
+      onHover={handleOnHover}
+      verticalSideMarkerWidth={30}
+      horizontalSideMarkerHeight={30}/>
   ))
   .add('10x10 with cycles', () => (
     <DSM labels={createLabels(10)}
       cells={createCells(10)}
       stronglyConnectedComponents={ [{ nodePositions: [1, 2] }, { nodePositions: [7, 8, 9] } ]} 
-      onHover={handleOnHover}/>
+      onHover={handleOnHover}
+      verticalSideMarkerWidth={30}
+      horizontalSideMarkerHeight={30}/>
   )); 

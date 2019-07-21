@@ -15,17 +15,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-export interface ITreeNodeSelection {
-    selectedNodeIds: string[];
-    exapndedNodeIds: string[];
+export interface IAppState {
+    currentDatabase: string | undefined;
+    currentHierarchicalGraph: string | undefined;
+    dependenciesViewState: IDependenciesViewState;
 }
 
-export interface IAppState {
-    currentDatabase?: string;
-    currentHierarchicalGraph?: string;
-    currentTreeNodeSelection_DsmView?: ITreeNodeSelection;
+export interface IDependenciesViewState {
+    treeNodeSelection: ITreeNodeSelection;
+    dsmSettings: IDsmSettings;
 }
+
+ export interface ITreeNodeSelection {
+    selectedNodeIds: string[];
+    expandedNodeIds: string[];
+}
+
+export interface IDsmSettings {
+    horizontalSideMarkerHeight: number;
+    verticalSideMarkerWidth: number;
+}
+
+
 
 export function defaultState() : IAppState {
-    return {};
+    return {
+        currentDatabase: undefined,
+        currentHierarchicalGraph: undefined,
+        dependenciesViewState: {
+            dsmSettings: {
+                horizontalSideMarkerHeight: 50,
+                verticalSideMarkerWidth: 50
+            },
+            treeNodeSelection: {
+                expandedNodeIds: [],
+                selectedNodeIds: []
+            }
+        }
+
+    };
   }

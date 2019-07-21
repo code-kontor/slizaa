@@ -19,11 +19,20 @@ import { Action } from 'redux';
 
 export const ACTION_SELECT_DATABASE = 'ACTION_SELECT_DATABASE';
 export const ACTION_SELECT_HIERARCHICAL_GRAPH = 'ACTION_SELECT_HIERARCHICAL_GRAPH';
-export const ACTION_SET_TREE_NODE_SELECTION_DEPENDENCIES_VIEW = 'ACTION_SET_TREE_NODE_SELECTION_DEPENDENCIES_VIEW';
+
+// dependencies view
+export const ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION = 'ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION';
+export const ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE = 'ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE';
 
 export interface IActionSelectDatabase extends Action {
   type: 'ACTION_SELECT_DATABASE';
   selectedDatabaseId: string;
+}
+
+export interface IActionSetDsmSidemarkerSize extends Action {
+  type: 'ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE';
+  horizontalSideMarkerHeight: number;
+  verticalSideMarkerWidth: number;
 }
 
 export interface IActionSelectHierarchicalGraph extends Action {
@@ -32,12 +41,16 @@ export interface IActionSelectHierarchicalGraph extends Action {
 }
 
 export interface IActionSetTreeNodeSelection extends Action {
-  type: 'ACTION_SET_TREE_NODE_SELECTION_DEPENDENCIES_VIEW';
+  type: 'ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION';
   selectedNodeIds: string[];
   expandedNodeIds: string[];
 }
 
-export type AppActions = IActionSelectDatabase | IActionSelectHierarchicalGraph | IActionSetTreeNodeSelection;
+export type AppActions = 
+  IActionSelectDatabase | 
+  IActionSelectHierarchicalGraph | 
+  IActionSetTreeNodeSelection |
+  IActionSetDsmSidemarkerSize;
 
 export function actionSelectDatabase(selectedDatabaseId: string): IActionSelectDatabase {
   return {
@@ -57,6 +70,13 @@ export function actionSetTreeNodeSelection_DsmView(expNodeIds: string[], selNode
   return {
     expandedNodeIds: expNodeIds,
     selectedNodeIds: selNodeIds,
-    type: ACTION_SET_TREE_NODE_SELECTION_DEPENDENCIES_VIEW
+    type: ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION
+  };
+}
+ export function action_DsmView_SetDsmSidemarkerSize(horizontalHeight: number, verticalWidth: number): IActionSetDsmSidemarkerSize {
+    return {
+      horizontalSideMarkerHeight: horizontalHeight,
+      type: ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE,
+      verticalSideMarkerWidth: verticalWidth,
   };
 }

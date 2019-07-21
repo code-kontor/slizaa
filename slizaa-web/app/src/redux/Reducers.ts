@@ -33,14 +33,29 @@ export function appReducer(state: IAppState = defaultState(), action: AppActions
             currentHierarchicalGraph: action.selectedHierarchicalGraphId
         }
     }
-    else if (action.type === "ACTION_SET_TREE_NODE_SELECTION_DEPENDENCIES_VIEW") {
+    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION") {
         return {
             ...state,
-            currentTreeNodeSelection_DsmView: 
+            dependenciesViewState: {
+                ...state.dependenciesViewState,
+                treeNodeSelection: 
                 {   
-                    exapndedNodeIds: action.expandedNodeIds,
+                    expandedNodeIds: action.expandedNodeIds,
                     selectedNodeIds: action.selectedNodeIds,
                 }
+            }
+        }
+    }
+    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE") {
+        return {
+            ...state,
+            dependenciesViewState: {
+                ...state.dependenciesViewState,
+                dsmSettings: {
+                    horizontalSideMarkerHeight: action.horizontalSideMarkerHeight,
+                    verticalSideMarkerWidth: action.verticalSideMarkerWidth
+                }
+            }
         }
     }
 

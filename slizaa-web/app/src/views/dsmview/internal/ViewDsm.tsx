@@ -25,8 +25,8 @@ import { Card } from 'src/components/card';
 import { DSM } from 'src/components/dsm';
 import { HierarchicalGraphTree } from 'src/components/hierarchicalgraphtree';
 import { HorizontalSplitLayout, ResizableBox } from 'src/components/layout';
-import { actionSetTreeNodeSelection_DsmView } from 'src/redux/Actions';
-import { IAppState, ITreeNodeSelection } from 'src/redux/IAppState';
+import { action_DsmView_SetDsmSidemarkerSize, actionSetTreeNodeSelection_DsmView } from 'src/redux/Actions';
+import { IAppState, IDependenciesViewState } from 'src/redux/IAppState';
 import { DsmForNodeChildren, DsmForNodeChildrenVariables } from './__generated__/DsmForNodeChildren';
 import { GQ_DSM_FOR_NODE_CHILDREN } from './GqlQueries';
 import './ViewDsm.css';
@@ -34,8 +34,9 @@ import './ViewDsm.css';
 interface IProps {
     databaseId: string
     hierarchicalGraphId: string
-    nodeSelection?: ITreeNodeSelection
+    dependenciesViewState: IDependenciesViewState
     dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => void
+    dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
 }
 
 interface IState {
@@ -58,7 +59,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
     public render() {
 
-        if (!this.props.hierarchicalGraphId && !this.props.hierarchicalGraphId) {
+        if (!this.props.hierarchicalGraphId) {
             return null
         }
 
@@ -66,9 +67,9 @@ export class ViewDsm extends React.Component<IProps, IState> {
         const queryVariables = {
             databaseId: this.props.databaseId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
-            nodeId: this.props.nodeSelection && this.props.nodeSelection.selectedNodeIds && this.props.nodeSelection.selectedNodeIds.length > 0 ? this.props.nodeSelection.selectedNodeIds[0] : "-1"
+            nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
         };
-        const items = this.props.nodeSelection ? this.props.nodeSelection.selectedNodeIds.map(id => <li key={id}>{id}</li>) : null;
+        const items = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.map(id => <li key={id}>{id}</li>) : null;
 
         return (
 
@@ -85,7 +86,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
                                             hierarchicalGraphId={this.props.hierarchicalGraphId}
                                             onSelect={this.onSelect}
                                             onExpand={this.onExpand}
-                                            expandedKeys={this.props.nodeSelection ? this.props.nodeSelection.exapndedNodeIds : [] } />
+                                            expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : [] } />
                                     }
                                 </ApolloConsumer>
                             </Card>
@@ -114,7 +115,11 @@ export class ViewDsm extends React.Component<IProps, IState> {
                                                     cells={cells}
                                                     stronglyConnectedComponents={stronglyConnectedComponents}
                                                     horizontalBoxSize={35}
-                                                    verticalBoxSize={35} />
+                                                    verticalBoxSize={35} 
+                                                    horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
+                                                    verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
+                                                    onSideMarkerResize={this.onResizeDsmSidemarker}
+                                                    />
                                     }}
                                 </Query>
                             </Card>
@@ -133,16 +138,16 @@ export class ViewDsm extends React.Component<IProps, IState> {
     }
 
     private onSelect = (selectedKeys: string[]): void => {
-        
-        // tslint:disable-next-line:no-console
-        console.log("selectedKeys" + selectedKeys);
-        
-        const exapndedNodeIds = this.props.nodeSelection ? this.props.nodeSelection.exapndedNodeIds : [];
+        const exapndedNodeIds = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : [];
         this.props.dispatchSelectNodeSelection(exapndedNodeIds, selectedKeys);
     }
 
+    private onResizeDsmSidemarker = (horizontalHeight: number, verticalWidth: number): void => {
+        this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
+    }
+
     private onExpand = (expandedKeys: string[]): void => {
-        const selectedNodeIds = this.props.nodeSelection ? this.props.nodeSelection.selectedNodeIds : [];
+        const selectedNodeIds = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds : [];
         this.props.dispatchSelectNodeSelection(expandedKeys, selectedNodeIds);
     }
 
@@ -163,16 +168,19 @@ export class ViewDsm extends React.Component<IProps, IState> {
 const mapStateToProps = (state: IAppState) => {
     return {
         databaseId: state.currentDatabase,
-        hierarchicalGraphId: state.currentHierarchicalGraph,
-        nodeSelection: state.currentTreeNodeSelection_DsmView
-    }
-}
+        dependenciesViewState : state.dependenciesViewState,
+        hierarchicalGraphId: state.currentHierarchicalGraph
+    };
+};
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
         dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => {
-            dispatch(actionSetTreeNodeSelection_DsmView(expandedNodeIds, selectedNodeIds));
-        }
+            dispatch(actionSetTreeNodeSelection_DsmView(expandedNodeIds, selectedNodeIds)); 
+        },
+        dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => {
+            dispatch(action_DsmView_SetDsmSidemarkerSize(verticalWidth, horizontalHeight)); 
+        },
     };
 };
 

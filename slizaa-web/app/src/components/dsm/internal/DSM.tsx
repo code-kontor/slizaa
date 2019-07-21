@@ -20,9 +20,9 @@ import { setupCanvas } from './DpiFixer';
 import './DSM.css';
 import { DefaultColorScheme, IDsmColorScheme } from './IDsmColorScheme';
 
+// tslint:disable-next-line: no-empty-interface
 export interface IState {
-    horizontalSideMarkerHeight: number;
-    verticalSideMarkerWidth: number;
+
     // markedCellX: number | undefined;
     // markedCellY: number | undefined;
 }
@@ -33,8 +33,9 @@ export interface IProps {
     stronglyConnectedComponents: IDsmStronglyConnectedComponent[];
     horizontalBoxSize?: number;
     verticalBoxSize?: number;
-    initialHorizontalSideMarkerHeight?: number;
-    intialVerticalSideMarkerWidth?: number;
+    horizontalSideMarkerHeight: number;
+    verticalSideMarkerWidth: number;
+    onSideMarkerResize?: (horizontalSideMarkerHeight: number | undefined, verticalSideMarkerWidth: number | undefined) => void;
     onHover?: (column: number | undefined, row: number | undefined) => void;
     onSelect?: (column: number | undefined, row: number | undefined) => void;
 }
@@ -81,11 +82,6 @@ export class DSM extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
-
-        this.state = {
-            horizontalSideMarkerHeight: 50,
-            verticalSideMarkerWidth: 100,
-        }
     }
 
     public componentDidMount() {
@@ -124,23 +120,26 @@ export class DSM extends React.Component<IProps, IState> {
                     // handle the resize dragging...
                     if (this.mouseDragging && (this.verticalResize || this.horizontalResize)) {
 
-                        if (this.verticalResize && event.offsetX !== this.state.verticalSideMarkerWidth && 
-                            this.horizontalResize && event.offsetY !== this.state.horizontalSideMarkerHeight) {
-                            this.setState({ verticalSideMarkerWidth: event.offsetX, horizontalSideMarkerHeight: event.offsetY });
-                        } else if (this.verticalResize && event.offsetX !== this.state.verticalSideMarkerWidth) {
-                            this.setState({ verticalSideMarkerWidth: event.offsetX });
-                        } else if (this.horizontalResize && event.offsetY !== this.state.horizontalSideMarkerHeight) {
-                            this.setState({ horizontalSideMarkerHeight: event.offsetY });   
-                        } 
+                        if (this.props.onSideMarkerResize) {
+
+                            if (this.verticalResize && event.offsetX !== this.props.verticalSideMarkerWidth && 
+                                this.horizontalResize && event.offsetY !== this.props.horizontalSideMarkerHeight) {
+                                this.props.onSideMarkerResize(event.offsetX, event.offsetY);
+                            } else if (this.verticalResize && event.offsetX !== this.props.verticalSideMarkerWidth) {
+                                this.props.onSideMarkerResize(event.offsetX, this.props.horizontalSideMarkerHeight);
+                            } else if (this.horizontalResize && event.offsetY !== this.props.horizontalSideMarkerHeight) {
+                                this.props.onSideMarkerResize(this.props.verticalSideMarkerWidth, event.offsetY);
+                            } 
+                        }
                     }
                     else {
 
                         // check if we are in a 'resize' area
-                        this.verticalResize = event.offsetX > this.state.verticalSideMarkerWidth - 2 * this.SEP_SIZE &&
-                                         event.offsetX < this.state.verticalSideMarkerWidth + this.SEP_SIZE;
+                        this.verticalResize = event.offsetX > this.props.verticalSideMarkerWidth - 2 * this.SEP_SIZE &&
+                                         event.offsetX < this.props.verticalSideMarkerWidth + this.SEP_SIZE;
                         
-                        this.horizontalResize = event.offsetY > this.state.horizontalSideMarkerHeight - 2 * this.SEP_SIZE &&
-                                         event.offsetY < this.state.horizontalSideMarkerHeight + this.SEP_SIZE;
+                        this.horizontalResize = event.offsetY > this.props.horizontalSideMarkerHeight - 2 * this.SEP_SIZE &&
+                                         event.offsetY < this.props.horizontalSideMarkerHeight + this.SEP_SIZE;
                         
                         // change the cursor
                         if ( this.markedCellLayerrenderingContext) {
@@ -156,9 +155,9 @@ export class DSM extends React.Component<IProps, IState> {
                         }
 
                         let x: number | undefined = 
-                            Math.floor((event.offsetX - this.state.verticalSideMarkerWidth) / this.getBoxSize().getHorizontalBoxSize())
+                            Math.floor((event.offsetX - this.props.verticalSideMarkerWidth) / this.getBoxSize().getHorizontalBoxSize())
                         let y: number | undefined = 
-                            Math.floor((event.offsetY - this.state.horizontalSideMarkerHeight) / this.getBoxSize().getVerticalBoxSize())
+                            Math.floor((event.offsetY - this.props.horizontalSideMarkerHeight) / this.getBoxSize().getVerticalBoxSize())
                         
                         if (x < 0 || x >= this.props.labels.length) { x = undefined }
                         if (y < 0 || y >= this.props.labels.length) { y = undefined }
@@ -199,8 +198,8 @@ export class DSM extends React.Component<IProps, IState> {
             const verticalSliceSize = this.getVerticalSliceSize;
 
             const itemCount = this.props.labels.length
-            const width = horizontalSliceSize(itemCount) + this.state.verticalSideMarkerWidth + 2;
-            const height = verticalSliceSize(itemCount) + this.state.horizontalSideMarkerHeight + 2;
+            const width = horizontalSliceSize(itemCount) + this.props.verticalSideMarkerWidth + 2;
+            const height = verticalSliceSize(itemCount) + this.props.horizontalSideMarkerHeight + 2;
 
             //
             this.renderingContext.canvas.width = width;
@@ -241,12 +240,12 @@ export class DSM extends React.Component<IProps, IState> {
 
         // draw the background for the complete matrix
         renderingContext2D.fillStyle = this.colorScheme.getMatrixBackgroundColor();
-        renderingContext2D.fillRect(this.state.verticalSideMarkerWidth, this.state.horizontalSideMarkerHeight, horizontalSliceSize(this.props.labels.length), verticalSliceSize(this.props.labels.length));
+        renderingContext2D.fillRect(this.props.verticalSideMarkerWidth, this.props.horizontalSideMarkerHeight, horizontalSliceSize(this.props.labels.length), verticalSliceSize(this.props.labels.length));
 
         // draw the diagonal
         renderingContext2D.fillStyle = this.colorScheme.getMatrixDiagonalColor();
         for (let index = 0; index < this.props.labels.length; index++) {
-            renderingContext2D.fillRect(this.state.verticalSideMarkerWidth + horizontalSliceSize(index), this.state.horizontalSideMarkerHeight + verticalSliceSize(index),
+            renderingContext2D.fillRect(this.props.verticalSideMarkerWidth + horizontalSliceSize(index), this.props.horizontalSideMarkerHeight + verticalSliceSize(index),
                 horizontalSliceSize(index + 1) - horizontalSliceSize(index),
                 verticalSliceSize(index + 1) - verticalSliceSize(index));
         }
@@ -258,12 +257,12 @@ export class DSM extends React.Component<IProps, IState> {
             // extract the node positions
             const nodePositions = cycle.nodePositions;
 
-            renderingContext2D.fillRect(this.state.verticalSideMarkerWidth + horizontalSliceSize(nodePositions[0]), this.state.horizontalSideMarkerHeight + verticalSliceSize(nodePositions[0]),
+            renderingContext2D.fillRect(this.props.verticalSideMarkerWidth + horizontalSliceSize(nodePositions[0]), this.props.horizontalSideMarkerHeight + verticalSliceSize(nodePositions[0]),
                 horizontalSliceSize(nodePositions.length), verticalSliceSize(nodePositions.length));
 
             renderingContext2D.fillStyle = this.colorScheme.getCycleMatrixDiagonalColor();
             for (const position of nodePositions) {
-                renderingContext2D.fillRect(this.state.verticalSideMarkerWidth + horizontalSliceSize(position), this.state.horizontalSideMarkerHeight + verticalSliceSize(position),
+                renderingContext2D.fillRect(this.props.verticalSideMarkerWidth + horizontalSliceSize(position), this.props.horizontalSideMarkerHeight + verticalSliceSize(position),
                     horizontalSliceSize(position + 1) - horizontalSliceSize(position),
                     verticalSliceSize(position + 1) - verticalSliceSize(position));
             }
@@ -278,8 +277,8 @@ export class DSM extends React.Component<IProps, IState> {
                     renderingContext2D.textAlign = "center";
                     renderingContext2D.textBaseline = "middle";
                     renderingContext2D.fillText('' + item.value,
-                        this.state.verticalSideMarkerWidth + horizontalSliceSize(item.row) + this.getBoxSize().getHorizontalBoxSize() / 2,
-                        this.state.horizontalSideMarkerHeight + verticalSliceSize(item.column) + this.getBoxSize().getVerticalBoxSize() / 2);
+                        this.props.verticalSideMarkerWidth + horizontalSliceSize(item.row) + this.getBoxSize().getHorizontalBoxSize() / 2,
+                        this.props.horizontalSideMarkerHeight + verticalSliceSize(item.column) + this.getBoxSize().getVerticalBoxSize() / 2);
                 }
             }
         });
@@ -289,11 +288,11 @@ export class DSM extends React.Component<IProps, IState> {
         renderingContext2D.beginPath();
         for (let index = 0; index <= this.props.labels.length; index++) {
 
-            renderingContext2D.moveTo(this.state.verticalSideMarkerWidth, this.state.horizontalSideMarkerHeight + verticalSliceSize(index));
-            renderingContext2D.lineTo(this.state.verticalSideMarkerWidth + this.getBoxSize().getHorizontalBoxSize() * this.props.labels.length, this.state.horizontalSideMarkerHeight + verticalSliceSize(index));
+            renderingContext2D.moveTo(this.props.verticalSideMarkerWidth, this.props.horizontalSideMarkerHeight + verticalSliceSize(index));
+            renderingContext2D.lineTo(this.props.verticalSideMarkerWidth + this.getBoxSize().getHorizontalBoxSize() * this.props.labels.length, this.props.horizontalSideMarkerHeight + verticalSliceSize(index));
 
-            renderingContext2D.moveTo(this.state.verticalSideMarkerWidth + horizontalSliceSize(index), this.state.horizontalSideMarkerHeight);
-            renderingContext2D.lineTo(this.state.verticalSideMarkerWidth + horizontalSliceSize(index), this.state.horizontalSideMarkerHeight + this.getBoxSize().getVerticalBoxSize() * this.props.labels.length);
+            renderingContext2D.moveTo(this.props.verticalSideMarkerWidth + horizontalSliceSize(index), this.props.horizontalSideMarkerHeight);
+            renderingContext2D.lineTo(this.props.verticalSideMarkerWidth + horizontalSliceSize(index), this.props.horizontalSideMarkerHeight + this.getBoxSize().getVerticalBoxSize() * this.props.labels.length);
         }
         renderingContext2D.stroke();
 
@@ -306,15 +305,15 @@ export class DSM extends React.Component<IProps, IState> {
             // tslint:disable-next-line:prefer-for-of
             for (let index = 1; index < cycle.nodePositions.length; index++) {
 
-                renderingContext2D.moveTo(this.state.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[index]),
-                    this.state.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[0]));
-                renderingContext2D.lineTo(this.state.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[index]),
-                    this.state.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[cycle.nodePositions.length - 1] + 1));
+                renderingContext2D.moveTo(this.props.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[index]),
+                    this.props.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[0]));
+                renderingContext2D.lineTo(this.props.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[index]),
+                    this.props.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[cycle.nodePositions.length - 1] + 1));
 
-                renderingContext2D.moveTo(this.state.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[0]),
-                    this.state.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[index]));
-                renderingContext2D.lineTo(this.state.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[cycle.nodePositions.length - 1] + 1),
-                    this.state.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[index]));
+                renderingContext2D.moveTo(this.props.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[0]),
+                    this.props.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[index]));
+                renderingContext2D.lineTo(this.props.verticalSideMarkerWidth + horizontalSliceSize(cycle.nodePositions[cycle.nodePositions.length - 1] + 1),
+                    this.props.horizontalSideMarkerHeight + verticalSliceSize(cycle.nodePositions[index]));
             }
 
             renderingContext2D.stroke();
@@ -382,20 +381,20 @@ export class DSM extends React.Component<IProps, IState> {
 
         renderingContext.fillRect(
             0,
-            this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y),
-            this.state.verticalSideMarkerWidth - this.SEP_SIZE,
+            this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y),
+            this.props.verticalSideMarkerWidth - this.SEP_SIZE,
             this.getVerticalSliceSize(y + 1) - this.getVerticalSliceSize(y));
 
         // step 2: separators   
         renderingContext.strokeStyle = isInCycle ? this.colorScheme.getCycleSideMarkerSeparatorColor() : this.colorScheme.getSideMarkerSeparatorColor();
         renderingContext.beginPath();
-        renderingContext.moveTo(0, this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y));
-        renderingContext.lineTo(this.state.verticalSideMarkerWidth - this.SEP_SIZE, this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y));
-        renderingContext.moveTo(this.state.verticalSideMarkerWidth - this.SEP_SIZE, this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y));
-        renderingContext.lineTo(this.state.verticalSideMarkerWidth - this.SEP_SIZE, this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y + 1));
+        renderingContext.moveTo(0, this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y));
+        renderingContext.lineTo(this.props.verticalSideMarkerWidth - this.SEP_SIZE, this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y));
+        renderingContext.moveTo(this.props.verticalSideMarkerWidth - this.SEP_SIZE, this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y));
+        renderingContext.lineTo(this.props.verticalSideMarkerWidth - this.SEP_SIZE, this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y + 1));
         if (y === this.props.labels.length - 1) {
-            renderingContext.moveTo(0, this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(this.props.labels.length));
-            renderingContext.lineTo(this.state.verticalSideMarkerWidth - this.SEP_SIZE, this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(this.props.labels.length));
+            renderingContext.moveTo(0, this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(this.props.labels.length));
+            renderingContext.lineTo(this.props.verticalSideMarkerWidth - this.SEP_SIZE, this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(this.props.labels.length));
         }
         renderingContext.stroke();
 
@@ -404,8 +403,8 @@ export class DSM extends React.Component<IProps, IState> {
         renderingContext.beginPath();
         renderingContext.rect(
             0,
-            this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y),
-            this.state.verticalSideMarkerWidth - (this.SEP_SIZE + this.TEXT_CLIP_PADDING),
+            this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y),
+            this.props.verticalSideMarkerWidth - (this.SEP_SIZE + this.TEXT_CLIP_PADDING),
             this.getVerticalSliceSize(y + 1) - this.getVerticalSliceSize(y));
         renderingContext.clip();
 
@@ -416,7 +415,7 @@ export class DSM extends React.Component<IProps, IState> {
         renderingContext.textBaseline = "middle";
         renderingContext.fillText(this.props.labels[y].text,
             10,
-            this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + this.getBoxSize().getVerticalBoxSize() / 2);
+            this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + this.getBoxSize().getVerticalBoxSize() / 2);
 
         renderingContext.restore();
     }
@@ -435,33 +434,33 @@ export class DSM extends React.Component<IProps, IState> {
         }
 
         renderingContext.fillRect(
-            this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x),
+            this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x),
             0,
             this.getHorizontalSliceSize(x + 1) - this.getHorizontalSliceSize(x),
-            this.state.horizontalSideMarkerHeight - this.SEP_SIZE);
+            this.props.horizontalSideMarkerHeight - this.SEP_SIZE);
 
         // step 2: separators
         renderingContext.strokeStyle = isInCycle ? this.colorScheme.getCycleSideMarkerSeparatorColor() : this.colorScheme.getSideMarkerSeparatorColor();
         renderingContext.beginPath();
-        renderingContext.moveTo(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), 0);
-        renderingContext.lineTo(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), this.state.horizontalSideMarkerHeight - this.SEP_SIZE);
-        renderingContext.moveTo(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), this.state.horizontalSideMarkerHeight - this.SEP_SIZE);
-        renderingContext.lineTo(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x + 1), this.state.horizontalSideMarkerHeight - this.SEP_SIZE);
+        renderingContext.moveTo(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), 0);
+        renderingContext.lineTo(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), this.props.horizontalSideMarkerHeight - this.SEP_SIZE);
+        renderingContext.moveTo(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), this.props.horizontalSideMarkerHeight - this.SEP_SIZE);
+        renderingContext.lineTo(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x + 1), this.props.horizontalSideMarkerHeight - this.SEP_SIZE);
         if (x === this.props.labels.length - 1) {
-            renderingContext.moveTo(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(this.props.labels.length), 0);
-            renderingContext.lineTo(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(this.props.labels.length), this.state.horizontalSideMarkerHeight - this.SEP_SIZE);
+            renderingContext.moveTo(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(this.props.labels.length), 0);
+            renderingContext.lineTo(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(this.props.labels.length), this.props.horizontalSideMarkerHeight - this.SEP_SIZE);
         }
         renderingContext.stroke();
 
         // step 2: re-draw the text
         // ...set the clipping area
         renderingContext.beginPath();
-        renderingContext.rect(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), 0,
-            this.getHorizontalSliceSize(x + 1) - this.getHorizontalSliceSize(x), this.state.horizontalSideMarkerHeight - (this.SEP_SIZE + this.TEXT_CLIP_PADDING));
+        renderingContext.rect(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), 0,
+            this.getHorizontalSliceSize(x + 1) - this.getHorizontalSliceSize(x), this.props.horizontalSideMarkerHeight - (this.SEP_SIZE + this.TEXT_CLIP_PADDING));
         renderingContext.clip();
 
         // ...draw rotated text
-        renderingContext.translate(this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + this.getBoxSize().getHorizontalBoxSize() / 2, 10);
+        renderingContext.translate(this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + this.getBoxSize().getHorizontalBoxSize() / 2, 10);
         renderingContext.rotate(1 * Math.PI / 2);
         renderingContext.fillStyle = this.colorScheme.getSideMarkerTextColor();
         renderingContext.font = this.FONT;
@@ -481,8 +480,8 @@ export class DSM extends React.Component<IProps, IState> {
             this.markedCellLayerrenderingContext.strokeStyle = this.isCellInCycle(x, y) ? this.colorScheme.getCycleMatrixMarkedCellColor() : this.colorScheme.getMatrixMarkedCellColor();
             this.markedCellLayerrenderingContext.lineWidth = 3;
             this.markedCellLayerrenderingContext.strokeRect(
-                this.state.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + 1,
-                this.state.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + 1,
+                this.props.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + 1,
+                this.props.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + 1,
                 this.getBoxSize().getHorizontalBoxSize() - 2,
                 this.getBoxSize().getVerticalBoxSize() - 2);
 
