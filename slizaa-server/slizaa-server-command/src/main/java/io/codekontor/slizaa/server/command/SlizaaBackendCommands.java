@@ -42,7 +42,7 @@ public class SlizaaBackendCommands extends AbstractGraphDatabaseCommandComponent
         return stringBuffer.toString();
     }
 
-    @ShellMethod(value = "List installed extensions.", key="listInstalledExtensions")
+     @ShellMethod(value = "List installed extensions.", key="listInstalledExtensions")
     public String listInstalledExtensions() {
 
         StringBuffer stringBuffer = new StringBuffer();
@@ -94,9 +94,5 @@ public class SlizaaBackendCommands extends AbstractGraphDatabaseCommandComponent
         return modifiableBackendService() != null
                 ? Availability.available()
                 : Availability.unavailable("an offline backend is not modifiable.");
-    }
-
-    private String formatExtension(IExtension extension) {
-        return String.format(" - %1$s_%2$s (Symbolic name: %1$s, version: %2$s)\n", extension.getSymbolicName(), extension.getVersion());
     }
 }

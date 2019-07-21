@@ -22,6 +22,7 @@ import io.codekontor.slizaa.server.descr.GraphDatabase;
 import io.codekontor.slizaa.server.descr.HierarchicalGraph;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
+import io.codekontor.slizaa.server.service.extensions.IExtension;
 import io.codekontor.slizaa.server.service.extensions.IExtensionService;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
@@ -84,7 +85,6 @@ public abstract class AbstractGraphDatabaseCommandComponent {
                                 null;
 
 
-
                 GraphDatabase graphDatabase = new GraphDatabase(
                         db.getIdentifier(),
                         contentDefinition,
@@ -111,7 +111,7 @@ public abstract class AbstractGraphDatabaseCommandComponent {
 
         if (!_slizaaService.getContentDefinitionProviderFactories().isEmpty()) {
             _slizaaService.getContentDefinitionProviderFactories().forEach(factory -> {
-                stringBuffer.append(" - " + factory.getFactoryId() + "\n");
+                stringBuffer.append(" - " + factory.getShortForm() + " (" + factory.getFactoryId() + ")\n");
             });
         } else {
             stringBuffer.append("No Content Definition Provider Factories available.\n");
@@ -127,7 +127,13 @@ public abstract class AbstractGraphDatabaseCommandComponent {
      */
     protected String checkBackendConfigured() {
         if (!_slizaaService.getBackendService().hasInstalledExtensions()) {
-            return cannotExecuteCommand("The Slizaa Server has not been configured properly: There are not installed backend extensions.\n");
+            StringBuilder message = new StringBuilder();
+            message.append("The Slizaa Server has not been configured properly: There are not installed backend extensions.\n");
+            message.append(dumpAvailableExtensions());
+            if (_modifiableBackendService != null) {
+                message.append("You can install backend extensions using the command 'installExtensions'.");
+            }
+            return cannotExecuteCommand(message.toString());
         }
         return null;
     }
@@ -153,5 +159,18 @@ public abstract class AbstractGraphDatabaseCommandComponent {
         stringBuffer.append("Can not execute command.\n");
         stringBuffer.append(msg + "\n");
         return stringBuffer.toString();
+    }
+
+    protected String dumpAvailableExtensions() {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Available Backend Extensions:\n");
+        extensionService().getExtensions().forEach(extension -> {
+            stringBuffer.append(formatExtension(extension));
+        });
+        return stringBuffer.toString();
+    }
+
+    protected String formatExtension(IExtension extension) {
+        return String.format(" - %1$s_%2$s (Symbolic name: %1$s, version: %2$s)\n", extension.getSymbolicName(), extension.getVersion());
     }
 }
