@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ApolloClient } from 'apollo-client';
 import * as React from 'react';
 import { WithApolloClient } from 'react-apollo';
 import { SlizaaIcon } from 'src/components/slizaaicon';
@@ -29,18 +28,8 @@ import { IHierarchicalGraphTreeState } from './IHierarchicalGraphTreeState';
 
 export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHierarchicalGraphTreeProps>, IHierarchicalGraphTreeState> {
 
-  private apolloClient: ApolloClient<any>;
-
-  private databaseId: string;
-
-  private hierarchicalGraphId: string;
-
   constructor(props: WithApolloClient<IHierarchicalGraphTreeProps>) {
     super(props);
-
-    this.apolloClient = props.client;
-    this.databaseId = props.databaseId;
-    this.hierarchicalGraphId = props.hierarchicalGraphId;
   }
 
   public onExpand = (expandedKeys: string[]) => {
@@ -56,7 +45,7 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
   }
 
   public loadData = (parent: SlizaaNode, callback: () => void): Promise<{}> => {
-    return fetchChildren(parent, this.apolloClient, this.databaseId, this.hierarchicalGraphId, callback);
+    return fetchChildren(this.props.client, parent, this.props.databaseId, this.props.hierarchicalGraphId, callback);
   }
 
   public render() {

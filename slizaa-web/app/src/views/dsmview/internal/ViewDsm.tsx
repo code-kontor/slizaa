@@ -17,6 +17,7 @@
  */
 
 import { Spin } from 'antd';
+import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import { ApolloConsumer, Query } from 'react-apollo';
 import { connect } from 'react-redux';
@@ -25,6 +26,11 @@ import { Card } from 'src/components/card';
 import { DSM } from 'src/components/dsm';
 import { HierarchicalGraphTree } from 'src/components/hierarchicalgraphtree';
 import { HorizontalSplitLayout, ResizableBox } from 'src/components/layout';
+import { SlizaaIcon } from 'src/components/slizaaicon';
+import STree from 'src/components/stree/STree';
+import { ISlizaaNode } from 'src/model/ISlizaaNode';
+import { SlizaaNode } from 'src/model/SlizaaNode';
+import { fetchChildrenFilterByDependencySet } from 'src/model/SlizaaNodeChildrenResolver';
 import { action_DsmView_SetDsmSidemarkerSize, actionSetTreeNodeSelection_DsmView } from 'src/redux/Actions';
 import { IAppState, IDependenciesViewState } from 'src/redux/IAppState';
 import { DsmForNodeChildren, DsmForNodeChildrenVariables } from './__generated__/DsmForNodeChildren';
@@ -69,8 +75,9 @@ export class ViewDsm extends React.Component<IProps, IState> {
             hierarchicalGraphId: this.props.hierarchicalGraphId,
             nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
         };
-        const items = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.map(id => <li key={id}>{id}</li>) : null;
 
+        const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
+ 
         return (
 
             <div>
@@ -128,9 +135,22 @@ export class ViewDsm extends React.Component<IProps, IState> {
                 </ResizableBox>
                 <ResizableBox id="lowerResizableBox" intitalHeight={this.state.lowerHeight} onHeightChanged={this.onHeightChanged}>
                     <Card title="Dependencies Details" >
-                        <ul>
-                            {items}
-                        </ul>
+                        <ApolloConsumer>
+                            {cl =>
+                                 <HorizontalSplitLayout id="upper" initialWidth={450}
+                                    left={
+                                        <STree
+                                            rootNode={rootNodeDependencySource}
+                                            onExpand={this.onExpand}
+                                            onSelect={this.onSelect}
+                                            loadData={this.loadChildrenFilteredByDependencySource(cl)}
+                                            fetchIcon={this.fetchIcon}
+                                        />
+                                    }
+                                    right={<h1>right</h1>}
+                                />
+                            }
+                        </ApolloConsumer>
                     </Card>
                 </ResizableBox>
             </div>
@@ -162,6 +182,14 @@ export class ViewDsm extends React.Component<IProps, IState> {
         else if (id === "lowerResizableBox") {
             this.setState({ lowerHeight: newHeight });
         }
+    }
+
+    private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
+        return <SlizaaIcon iconId={item.iconId} />
+      }
+
+    private loadChildrenFilteredByDependencySource = (client : ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
+        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, this.props.databaseId, this.props.hierarchicalGraphId, c );
     }
 }
 

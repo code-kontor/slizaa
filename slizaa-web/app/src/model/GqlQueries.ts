@@ -33,3 +33,17 @@ query NodeChildren($databaseId: ID!, $hierarchicalGraphId: ID!, $nodeId: ID!)  {
     }
   }
 }`
+
+export const NodeChildrenFilteredByDependencySetQuery = gql`
+query NodeChildrenFilteredByDependencySet($databaseId: ID!, $hierarchicalGraphId: ID!, $sourceNodeId: ID!, $targetNodeId:  ID!, $nodeId: ID!, $nodeType: NodeType!) {
+	hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+    dependencySetForAggregatedDependency(sourceNodeId: $sourceNodeId, targetNodeId: $targetNodeId) {
+      filteredChildren(parentNode: $nodeId, parentNodeType: $nodeType) {
+          id
+          text
+          iconIdentifier
+          hasChildren
+      }
+    }
+  }
+}`

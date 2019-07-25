@@ -16,47 +16,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ApolloClient from 'apollo-client';
+import ApolloClient, { ApolloQueryResult } from 'apollo-client';
+import { NodeType } from 'src/__generated__/query-types';
 import { NodeChildren, NodeChildrenVariables } from './__generated__/NodeChildren';
-import { NodeChildrenQuery } from './GqlQueries';
+import { NodeChildrenFilteredByDependencySet, NodeChildrenFilteredByDependencySetVariables } from './__generated__/NodeChildrenFilteredByDependencySet';
+import { NodeChildrenFilteredByDependencySetQuery, NodeChildrenQuery } from './GqlQueries';
 import { SlizaaNode } from "./SlizaaNode";
 
-export function fetchChildren(parentNode: SlizaaNode, apolloClient: ApolloClient<any>, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
+export function fetchChildren( aApolloClient: ApolloClient<any>, aParentNode: SlizaaNode, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
+    return queryChildren(aParentNode, (slizaaNode) => aApolloClient.query<NodeChildren, NodeChildrenVariables>({
+        query: NodeChildrenQuery,
+        variables: {
+            databaseId: aDatabaseId,
+            hierarchicalGraphId: aHierarchicalGraphId,
+            nodeId: aParentNode.key
+        }
+    }), callback);
+}
+
+export function fetchChildrenFilterByDependencySet( apolloClient: ApolloClient<any>, aParentNode: SlizaaNode, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
+    return queryChildren(aParentNode, (slizaaNode) => apolloClient.query<NodeChildrenFilteredByDependencySet, NodeChildrenFilteredByDependencySetVariables>({
+        query: NodeChildrenFilteredByDependencySetQuery,
+        variables: {
+            databaseId: aDatabaseId,
+            hierarchicalGraphId: aHierarchicalGraphId,
+            nodeId: aParentNode.key,
+            nodeType: NodeType.SOURCE,
+            sourceNodeId: "23873",
+            targetNodeId: ""
+        }
+    }), callback);
+}
+
+/**
+ * 
+ * @param parentNode the parent node to request the children for
+ * @param query the query used to request the children
+ * @param callback a callback to execute
+ */
+function queryChildren(parentNode: SlizaaNode, query: (parentNode: SlizaaNode) => Promise<ApolloQueryResult<any>>, callback: () => void): Promise<{}> {
 
     return new Promise(async (resolve, reject) => {
 
-        // return if children already have been resolved
+        // return if children already have been resolved...
         if (parentNode.internalChildren) {
             resolve();
             return;
         }
 
-        const key: string = parentNode.key;
-
-        await apolloClient.query<NodeChildren, NodeChildrenVariables>({
-            query: NodeChildrenQuery,
-            variables: {
-                databaseId: aDatabaseId,
-                hierarchicalGraphId: aHierarchicalGraphId,
-                nodeId: key
-            }
-        })
+        // otherwise try to resolve the children...
+        await query(parentNode)
             .then(result => {
-
                 if (result.data.hierarchicalGraph && result.data.hierarchicalGraph.node) {
-                    const resultChildren = result.data.hierarchicalGraph.node.children.nodes
+                    const resultChildren = result.data.hierarchicalGraph.node.children.nodes;
                     parentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
-
                     for (let i = 0; i < resultChildren.length; i++) {
-                        parentNode.internalChildren[i] = SlizaaNode.createNode(
-                            resultChildren[i].id,
-                            resultChildren[i].text,
-                            resultChildren[i].iconIdentifier,
-                            resultChildren[i].hasChildren,
-                        )
+                        parentNode.internalChildren[i] = SlizaaNode.createNode(resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
                     }
                 }
-
                 callback();
                 resolve();
             })
@@ -65,5 +82,4 @@ export function fetchChildren(parentNode: SlizaaNode, apolloClient: ApolloClient
             });
     });
 }
-
 
