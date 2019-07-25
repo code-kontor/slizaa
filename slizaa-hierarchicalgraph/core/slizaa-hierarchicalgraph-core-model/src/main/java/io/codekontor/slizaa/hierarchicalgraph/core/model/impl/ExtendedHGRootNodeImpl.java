@@ -168,7 +168,11 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
       });
     }
 
-    return this._idToNodeMap.get(identifier);
+    HGNode result = this._idToNodeMap.get(identifier);
+    if (result == null && this.getIdentifier().equals(identifier)) {
+      return this;
+    }
+    return result;
   }
 
   /**
