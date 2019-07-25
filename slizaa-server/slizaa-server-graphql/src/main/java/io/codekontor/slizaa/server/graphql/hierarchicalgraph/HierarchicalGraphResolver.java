@@ -84,7 +84,7 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
 
     private HGNode hgNode(HierarchicalGraph hierarchicalGraph, String id) {
         return nullSafe(hierarchicalGraph, hgRootNode -> {
-            return "-1".equals(id) ? hgRootNode : hgRootNode.lookupNode(Long.parseLong(id));
+            return hgRootNode.lookupNode(Long.parseLong(id));
         });
     }
 

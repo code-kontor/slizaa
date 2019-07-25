@@ -114,7 +114,10 @@ type DependencySet{
     filteredDependencies(selectedNodes: [ID!]!, selectedNodesType: NodeType!): DependencySet!
 
     # Returns a set of nodes filtered by the specified node type.
-    filteredChildren(selectedNode: ID!, selectedNodeType: NodeType!): NodeSet!
+    filteredChildren(parentNode: ID!, parentNodeType: NodeType!): [Node!]!
+
+    #
+    filteredChildrenIds(parentNode: ID!, parentNodeType: NodeType!): [String!]!
 }
 
 # The Query type

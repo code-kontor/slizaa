@@ -73,13 +73,12 @@ public class DependencySet {
         return AbstractNodeSet.toNodeIds(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
     }
 
-    public NodeSet filteredChildren(String selectedNode, NodeType selectedNodeType) {
-        HGNode hgNode = _aggregatedDependency.getRootNode().lookupNode(Long.parseLong(checkNotNull(selectedNode)));
-        // TODO: NULL CHECK
-        Set<HGNode> nodes = checkNotNull(selectedNodeType).equals(NodeType.SOURCE) ?
-                _selectionService.getChildrenFilteredByDependencySources(_aggregatedDependency, hgNode) :
-                _selectionService.getChildrenFilteredByDependencyTargets(_aggregatedDependency, hgNode);
-        return new NodeSet(nodes);
+    public List<Node> filteredChildren(String parentNode, NodeType parentNodeType) {
+        return AbstractNodeSet.toNodes(filteredHgNodesChildren(parentNode, parentNodeType));
+    }
+
+    public List<String> filteredChildrenIds(String parentNode, NodeType parentNodeType) {
+        return AbstractNodeSet.toNodeIds(filteredHgNodesChildren(parentNode, parentNodeType));
     }
 
     public DependencySet filteredDependencies(List<String> selectedNodes, NodeType selectedNodesType) {
@@ -94,5 +93,13 @@ public class DependencySet {
         return checkNotNull(selectedNodesType).equals(NodeType.SOURCE) ?
                 _selectionService.getReferencedTargetNodes(_aggregatedDependency, hgNodes, includedPredecessors) :
                 _selectionService.getReferencedSourceNodes(_aggregatedDependency, hgNodes, includedPredecessors);
+    }
+
+    private Set<HGNode> filteredHgNodesChildren(String parentNode, NodeType parentNodeType) {
+        HGNode hgNode = _aggregatedDependency.getRootNode().lookupNode(Long.parseLong(checkNotNull(parentNode)));
+        // TODO: NULL CHECK
+        return checkNotNull(parentNodeType).equals(NodeType.SOURCE) ?
+                _selectionService.getChildrenFilteredByDependencySources(_aggregatedDependency, hgNode) :
+                _selectionService.getChildrenFilteredByDependencyTargets(_aggregatedDependency, hgNode);
     }
 }
