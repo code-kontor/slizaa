@@ -34,22 +34,14 @@ public abstract class AbstractNodeSet {
   }
 
   public List<Node> getNodes() {
-    return toNodes(_hgNodeSet);
+    return NodeUtils.toNodes(_hgNodeSet);
   }
 
   public List<String> getNodeIds() {
-    return toNodeIds(_hgNodeSet);
+    return NodeUtils.toNodeIds(_hgNodeSet);
   }
   
   protected Collection<HGNode> hgNodeSet() {
     return _hgNodeSet;
-  }
-
-  public static List<Node> toNodes(Collection<HGNode> nodes) {
-    return checkNotNull(nodes).stream().map(hgNode -> new Node(hgNode)).collect(Collectors.toList());
-  }
-
-  public static List<String> toNodeIds(Collection<HGNode> nodes) {
-    return checkNotNull(nodes).stream().map(hgNode -> hgNode.getIdentifier().toString()).collect(Collectors.toList());
   }
 }

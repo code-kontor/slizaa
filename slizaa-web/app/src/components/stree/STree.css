@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-li.slizaa-focus > span.ant-tree-node-content-wrapper {
-  background-color: red;
-}
-
 .slizaa-tree {
   font-size: 12px;
 }
 
 .ant-tree-child-tree > li:first-child {
   padding-top: 0px;
+}
+
+.ant-tree-checkbox-checked .ant-tree-checkbox-inner {
+  background-color: rgba(0, 0, 0, 0.65);
+  border-color: rgba(0, 0, 0, 0.65);
 }

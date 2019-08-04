@@ -22,6 +22,7 @@ import * as React from 'react';
 import { ApolloConsumer, Query } from 'react-apollo';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
+import { NodeType } from 'src/__generated__/query-types';
 import { Card } from 'src/components/card';
 import { DSM } from 'src/components/dsm';
 import { HierarchicalGraphTree } from 'src/components/hierarchicalgraphtree';
@@ -34,8 +35,8 @@ import { fetchChildrenFilterByDependencySet } from 'src/model/SlizaaNodeChildren
 import { action_DsmView_SetDsmSidemarkerSize, actionSetTreeNodeSelection_DsmView } from 'src/redux/Actions';
 import { IAppState, IDependenciesViewState } from 'src/redux/IAppState';
 import { DsmForNodeChildren, DsmForNodeChildrenVariables } from './__generated__/DsmForNodeChildren';
+import './DependenciesView.css';
 import { GQ_DSM_FOR_NODE_CHILDREN } from './GqlQueries';
-import './ViewDsm.css';
 
 interface IProps {
     databaseId: string
@@ -77,6 +78,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
         };
 
         const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
+        const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
  
         return (
 
@@ -141,13 +143,21 @@ export class ViewDsm extends React.Component<IProps, IState> {
                                     left={
                                         <STree
                                             rootNode={rootNodeDependencySource}
-                                            onExpand={this.onExpand}
-                                            onSelect={this.onSelect}
+                                            // onExpand={this.onExpand}
+                                            // onSelect={this.onSelect}
                                             loadData={this.loadChildrenFilteredByDependencySource(cl)}
                                             fetchIcon={this.fetchIcon}
                                         />
                                     }
-                                    right={<h1>right</h1>}
+                                    right={
+                                        <STree
+                                            rootNode={rootNodeDependencyTarget}
+                                            // onExpand={this.onExpand}
+                                            // onSelect={this.onSelect}
+                                            loadData={this.loadChildrenFilteredByDependencyTarget(cl)}
+                                            fetchIcon={this.fetchIcon}
+                                        />
+                                    }
                                 />
                             }
                         </ApolloConsumer>
@@ -189,7 +199,11 @@ export class ViewDsm extends React.Component<IProps, IState> {
       }
 
     private loadChildrenFilteredByDependencySource = (client : ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, this.props.databaseId, this.props.hierarchicalGraphId, c );
+        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, this.props.databaseId, this.props.hierarchicalGraphId, c );
+    }
+
+    private loadChildrenFilteredByDependencyTarget = (client : ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
+        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, this.props.databaseId, this.props.hierarchicalGraphId, c );
     }
 }
 
