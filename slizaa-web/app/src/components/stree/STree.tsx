@@ -59,6 +59,7 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
   }
 
   public onCheck = (checkedItems: ICheckedItems, e: AntTreeNodeCheckedEvent): void => {
+    // TODO: multiple check
     const newCheckedKeys = !e.node.props.checked ? [e.node.props.dataRef.key] : [];
     this.setState({
       checkedKeys: newCheckedKeys
@@ -120,15 +121,15 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
 
     return (
       <Tree
-        checkable={true}
-        checkStrictly={true}
+        checkable={false}
+        checkStrictly={false}
         defaultExpandedKeys={this.state.expandedKeys}
         expandedKeys={this.state.expandedKeys}
         defaultCheckedKeys={this.state.checkedKeys}
         checkedKeys={this.state.checkedKeys}
         autoExpandParent={true}
         multiple={false}
-        selectable={false}
+        selectable={true}
         onSelect={this.onSelect}
         onExpand={this.onExpand}
         onCheck={this.onCheck}

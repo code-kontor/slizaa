@@ -19,7 +19,7 @@
 import { Spin } from 'antd';
 import ApolloClient from 'apollo-client';
 import * as React from 'react';
-import { ApolloConsumer, Query } from 'react-apollo';
+import { ApolloConsumer, Query} from 'react-apollo';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { NodeType } from 'src/__generated__/query-types';
@@ -70,13 +70,6 @@ export class ViewDsm extends React.Component<IProps, IState> {
             return null
         }
 
-        const query = GQ_DSM_FOR_NODE_CHILDREN;
-        const queryVariables = {
-            databaseId: this.props.databaseId,
-            hierarchicalGraphId: this.props.hierarchicalGraphId,
-            nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
-        };
-
         const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
         const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
  
@@ -102,35 +95,8 @@ export class ViewDsm extends React.Component<IProps, IState> {
                         }
                         right={
                             <Card title="Dependencies Overview" >
-                                <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables} fetchPolicy="no-cache" >
-                                    {({ loading, data, error }) => {
+                                {this.dependenciesOverwiew()}
 
-                                        if (loading) {
-                                            return <Spin size="large" />;
-                                        }
-
-                                        if (error) {
-                                            return <h1>{error.message}</h1>
-                                        }
-
-                                        if (!data || !data.hierarchicalGraph || !data.hierarchicalGraph.node) {
-                                            return <div>UNDEFINED - TODO</div>
-                                        }
-
-                                        // get  the data
-                                        const { orderedNodes, cells, stronglyConnectedComponents } = data.hierarchicalGraph.node.children.dependencyMatrix
-
-                                        return <DSM labels={orderedNodes}
-                                                    cells={cells}
-                                                    stronglyConnectedComponents={stronglyConnectedComponents}
-                                                    horizontalBoxSize={35}
-                                                    verticalBoxSize={35} 
-                                                    horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
-                                                    verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
-                                                    onSideMarkerResize={this.onResizeDsmSidemarker}
-                                                    />
-                                    }}
-                                </Query>
                             </Card>
                         }
                     />
@@ -173,7 +139,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
     }
 
     private onResizeDsmSidemarker = (horizontalHeight: number, verticalWidth: number): void => {
-        this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
+         this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
     }
 
     private onExpand = (expandedKeys: string[]): void => {
@@ -204,6 +170,51 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
     private loadChildrenFilteredByDependencyTarget = (client : ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
         return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, this.props.databaseId, this.props.hierarchicalGraphId, c );
+    }
+
+    private dependenciesOverwiew(): React.ReactNode {
+
+        if (this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0) {
+
+            const query = GQ_DSM_FOR_NODE_CHILDREN;
+            const queryVariables = {
+            databaseId: this.props.databaseId,
+            hierarchicalGraphId: this.props.hierarchicalGraphId,
+            nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
+        };                            
+
+        return <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables} fetchPolicy="no-cache" >
+        {({ loading, data, error }) => {
+            
+            if (loading) {
+                return <Spin size="large" />;
+                                        }
+                                        
+                                        if (error) {
+                                            return <h1>{error.message}</h1>
+                                        }
+                                        
+                                        if (!data || !data.hierarchicalGraph || !data.hierarchicalGraph.node) {
+                                            return <div>UNDEFINED - TODO</div>
+                                        }
+                                        
+                                        // get  the data
+                                        const { orderedNodes, cells, stronglyConnectedComponents } = data.hierarchicalGraph.node.children.dependencyMatrix
+                                        
+                                        return <DSM labels={orderedNodes}
+                                        cells={cells}
+                                        stronglyConnectedComponents={stronglyConnectedComponents}
+                                        horizontalBoxSize={35}
+                                        verticalBoxSize={35} 
+                                        horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
+                                        verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
+                                        onSideMarkerResize={this.onResizeDsmSidemarker}
+                                        />
+                                    }}
+                                </Query>
+                               
+                            }
+        return null;
     }
 }
 
