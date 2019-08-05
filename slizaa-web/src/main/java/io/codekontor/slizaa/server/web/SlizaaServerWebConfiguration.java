@@ -17,29 +17,12 @@
  */
 package io.codekontor.slizaa.server.web;
 
-import io.codekontor.slizaa.server.command.EnableSlizaaServerCommandModule;
-import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModule;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import io.codekontor.slizaa.server.graphql.EnableGraphqlModule;
-import io.codekontor.slizaa.server.service.backend.EnableBackendServiceModule;
-import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
-import io.codekontor.slizaa.server.service.extensions.EnableExtensionsModule;
-import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
-import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
+import io.codekontor.slizaa.server.SlizaaServerConfiguration;
 
 /**
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class SlizaaServerWeb {
+public class SlizaaServerWebConfiguration extends SlizaaServerConfiguration {
 
-  /**
-   *
-   * @param args
-   */
-  public static void main(String[] args) {
-    SpringApplication.run(SlizaaServerWebConfiguration.class, args);
-  }
 }

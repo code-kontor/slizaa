@@ -32,7 +32,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class SlizaaServer {
+@SpringBootApplication
+@EnableExtensionsModule
+@EnableBackendServiceModule
+@EnableSlizaaServiceModule
+@EnableGraphqlModule
+@EnableConfigurationModule
+@EnableSvgServiceModule
+@EnableSlizaaServerCommandModule
+@EnableSelectionServiceModule
+public class SlizaaServerConfiguration {
 
   /**
    *
