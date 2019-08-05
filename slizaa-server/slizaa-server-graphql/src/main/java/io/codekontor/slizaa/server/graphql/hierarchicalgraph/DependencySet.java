@@ -53,7 +53,7 @@ public class DependencySet {
                 _selectionService.getSourceNodes(_aggregatedDependency, includedPredecessors) :
                 _selectionService.getTargetNodes(_aggregatedDependency, includedPredecessors);
 
-        return AbstractNodeSet.toNodes(nodes);
+        return NodeUtils.toNodes(nodes);
     }
 
     public List<String> nodeIds(NodeType nodeType, boolean includedPredecessors) {
@@ -62,23 +62,23 @@ public class DependencySet {
                 _selectionService.getSourceNodes(_aggregatedDependency, includedPredecessors) :
                 _selectionService.getTargetNodes(_aggregatedDependency, includedPredecessors);
 
-        return AbstractNodeSet.toNodeIds(nodes);
+        return NodeUtils.toNodeIds(nodes);
     }
 
     public List<Node> referencedNodes(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
-        return AbstractNodeSet.toNodes(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
+        return NodeUtils.toNodes(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
     }
 
     public List<String> referencedNodeIds(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
-        return AbstractNodeSet.toNodeIds(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
+        return NodeUtils.toNodeIds(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
     }
 
     public List<Node> filteredChildren(String parentNode, NodeType parentNodeType) {
-        return AbstractNodeSet.toNodes(filteredHgNodesChildren(parentNode, parentNodeType));
+        return NodeUtils.toNodes(filteredHgNodesChildren(parentNode, parentNodeType));
     }
 
     public List<String> filteredChildrenIds(String parentNode, NodeType parentNodeType) {
-        return AbstractNodeSet.toNodeIds(filteredHgNodesChildren(parentNode, parentNodeType));
+        return NodeUtils.toNodeIds(filteredHgNodesChildren(parentNode, parentNodeType));
     }
 
     public DependencySet filteredDependencies(List<String> selectedNodes, NodeType selectedNodesType) {
