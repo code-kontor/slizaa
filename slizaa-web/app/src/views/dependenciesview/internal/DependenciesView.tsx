@@ -19,7 +19,7 @@
 import { Spin } from 'antd';
 import ApolloClient from 'apollo-client';
 import * as React from 'react';
-import { ApolloConsumer, Query} from 'react-apollo';
+import { ApolloConsumer, Query } from 'react-apollo';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { NodeType } from 'src/__generated__/query-types';
@@ -32,7 +32,7 @@ import STree from 'src/components/stree/STree';
 import { ISlizaaNode } from 'src/model/ISlizaaNode';
 import { SlizaaNode } from 'src/model/SlizaaNode';
 import { fetchChildrenFilterByDependencySet } from 'src/model/SlizaaNodeChildrenResolver';
-import { action_DsmView_SetDsmSidemarkerSize, actionSetTreeNodeSelection_DsmView } from 'src/redux/Actions';
+import { action_DependenciesView_SetDsmSidemarkerSize, actionSet_DependenciesView_DependencySelection, actionSet_DependenciesView_TreeNodeSelection } from 'src/redux/Actions';
 import { IAppState, IDependenciesViewState } from 'src/redux/IAppState';
 import { DsmForNodeChildren, DsmForNodeChildrenVariables } from './__generated__/DsmForNodeChildren';
 import './DependenciesView.css';
@@ -43,6 +43,7 @@ interface IProps {
     hierarchicalGraphId: string
     dependenciesViewState: IDependenciesViewState
     dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => void
+    dispatchSelectDependencySelection: (sourceNodeId: string | undefined, targetNodeId: string | undefined, weight: number) => void;
     dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
 }
 
@@ -72,7 +73,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
         const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
         const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
- 
+
         return (
 
             <div>
@@ -88,7 +89,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
                                             hierarchicalGraphId={this.props.hierarchicalGraphId}
                                             onSelect={this.onSelect}
                                             onExpand={this.onExpand}
-                                            expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : [] } />
+                                            expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : []} />
                                     }
                                 </ApolloConsumer>
                             </Card>
@@ -105,7 +106,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
                     <Card title="Dependencies Details" >
                         <ApolloConsumer>
                             {cl =>
-                                 <HorizontalSplitLayout id="upper" initialWidth={450}
+                                <HorizontalSplitLayout id="upper" initialWidth={450}
                                     left={
                                         <STree
                                             rootNode={rootNodeDependencySource}
@@ -139,12 +140,17 @@ export class ViewDsm extends React.Component<IProps, IState> {
     }
 
     private onResizeDsmSidemarker = (horizontalHeight: number, verticalWidth: number): void => {
-         this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
+        this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
     }
 
     private onExpand = (expandedKeys: string[]): void => {
         const selectedNodeIds = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds : [];
         this.props.dispatchSelectNodeSelection(expandedKeys, selectedNodeIds);
+    }
+
+    private onSelectDependency = (aSourceNodeId: string | undefined, aTargetNodeId: string | undefined): void => {
+        // TODO: WEIGHT
+        this.props.dispatchSelectDependencySelection(aSourceNodeId, aTargetNodeId, 0);
     }
 
     private onWidthChanged = (id: string, newWidth: number): void => {
@@ -162,14 +168,14 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
     private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
         return <SlizaaIcon iconId={item.iconId} />
-      }
-
-    private loadChildrenFilteredByDependencySource = (client : ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, this.props.databaseId, this.props.hierarchicalGraphId, c );
     }
 
-    private loadChildrenFilteredByDependencyTarget = (client : ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, this.props.databaseId, this.props.hierarchicalGraphId, c );
+    private loadChildrenFilteredByDependencySource = (client: ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
+        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, this.props.databaseId, this.props.hierarchicalGraphId, c);
+    }
+
+    private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
+        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, this.props.databaseId, this.props.hierarchicalGraphId, c);
     }
 
     private dependenciesOverwiew(): React.ReactNode {
@@ -178,42 +184,43 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
             const query = GQ_DSM_FOR_NODE_CHILDREN;
             const queryVariables = {
-            databaseId: this.props.databaseId,
-            hierarchicalGraphId: this.props.hierarchicalGraphId,
-            nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
-        };                            
+                databaseId: this.props.databaseId,
+                hierarchicalGraphId: this.props.hierarchicalGraphId,
+                nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
+            };
 
-        return <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables} fetchPolicy="no-cache" >
-        {({ loading, data, error }) => {
-            
-            if (loading) {
-                return <Spin size="large" />;
-                                        }
-                                        
-                                        if (error) {
-                                            return <h1>{error.message}</h1>
-                                        }
-                                        
-                                        if (!data || !data.hierarchicalGraph || !data.hierarchicalGraph.node) {
-                                            return <div>UNDEFINED - TODO</div>
-                                        }
-                                        
-                                        // get  the data
-                                        const { orderedNodes, cells, stronglyConnectedComponents } = data.hierarchicalGraph.node.children.dependencyMatrix
-                                        
-                                        return <DSM labels={orderedNodes}
-                                        cells={cells}
-                                        stronglyConnectedComponents={stronglyConnectedComponents}
-                                        horizontalBoxSize={35}
-                                        verticalBoxSize={35} 
-                                        horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
-                                        verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
-                                        onSideMarkerResize={this.onResizeDsmSidemarker}
-                                        />
-                                    }}
-                                </Query>
-                               
-                            }
+            return <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables} fetchPolicy="no-cache" >
+                {({ loading, data, error }) => {
+
+                    if (loading) {
+                        return <Spin size="large" />;
+                    }
+
+                    if (error) {
+                        return <h1>{error.message}</h1>
+                    }
+
+                    if (!data || !data.hierarchicalGraph || !data.hierarchicalGraph.node) {
+                        return <div>UNDEFINED - TODO</div>
+                    }
+
+                    // get  the data
+                    const { orderedNodes, cells, stronglyConnectedComponents } = data.hierarchicalGraph.node.children.dependencyMatrix
+
+                    return <DSM labels={orderedNodes}
+                        cells={cells}
+                        stronglyConnectedComponents={stronglyConnectedComponents}
+                        horizontalBoxSize={35}
+                        verticalBoxSize={35}
+                        horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
+                        verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
+                        onSideMarkerResize={this.onResizeDsmSidemarker}
+                        onSelect={this.onSelectDependency}
+                    />
+                }}
+            </Query>
+
+        }
         return null;
     }
 }
@@ -221,18 +228,21 @@ export class ViewDsm extends React.Component<IProps, IState> {
 const mapStateToProps = (state: IAppState) => {
     return {
         databaseId: state.currentDatabase,
-        dependenciesViewState : state.dependenciesViewState,
+        dependenciesViewState: state.dependenciesViewState,
         hierarchicalGraphId: state.currentHierarchicalGraph
     };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
+        dispatchSelectDependencySelection: (aSourceNodeId: string, aTargetNodeId: string, weight: number) => {
+            dispatch(actionSet_DependenciesView_DependencySelection(aSourceNodeId, aTargetNodeId, weight));
+        },
         dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => {
-            dispatch(actionSetTreeNodeSelection_DsmView(expandedNodeIds, selectedNodeIds)); 
+            dispatch(actionSet_DependenciesView_TreeNodeSelection(expandedNodeIds, selectedNodeIds));
         },
         dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => {
-            dispatch(action_DsmView_SetDsmSidemarkerSize(verticalWidth, horizontalHeight)); 
+            dispatch(action_DependenciesView_SetDsmSidemarkerSize(verticalWidth, horizontalHeight));
         },
     };
 };

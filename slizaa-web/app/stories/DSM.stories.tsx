@@ -37,7 +37,7 @@ function createLabels(count: number): Array<{ id: string, text: string }> {
   return result;
 }
 
-function handleOnHover(column: number | undefined, row: number | undefined) {
+function handleOnHover(column: string | undefined, row: string | undefined) {
   // tslint:disable-next-line
   console.log("Row: " + row + " , Column: " + column);
 }

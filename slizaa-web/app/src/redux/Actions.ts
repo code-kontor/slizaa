@@ -23,6 +23,7 @@ export const ACTION_SELECT_HIERARCHICAL_GRAPH = 'ACTION_SELECT_HIERARCHICAL_GRAP
 // dependencies view
 export const ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION = 'ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION';
 export const ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE = 'ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE';
+export const ACTION__DEPENDENCIES_VIEW__SET_DEPENDENCY_SELECTION = 'ACTION__DEPENDENCIES_VIEW__SET_DEPENDENCY_SELECTION';
 
 export interface IActionSelectDatabase extends Action {
   type: 'ACTION_SELECT_DATABASE';
@@ -46,11 +47,19 @@ export interface IActionSetTreeNodeSelection extends Action {
   expandedNodeIds: string[];
 }
 
-export type AppActions = 
-  IActionSelectDatabase | 
-  IActionSelectHierarchicalGraph | 
+export interface IActionSetDependencySelection extends Action {
+  type: 'ACTION__DEPENDENCIES_VIEW__SET_DEPENDENCY_SELECTION';
+  sourceNode: string;
+  targetNode: string;
+  weight: number;
+}
+
+export type AppActions =
+  IActionSelectDatabase |
+  IActionSelectHierarchicalGraph |
   IActionSetTreeNodeSelection |
-  IActionSetDsmSidemarkerSize;
+  IActionSetDsmSidemarkerSize |
+  IActionSetDependencySelection;
 
 export function actionSelectDatabase(selectedDatabaseId: string): IActionSelectDatabase {
   return {
@@ -66,17 +75,27 @@ export function actionSelectHierarchicalGraph(selectedHierarchicalGraphId: strin
   };
 }
 
-export function actionSetTreeNodeSelection_DsmView(expNodeIds: string[], selNodeIds: string[]): IActionSetTreeNodeSelection {
+export function actionSet_DependenciesView_TreeNodeSelection(expNodeIds: string[], selNodeIds: string[]): IActionSetTreeNodeSelection {
   return {
     expandedNodeIds: expNodeIds,
     selectedNodeIds: selNodeIds,
     type: ACTION__DEPENDENCIES_VIEW__SET_TREE_NODE_SELECTION
   };
 }
- export function action_DsmView_SetDsmSidemarkerSize(horizontalHeight: number, verticalWidth: number): IActionSetDsmSidemarkerSize {
-    return {
-      horizontalSideMarkerHeight: horizontalHeight,
-      type: ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE,
-      verticalSideMarkerWidth: verticalWidth,
+
+export function actionSet_DependenciesView_DependencySelection(aSourceNode: string, aTargetNode: string, aWeight: number): IActionSetDependencySelection {
+  return {
+    sourceNode: aSourceNode,
+    targetNode: aTargetNode,
+    type: ACTION__DEPENDENCIES_VIEW__SET_DEPENDENCY_SELECTION,
+    weight: aWeight,
+  };
+}
+
+export function action_DependenciesView_SetDsmSidemarkerSize(horizontalHeight: number, verticalWidth: number): IActionSetDsmSidemarkerSize {
+  return {
+    horizontalSideMarkerHeight: horizontalHeight,
+    type: ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE,
+    verticalSideMarkerWidth: verticalWidth,
   };
 }

@@ -46,6 +46,20 @@ export function appReducer(state: IAppState = defaultState(), action: AppActions
             }
         }
     }
+    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_DEPENDENCY_SELECTION") {
+        return {
+            ...state,
+            dependenciesViewState: {
+                ...state.dependenciesViewState,
+                selectedDependency: 
+                {   
+                    sourceNode: action.sourceNode,
+                    targetNode: action.targetNode,
+                    weight: action.weight,
+                }
+            }
+        }
+    }
     else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE") {
         return {
             ...state,

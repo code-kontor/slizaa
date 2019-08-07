@@ -24,19 +24,24 @@ export interface IAppState {
 export interface IDependenciesViewState {
     treeNodeSelection: ITreeNodeSelection;
     dsmSettings: IDsmSettings;
+    selectedDependency?: IDependencySelection;
 }
 
+export interface IDependencySelection {
+    sourceNode: string;
+    targetNode: string;
+    weight: number;
+}
  export interface ITreeNodeSelection {
     selectedNodeIds: string[];
     expandedNodeIds: string[];
 }
 
 export interface IDsmSettings {
+
     horizontalSideMarkerHeight: number;
     verticalSideMarkerWidth: number;
 }
-
-
 
 export function defaultState() : IAppState {
     return {
