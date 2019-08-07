@@ -89,6 +89,12 @@ export class DSM extends React.Component<IDsmProps, {}> {
                         this.newlySelectedX = position[0];
                         this.newlySelectedY = position[1];
                         requestAnimationFrame(this.updateMarkedLayer);
+                        if (this.props.onSelect) {
+                            this.props.onSelect(
+                                this.newlySelectedX !== undefined ? this.props.labels[this.newlySelectedX].id : undefined,
+                                this.newlySelectedY !== undefined ? this.props.labels[this.newlySelectedY].id : undefined
+                            );
+                        }
                     }
                 }).bind(this)
 
