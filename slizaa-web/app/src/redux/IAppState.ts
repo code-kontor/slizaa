@@ -28,8 +28,8 @@ export interface IDependenciesViewState {
 }
 
 export interface IDependencySelection {
-    sourceNode: string;
-    targetNode: string;
+    sourceNodeId: string;
+    targetNodeId: string;
     weight: number;
 }
  export interface ITreeNodeSelection {

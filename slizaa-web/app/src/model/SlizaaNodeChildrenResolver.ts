@@ -61,7 +61,7 @@ export function fetchChildren( aApolloClient: ApolloClient<NodeChildren>, aParen
     });
 }
 
-export function fetchChildrenFilterByDependencySet( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aNodeType: NodeType, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
+export function fetchChildrenFilterByDependencySet( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aNodeType: NodeType, dependencySourceNodeId: string, dependencyTargetNodeId: string, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
 
     // create new result promise
     return new Promise(async (resolve, reject) => {
@@ -80,8 +80,8 @@ export function fetchChildrenFilterByDependencySet( aApolloClient: ApolloClient<
                 hierarchicalGraphId: aHierarchicalGraphId,
                 nodeId: aParentNode.key,
                 nodeType: aNodeType,
-                sourceNodeId: "1361",
-                targetNodeId: "19440"
+                sourceNodeId: dependencySourceNodeId,
+                targetNodeId: dependencyTargetNodeId
             }
         })
         .then(result => {

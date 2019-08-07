@@ -53,8 +53,8 @@ export function appReducer(state: IAppState = defaultState(), action: AppActions
                 ...state.dependenciesViewState,
                 selectedDependency: 
                 {   
-                    sourceNode: action.sourceNode,
-                    targetNode: action.targetNode,
+                    sourceNodeId: action.sourceNode,
+                    targetNodeId: action.targetNode,
                     weight: action.weight,
                 }
             }
