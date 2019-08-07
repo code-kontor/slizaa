@@ -17,25 +17,26 @@
  */
 
 import {Spin} from 'antd';
-import ApolloClient from 'apollo-client';
+// import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import {NodeType} from 'src/__generated__/query-types';
+// import {NodeType} from 'src/__generated__/query-types';
 import {Card} from 'src/components/card';
 import {DSM} from 'src/components/dsm';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
-import {SlizaaIcon} from 'src/components/slizaaicon';
-import STree from 'src/components/stree/STree';
-import {ISlizaaNode} from 'src/model/ISlizaaNode';
-import {SlizaaNode} from 'src/model/SlizaaNode';
-import {fetchChildrenFilterByDependencySet} from 'src/model/SlizaaNodeChildrenResolver';
+// import {SlizaaIcon} from 'src/components/slizaaicon';
+// import STree from 'src/components/stree/STree';
+// import {ISlizaaNode} from 'src/model/ISlizaaNode';
+// import {SlizaaNode} from 'src/model/SlizaaNode';
+// import {fetchChildrenFilterByDependencySet} from 'src/model/SlizaaNodeChildrenResolver';
 import {
     action_DependenciesView_SetDsmSidemarkerSize,
+    action_DependenciesView_SetExpandedTreeNodes,
+    action_DependenciesView_SetSelectedTreeNodes,
     actionSet_DependenciesView_DependencySelection,
-    actionSet_DependenciesView_TreeNodeSelection
 } from 'src/redux/Actions';
 import {IAppState, IDependenciesViewState} from 'src/redux/IAppState';
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from './__generated__/DsmForNodeChildren';
@@ -46,7 +47,8 @@ interface IProps {
     databaseId: string
     hierarchicalGraphId: string
     dependenciesViewState: IDependenciesViewState
-    dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => void
+    dispatchSelectedNodes: (selectedNodeIds: string[]) => void
+    dispatchExpandedNodes: (expandedNodeIds: string[]) => void
     dispatchSelectDependencySelection: (sourceNodeId: string | undefined, targetNodeId: string | undefined, weight: number) => void;
     dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
 }
@@ -116,7 +118,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
     private dependenciesDetails(): React.ReactNode {
 
-        if (this.props.dependenciesViewState.selectedDependency) {
+/*        if (this.props.dependenciesViewState.selectedDependency) {
 
             const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
             const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
@@ -149,10 +151,10 @@ export class ViewDsm extends React.Component<IProps, IState> {
                     />
                 }
             </ApolloConsumer>
-        }
+        }*/
 
         //
-        return null;
+        return this.props.dependenciesViewState.selectedDependency ? <h1>{this.props.dependenciesViewState.selectedDependency.sourceNodeId + ":" + this.props.dependenciesViewState.selectedDependency.targetNodeId}</h1> : <div/>;
     }
 
     private dependenciesOverwiew(): React.ReactNode {
@@ -203,17 +205,15 @@ export class ViewDsm extends React.Component<IProps, IState> {
     }
 
     private onSelect = (selectedKeys: string[]): void => {
-        const exapndedNodeIds = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : [];
-        this.props.dispatchSelectNodeSelection(exapndedNodeIds, selectedKeys);
+        this.props.dispatchSelectedNodes(selectedKeys);
+    }
+
+    private onExpand = (expandedKeys: string[]): void => {
+        this.props.dispatchExpandedNodes(expandedKeys);
     }
 
     private onResizeDsmSidemarker = (horizontalHeight: number, verticalWidth: number): void => {
         this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
-    }
-
-    private onExpand = (expandedKeys: string[]): void => {
-        const selectedNodeIds = this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds : [];
-        this.props.dispatchSelectNodeSelection(expandedKeys, selectedNodeIds);
     }
 
     private onSelectDependency = (aSourceNodeId: string | undefined, aTargetNodeId: string | undefined): void => {
@@ -233,7 +233,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
         }
     }
 
-    private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
+/*    private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
         return <SlizaaIcon iconId={item.iconId}/>
     }
 
@@ -243,7 +243,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
 
     private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
         return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
-    }
+    }*/
 }
 
 const mapStateToProps = (state: IAppState) => {
@@ -256,11 +256,14 @@ const mapStateToProps = (state: IAppState) => {
 
 const mapDispatchToProps = (dispatch: Dispatch) => {
     return {
+        dispatchExpandedNodes: (expandedNodeIds: string[]) => {
+            dispatch(action_DependenciesView_SetExpandedTreeNodes(expandedNodeIds));
+        },
         dispatchSelectDependencySelection: (aSourceNodeId: string, aTargetNodeId: string, weight: number) => {
             dispatch(actionSet_DependenciesView_DependencySelection(aSourceNodeId, aTargetNodeId, weight));
         },
-        dispatchSelectNodeSelection: (expandedNodeIds: string[], selectedNodeIds: string[]) => {
-            dispatch(actionSet_DependenciesView_TreeNodeSelection(expandedNodeIds, selectedNodeIds));
+        dispatchSelectedNodes: (selectedNodeIds: string[]) => {
+            dispatch(action_DependenciesView_SetSelectedTreeNodes(selectedNodeIds));
         },
         dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => {
             dispatch(action_DependenciesView_SetDsmSidemarkerSize(verticalWidth, horizontalHeight));
