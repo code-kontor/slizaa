@@ -50,7 +50,9 @@ export interface IDsmColorScheme {
     getCycleMatrixDiagonalColor(): string;
   
     getCycleSideMarkerMarkedColor(): string;
-  }
+
+    getSelectedCellColor(): string;
+}
 
   export class DefaultColorScheme implements IDsmColorScheme {
 
@@ -151,4 +153,8 @@ export interface IDsmColorScheme {
   public getMatrixMarkedCellColor() {
     return this.VAR_2_DARK_MEDIUM;
   }
+
+  public getSelectedCellColor() {
+      return this.BLACK
   }
+}
