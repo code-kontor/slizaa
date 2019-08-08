@@ -18,10 +18,10 @@
 export interface IAppState {
     currentDatabase: string | undefined;
     currentHierarchicalGraph: string | undefined;
-    dependenciesViewState: IDependenciesViewState;
+    dependenciesViewState: IGlobalDependenciesViewState;
 }
 
-export interface IDependenciesViewState {
+export interface IGlobalDependenciesViewState {
     treeNodeSelection: ITreeNodeSelection;
     dsmSettings: IDsmSettings;
     selectedDependency?: IDependencySelection;

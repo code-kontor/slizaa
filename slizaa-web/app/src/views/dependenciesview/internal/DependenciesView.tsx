@@ -38,30 +38,30 @@ import {
     action_DependenciesView_SetSelectedTreeNodes,
     actionSet_DependenciesView_DependencySelection,
 } from 'src/redux/Actions';
-import {IAppState, IDependenciesViewState} from 'src/redux/IAppState';
+import {IAppState, IGlobalDependenciesViewState} from 'src/redux/IAppState';
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from './__generated__/DsmForNodeChildren';
 import './DependenciesView.css';
 import {GQ_DSM_FOR_NODE_CHILDREN} from './GqlQueries';
 
-interface IProps {
+interface IDependenciesViewProps {
     databaseId: string
     hierarchicalGraphId: string
-    dependenciesViewState: IDependenciesViewState
+    dependenciesViewState: IGlobalDependenciesViewState
     dispatchSelectedNodes: (selectedNodeIds: string[]) => void
     dispatchExpandedNodes: (expandedNodeIds: string[]) => void
     dispatchSelectDependencySelection: (sourceNodeId: string | undefined, targetNodeId: string | undefined, weight: number) => void;
     dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
 }
 
-interface IState {
+interface IDependenciesViewState {
     treeWidth: number
     upperHeight: number
     lowerHeight: number
 }
 
-export class ViewDsm extends React.Component<IProps, IState> {
+export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
 
-    constructor(props: IProps) {
+    constructor(props: IDependenciesViewProps) {
         super(props);
 
         this.state = {
@@ -80,33 +80,26 @@ export class ViewDsm extends React.Component<IProps, IState> {
         return (
 
             <div>
-                <ResizableBox id="upperResizableBox" intitalHeight={this.state.upperHeight}
+                <ResizableBox id="upperResizableBox"
+                              intitalHeight={this.state.upperHeight}
                               onHeightChanged={this.onHeightChanged}>
-                    <HorizontalSplitLayout id="upper" initialWidth={this.state.treeWidth}
-                                           onWidthChanged={this.onWidthChanged}
+                    <HorizontalSplitLayout id="upper"
+                                           initialWidth={this.state.treeWidth}
+                                           onWidthChanged={this.onSplitLayoutWidthChanged}
                                            left={
                                                <Card title="Hierarchical Graph">
-                                                   <ApolloConsumer>
-                                                       {cl =>
-                                                           <HierarchicalGraphTree
-                                                               client={cl}
-                                                               databaseId={this.props.databaseId}
-                                                               hierarchicalGraphId={this.props.hierarchicalGraphId}
-                                                               onSelect={this.onSelect}
-                                                               onExpand={this.onExpand}
-                                                               expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : []}/>
-                                                       }
-                                                   </ApolloConsumer>
+                                                   {this.hierarchicalGraph()}
                                                </Card>
                                            }
                                            right={
                                                <Card title="Dependencies Overview">
-                                                   {this.dependenciesOverwiew()}
+                                                   {this.dependenciesOverview()}
                                                </Card>
                                            }
                     />
                 </ResizableBox>
-                <ResizableBox id="lowerResizableBox" intitalHeight={this.state.lowerHeight}
+                <ResizableBox id="lowerResizableBox"
+                              intitalHeight={this.state.lowerHeight}
                               onHeightChanged={this.onHeightChanged}>
                     <Card title="Dependencies Details">
                         {this.dependenciesDetails()}
@@ -116,48 +109,67 @@ export class ViewDsm extends React.Component<IProps, IState> {
         );
     }
 
-    private dependenciesDetails(): React.ReactNode {
-
-/*        if (this.props.dependenciesViewState.selectedDependency) {
-
-            const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
-            const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
-
-            return <ApolloConsumer>
-                {cl =>
-                    <HorizontalSplitLayout id="upper" initialWidth={450}
-                                           left={
-                                               this.props.dependenciesViewState.selectedDependency ?
-                                                   <STree
-                                                       rootNode={rootNodeDependencySource}
-                                                       // onExpand={this.onExpand}
-                                                       // onSelect={this.onSelect}
-                                                       loadData={this.loadChildrenFilteredByDependencySource(cl, this.props.dependenciesViewState.selectedDependency.sourceNodeId, this.props.dependenciesViewState.selectedDependency.targetNodeId)}
-                                                       fetchIcon={this.fetchIcon}
-                                                   />
-                                                   : <div/>
-                                           }
-                                           right={
-                                               this.props.dependenciesViewState.selectedDependency ?
-                                                   <STree
-                                                       rootNode={rootNodeDependencyTarget}
-                                                       // onExpand={this.onExpand}
-                                                       // onSelect={this.onSelect}
-                                                       loadData={this.loadChildrenFilteredByDependencyTarget(cl, this.props.dependenciesViewState.selectedDependency.sourceNodeId, this.props.dependenciesViewState.selectedDependency.targetNodeId)}
-                                                       fetchIcon={this.fetchIcon}
-                                                   />
-                                                   : <div/>
-                                           }
-                    />
-                }
-            </ApolloConsumer>
-        }*/
-
-        //
-        return this.props.dependenciesViewState.selectedDependency ? <h1>{this.props.dependenciesViewState.selectedDependency.sourceNodeId + ":" + this.props.dependenciesViewState.selectedDependency.targetNodeId}</h1> : <div/>;
+    private hierarchicalGraph(): React.ReactNode {
+        return <ApolloConsumer>
+            {cl =>
+                <HierarchicalGraphTree
+                    client={cl}
+                    databaseId={this.props.databaseId}
+                    hierarchicalGraphId={this.props.hierarchicalGraphId}
+                    onSelect={this.props.dispatchSelectedNodes}
+                    onExpand={this.props.dispatchExpandedNodes}
+                    expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : []}/>
+            }
+        </ApolloConsumer>
     }
 
-    private dependenciesOverwiew(): React.ReactNode {
+    private dependenciesDetails(): React.ReactNode {
+
+        /*        if (this.props.dependenciesViewState.selectedDependency) {
+
+                    const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
+                    const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
+
+                    return <ApolloConsumer>
+                        {cl =>
+                            <HorizontalSplitLayout id="upper" initialWidth={450}
+                                                   left={
+                                                       this.props.dependenciesViewState.selectedDependency ?
+                                                           <STree
+                                                               rootNode={rootNodeDependencySource}
+                                                               // onExpand={this.onExpand}
+                                                               // onSelect={this.onSelect}
+                                                               loadData={this.loadChildrenFilteredByDependencySource(cl, this.props.dependenciesViewState.selectedDependency.sourceNodeId, this.props.dependenciesViewState.selectedDependency.targetNodeId)}
+                                                               fetchIcon={this.fetchIcon}
+                                                           />
+                                                           : <div/>
+                                                   }
+                                                   right={
+                                                       this.props.dependenciesViewState.selectedDependency ?
+                                                           <STree
+                                                               rootNode={rootNodeDependencyTarget}
+                                                               // onExpand={this.onExpand}
+                                                               // onSelect={this.onSelect}
+                                                               loadData={this.loadChildrenFilteredByDependencyTarget(cl, this.props.dependenciesViewState.selectedDependency.sourceNodeId, this.props.dependenciesViewState.selectedDependency.targetNodeId)}
+                                                               fetchIcon={this.fetchIcon}
+                                                           />
+                                                           : <div/>
+                                                   }
+                            />
+                        }
+                    </ApolloConsumer>
+                }*/
+
+        //
+        return this.props.dependenciesViewState.selectedDependency ?
+            <h1>{this.props.dependenciesViewState.selectedDependency.sourceNodeId + ":" + this.props.dependenciesViewState.selectedDependency.targetNodeId}</h1> :
+            <div/>;
+    }
+
+    /**
+     * Creates the dependencies overview component.
+     */
+    private dependenciesOverview(): React.ReactNode {
 
         if (this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0) {
 
@@ -194,7 +206,7 @@ export class ViewDsm extends React.Component<IProps, IState> {
                                 verticalBoxSize={35}
                                 horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
                                 verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
-                                onSideMarkerResize={this.onResizeDsmSidemarker}
+                                onSideMarkerResize={this.props.dispatchSidemarkerResize}
                                 onSelect={this.onSelectDependency}
                     />
                 }}
@@ -204,24 +216,12 @@ export class ViewDsm extends React.Component<IProps, IState> {
         return null;
     }
 
-    private onSelect = (selectedKeys: string[]): void => {
-        this.props.dispatchSelectedNodes(selectedKeys);
-    }
-
-    private onExpand = (expandedKeys: string[]): void => {
-        this.props.dispatchExpandedNodes(expandedKeys);
-    }
-
-    private onResizeDsmSidemarker = (horizontalHeight: number, verticalWidth: number): void => {
-        this.props.dispatchSidemarkerResize(horizontalHeight, verticalWidth);
-    }
-
     private onSelectDependency = (aSourceNodeId: string | undefined, aTargetNodeId: string | undefined): void => {
         // TODO: WEIGHT
         this.props.dispatchSelectDependencySelection(aSourceNodeId, aTargetNodeId, 0);
     }
 
-    private onWidthChanged = (id: string, newWidth: number): void => {
+    private onSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
         this.setState({treeWidth: newWidth});
     }
 
@@ -233,17 +233,17 @@ export class ViewDsm extends React.Component<IProps, IState> {
         }
     }
 
-/*    private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
-        return <SlizaaIcon iconId={item.iconId}/>
-    }
+    /*    private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
+            return <SlizaaIcon iconId={item.iconId}/>
+        }
 
-    private loadChildrenFilteredByDependencySource = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
-    }
+        private loadChildrenFilteredByDependencySource = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
+            return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
+        }
 
-    private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
-    }*/
+        private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
+            return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
+        }*/
 }
 
 const mapStateToProps = (state: IAppState) => {
