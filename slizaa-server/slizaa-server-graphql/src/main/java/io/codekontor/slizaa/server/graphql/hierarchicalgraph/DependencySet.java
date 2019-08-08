@@ -21,6 +21,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.server.service.selection.ISelectionService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,19 +36,33 @@ public class DependencySet {
 
     public DependencySet(ISelectionService selectionService, HGAggregatedDependency aggregatedDependency) {
         _selectionService = checkNotNull(selectionService);
-        _aggregatedDependency = checkNotNull(aggregatedDependency);
+        _aggregatedDependency = aggregatedDependency;
     }
 
     public List<Dependency> dependencies() {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
+
         return _aggregatedDependency.getCoreDependencies().stream()
                 .map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getWeight())).collect(Collectors.toList());
     }
 
     public int size() {
+
+        if (_aggregatedDependency == null) {
+            return 0;
+        }
+
         return _aggregatedDependency.getCoreDependencies().size();
     }
 
     public List<Node> nodes(NodeType nodeType, boolean includedPredecessors) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
 
         Set<HGNode> nodes = checkNotNull(nodeType).equals(NodeType.SOURCE) ?
                 _selectionService.getSourceNodes(_aggregatedDependency, includedPredecessors) :
@@ -58,6 +73,10 @@ public class DependencySet {
 
     public List<String> nodeIds(NodeType nodeType, boolean includedPredecessors) {
 
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
+
         Set<HGNode> nodes = checkNotNull(nodeType).equals(NodeType.SOURCE) ?
                 _selectionService.getSourceNodes(_aggregatedDependency, includedPredecessors) :
                 _selectionService.getTargetNodes(_aggregatedDependency, includedPredecessors);
@@ -66,18 +85,38 @@ public class DependencySet {
     }
 
     public List<Node> referencedNodes(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
+
         return NodeUtils.toNodes(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
     }
 
     public List<String> referencedNodeIds(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
+
         return NodeUtils.toNodeIds(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
     }
 
     public List<Node> filteredChildren(String parentNode, NodeType parentNodeType) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
+
         return NodeUtils.toNodes(filteredHgNodesChildren(parentNode, parentNodeType));
     }
 
     public List<String> filteredChildrenIds(String parentNode, NodeType parentNodeType) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptyList();
+        }
+
         return NodeUtils.toNodeIds(filteredHgNodesChildren(parentNode, parentNodeType));
     }
 
@@ -86,6 +125,10 @@ public class DependencySet {
     }
 
     private Set<HGNode> referencedHgNodes(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptySet();
+        }
 
         Set<HGNode> hgNodes = checkNotNull(selectedNodes).
                 stream().map(id -> _aggregatedDependency.getRootNode().lookupNode(Long.parseLong(id))).collect(Collectors.toSet());
@@ -96,6 +139,11 @@ public class DependencySet {
     }
 
     private Set<HGNode> filteredHgNodesChildren(String parentNode, NodeType parentNodeType) {
+
+        if (_aggregatedDependency == null) {
+            return Collections.emptySet();
+        }
+
         HGNode hgNode = _aggregatedDependency.getRootNode().lookupNode(Long.parseLong(checkNotNull(parentNode)));
         // TODO: NULL CHECK
         return checkNotNull(parentNodeType).equals(NodeType.SOURCE) ?

@@ -15,23 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import {Spin} from 'antd';
-// import ApolloClient from 'apollo-client';
+import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-// import {NodeType} from 'src/__generated__/query-types';
 import {Card} from 'src/components/card';
 import {DSM} from 'src/components/dsm';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
-// import {SlizaaIcon} from 'src/components/slizaaicon';
-// import STree from 'src/components/stree/STree';
-// import {ISlizaaNode} from 'src/model/ISlizaaNode';
-// import {SlizaaNode} from 'src/model/SlizaaNode';
-// import {fetchChildrenFilterByDependencySet} from 'src/model/SlizaaNodeChildrenResolver';
 import {
     action_DependenciesView_SetDsmSidemarkerSize,
     action_DependenciesView_SetExpandedTreeNodes,
@@ -39,6 +32,7 @@ import {
     actionSet_DependenciesView_DependencySelection,
 } from 'src/redux/Actions';
 import {IAppState, IGlobalDependenciesViewState} from 'src/redux/IAppState';
+import {SlizaaDependencyTree} from "../../../components/slizaadependencytree";
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from './__generated__/DsmForNodeChildren';
 import './DependenciesView.css';
 import {GQ_DSM_FOR_NODE_CHILDREN} from './GqlQueries';
@@ -78,92 +72,67 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
         }
 
         return (
-
-            <div>
-                <ResizableBox id="upperResizableBox"
-                              intitalHeight={this.state.upperHeight}
-                              onHeightChanged={this.onHeightChanged}>
-                    <HorizontalSplitLayout id="upper"
-                                           initialWidth={this.state.treeWidth}
-                                           onWidthChanged={this.onSplitLayoutWidthChanged}
-                                           left={
-                                               <Card title="Hierarchical Graph">
-                                                   {this.hierarchicalGraph()}
-                                               </Card>
-                                           }
-                                           right={
-                                               <Card title="Dependencies Overview">
-                                                   {this.dependenciesOverview()}
-                                               </Card>
-                                           }
-                    />
-                </ResizableBox>
-                <ResizableBox id="lowerResizableBox"
-                              intitalHeight={this.state.lowerHeight}
-                              onHeightChanged={this.onHeightChanged}>
-                    <Card title="Dependencies Details">
-                        {this.dependenciesDetails()}
-                    </Card>
-                </ResizableBox>
-            </div>
+            <ApolloConsumer>
+                {cl =>
+                    <div>
+                        <ResizableBox id="upperResizableBox"
+                                      intitalHeight={this.state.upperHeight}
+                                      onHeightChanged={this.onHeightChanged}>
+                            <HorizontalSplitLayout id="upper"
+                                                   initialWidth={this.state.treeWidth}
+                                                   onWidthChanged={this.onSplitLayoutWidthChanged}
+                                                   left={
+                                                       <Card title="Hierarchical Graph">
+                                                           {this.hierarchicalGraph(cl)}
+                                                       </Card>
+                                                   }
+                                                   right={
+                                                       <Card title="Dependencies Overview">
+                                                           {this.dependenciesOverview()}
+                                                       </Card>
+                                                   }
+                            />
+                        </ResizableBox>
+                        <ResizableBox id="lowerResizableBox"
+                                      intitalHeight={this.state.lowerHeight}
+                                      onHeightChanged={this.onHeightChanged}>
+                            <Card title="Dependencies Details">
+                                {this.dependenciesDetails(cl)}
+                            </Card>
+                        </ResizableBox>
+                    </div>
+                }
+            </ApolloConsumer>
         );
     }
 
-    private hierarchicalGraph(): React.ReactNode {
-        return <ApolloConsumer>
-            {cl =>
-                <HierarchicalGraphTree
-                    client={cl}
-                    databaseId={this.props.databaseId}
-                    hierarchicalGraphId={this.props.hierarchicalGraphId}
-                    onSelect={this.props.dispatchSelectedNodes}
-                    onExpand={this.props.dispatchExpandedNodes}
-                    expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : []}/>
-            }
-        </ApolloConsumer>
+    private hierarchicalGraph(client: ApolloClient<any>): React.ReactNode {
+        return <HierarchicalGraphTree
+            client={client}
+            databaseId={this.props.databaseId}
+            hierarchicalGraphId={this.props.hierarchicalGraphId}
+            onSelect={this.props.dispatchSelectedNodes}
+            onExpand={this.props.dispatchExpandedNodes}
+            expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : []}/>
+
     }
 
-    private dependenciesDetails(): React.ReactNode {
+    private dependenciesDetails(client: ApolloClient<any>): React.ReactNode {
 
-        /*        if (this.props.dependenciesViewState.selectedDependency) {
+        // return empty div if selected dependency is undefined
+        if (this.props.dependenciesViewState.selectedDependency === undefined ||
+            this.props.dependenciesViewState.selectedDependency.sourceNodeId === undefined ||
+            this.props.dependenciesViewState.selectedDependency.targetNodeId === undefined) {
 
-                    const rootNodeDependencySource = SlizaaNode.createRoot("Root", "default");
-                    const rootNodeDependencyTarget = SlizaaNode.createRoot("Root", "default");
-
-                    return <ApolloConsumer>
-                        {cl =>
-                            <HorizontalSplitLayout id="upper" initialWidth={450}
-                                                   left={
-                                                       this.props.dependenciesViewState.selectedDependency ?
-                                                           <STree
-                                                               rootNode={rootNodeDependencySource}
-                                                               // onExpand={this.onExpand}
-                                                               // onSelect={this.onSelect}
-                                                               loadData={this.loadChildrenFilteredByDependencySource(cl, this.props.dependenciesViewState.selectedDependency.sourceNodeId, this.props.dependenciesViewState.selectedDependency.targetNodeId)}
-                                                               fetchIcon={this.fetchIcon}
-                                                           />
-                                                           : <div/>
-                                                   }
-                                                   right={
-                                                       this.props.dependenciesViewState.selectedDependency ?
-                                                           <STree
-                                                               rootNode={rootNodeDependencyTarget}
-                                                               // onExpand={this.onExpand}
-                                                               // onSelect={this.onSelect}
-                                                               loadData={this.loadChildrenFilteredByDependencyTarget(cl, this.props.dependenciesViewState.selectedDependency.sourceNodeId, this.props.dependenciesViewState.selectedDependency.targetNodeId)}
-                                                               fetchIcon={this.fetchIcon}
-                                                           />
-                                                           : <div/>
-                                                   }
-                            />
-                        }
-                    </ApolloConsumer>
-                }*/
+            return <div/>;
+        }
 
         //
-        return this.props.dependenciesViewState.selectedDependency ?
-            <h1>{this.props.dependenciesViewState.selectedDependency.sourceNodeId + ":" + this.props.dependenciesViewState.selectedDependency.targetNodeId}</h1> :
-            <div/>;
+        return <SlizaaDependencyTree sourceNodeId={this.props.dependenciesViewState.selectedDependency.sourceNodeId}
+                                     targetNodeId={this.props.dependenciesViewState.selectedDependency.targetNodeId}
+                                     databaseId={this.props.databaseId}
+                                     hierarchicalGraphId={this.props.hierarchicalGraphId}
+                                     client={client}/>
     }
 
     /**
@@ -216,9 +185,9 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
         return null;
     }
 
-    private onSelectDependency = (aSourceNodeId: string | undefined, aTargetNodeId: string | undefined): void => {
+    private onSelectDependency = (aColumnNodeId: string | undefined, aRowNodeId: string | undefined): void => {
         // TODO: WEIGHT
-        this.props.dispatchSelectDependencySelection(aSourceNodeId, aTargetNodeId, 0);
+        this.props.dispatchSelectDependencySelection(aRowNodeId, aColumnNodeId, 0);
     }
 
     private onSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
@@ -232,18 +201,6 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
             this.setState({lowerHeight: newHeight});
         }
     }
-
-    /*    private fetchIcon = (item: ISlizaaNode): React.ReactNode => {
-            return <SlizaaIcon iconId={item.iconId}/>
-        }
-
-        private loadChildrenFilteredByDependencySource = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-            return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
-        }
-
-        private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-            return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
-        }*/
 }
 
 const mapStateToProps = (state: IAppState) => {

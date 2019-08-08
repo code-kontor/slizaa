@@ -92,7 +92,7 @@ export class DSM extends React.Component<IDsmProps, {}> {
                         if (this.props.onSelect) {
                             this.props.onSelect(
                                 this.newlySelectedX !== undefined ? this.props.labels[this.newlySelectedX].id : undefined,
-                                this.newlySelectedY !== undefined ? this.props.labels[this.newlySelectedY].id : undefined
+                                this.newlySelectedY !== undefined ? this.props.labels[this.newlySelectedY].id : undefined,
                             );
                         }
                     }

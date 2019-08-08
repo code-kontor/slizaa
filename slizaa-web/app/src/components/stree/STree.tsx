@@ -37,6 +37,16 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
     };
   }
 
+  public componentWillReceiveProps(nextProps: ISTreeProps) {
+
+    this.state = {
+      checkedKeys: nextProps.checkedKeys ? nextProps.checkedKeys : [],
+      expandedKeys: nextProps.expandedKeys ? nextProps.expandedKeys : [],
+      focusedNodes: [],
+      rootNodes: [nextProps.rootNode]
+    };
+  }
+
   public onExpand = (newExpandedKeys: string[], e: AntTreeNodeExpandedEvent) => {
 
     const expandedKey = e.node.props.dataRef.key;
@@ -80,7 +90,8 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
 
   public loadData = (treeNode: AntTreeNode) => {
 
-
+    // tslint:disable-next-line:no-console
+    console.log("loadData: " + treeNode);
 
     return Promise.resolve(true).then(async (resolve) => {
       if (this.props.loadData) {
@@ -137,6 +148,7 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
         showIcon={true}
         showLine={false}
         style={{ overflow: "auto" }}
+        key={this.makeid(10)}
       >
         {this.renderTreeNodes(this.state.rootNodes)}
       </Tree>
@@ -148,6 +160,16 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
       return this.props.fetchIcon(item);
     }
     return <Icon type="question" />;
+  }
+
+  private makeid = (length: number):string => {
+    let result           = '';
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
   }
 }
 interface ICheckedItems {
