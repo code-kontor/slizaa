@@ -57,28 +57,30 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
     public render() {
 
         return <HorizontalSplitLayout id="upper" initialWidth={450}
-                               left={
+                                      left={
 
-                                   <STree
-                                       rootNode={this.state.sourceNode}
-                                       // onExpand={this.onExpand}
-                                       // onSelect={this.onSelect}
-                                       loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
-                                       fetchIcon={this.fetchIcon}
-                                   />
+                                          <STree
+                                              rootNode={this.state.sourceNode}
+                                              // onExpand={this.onExpand}
+                                              // onSelect={this.onSelect}
+                                              expandedKeys={["-1"]}
+                                              loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
+                                              fetchIcon={this.fetchIcon}
+                                          />
 
-                               }
-                               right={
+                                      }
+                                      right={
 
-                                   <STree
-                                       rootNode={this.state.targetNode}
-                                       // onExpand={this.onExpand}
-                                       // onSelect={this.onSelect}
-                                       loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
-                                       fetchIcon={this.fetchIcon}
-                                   />
+                                          <STree
+                                              rootNode={this.state.targetNode}
+                                              // onExpand={this.onExpand}
+                                              // onSelect={this.onSelect}
+                                              loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
+                                              expandedKeys={["-1"]}
+                                              fetchIcon={this.fetchIcon}
+                                          />
 
-                               }
+                                      }
         />
     }
 

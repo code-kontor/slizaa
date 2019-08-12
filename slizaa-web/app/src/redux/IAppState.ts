@@ -38,7 +38,6 @@ export interface IDependencySelection {
 }
 
 export interface IDsmSettings {
-
     horizontalSideMarkerHeight: number;
     verticalSideMarkerWidth: number;
 }
@@ -57,6 +56,5 @@ export function defaultState() : IAppState {
                 selectedNodeIds: []
             }
         }
-
     };
   }

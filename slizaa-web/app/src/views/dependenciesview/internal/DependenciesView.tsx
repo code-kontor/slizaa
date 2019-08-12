@@ -20,48 +20,38 @@ import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
 import {connect} from 'react-redux';
-import {Dispatch} from 'redux';
 import {Card} from 'src/components/card';
 import {DSM} from 'src/components/dsm';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
-import {
-    action_DependenciesView_SetDsmSidemarkerSize,
-    action_DependenciesView_SetExpandedTreeNodes,
-    action_DependenciesView_SetSelectedTreeNodes,
-    actionSet_DependenciesView_DependencySelection,
-} from 'src/redux/Actions';
-import {IAppState, IGlobalDependenciesViewState} from 'src/redux/IAppState';
+import {IAppState} from 'src/redux/IAppState';
 import {SlizaaDependencyTree} from "../../../components/slizaadependencytree";
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from './__generated__/DsmForNodeChildren';
 import './DependenciesView.css';
 import {GQ_DSM_FOR_NODE_CHILDREN} from './GqlQueries';
+import {IDependenciesViewProps} from "./IDependenciesViewProps";
+import {IDependenciesViewState, NodeType} from "./IDependenciesViewState";
 
-interface IDependenciesViewProps {
-    databaseId: string
-    hierarchicalGraphId: string
-    dependenciesViewState: IGlobalDependenciesViewState
-    dispatchSelectedNodes: (selectedNodeIds: string[]) => void
-    dispatchExpandedNodes: (expandedNodeIds: string[]) => void
-    dispatchSelectDependencySelection: (sourceNodeId: string | undefined, targetNodeId: string | undefined, weight: number) => void;
-    dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
-}
 
-interface IDependenciesViewState {
-    treeWidth: number
-    upperHeight: number
-    lowerHeight: number
-}
-
-export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
+export class DependenciesView extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
 
     constructor(props: IDependenciesViewProps) {
         super(props);
 
         this.state = {
-            lowerHeight: 371,
-            treeWidth: 400,
-            upperHeight: 600,
+            layout: {
+                dsmSetting: {
+                    horizontalSideMarkerHeight: 10,
+                    verticalSideMarkerWidth: 150
+                },
+                lowerHeight: 371,
+                treeWidth: 400,
+                upperHeight: 600,
+            },
+            mainTreeNodeSelection: {
+                expandedNodeIds: ["-1"],
+                selectedNodeIds: [],
+            },
         }
     }
 
@@ -76,10 +66,10 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
                 {cl =>
                     <div>
                         <ResizableBox id="upperResizableBox"
-                                      intitalHeight={this.state.upperHeight}
+                                      intitalHeight={this.state.layout.upperHeight}
                                       onHeightChanged={this.onHeightChanged}>
                             <HorizontalSplitLayout id="upper"
-                                                   initialWidth={this.state.treeWidth}
+                                                   initialWidth={this.state.layout.treeWidth}
                                                    onWidthChanged={this.onSplitLayoutWidthChanged}
                                                    left={
                                                        <Card title="Hierarchical Graph">
@@ -94,7 +84,7 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
                             />
                         </ResizableBox>
                         <ResizableBox id="lowerResizableBox"
-                                      intitalHeight={this.state.lowerHeight}
+                                      intitalHeight={this.state.layout.lowerHeight}
                                       onHeightChanged={this.onHeightChanged}>
                             <Card title="Dependencies Details">
                                 {this.dependenciesDetails(cl)}
@@ -111,28 +101,10 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
             client={client}
             databaseId={this.props.databaseId}
             hierarchicalGraphId={this.props.hierarchicalGraphId}
-            onSelect={this.props.dispatchSelectedNodes}
-            onExpand={this.props.dispatchExpandedNodes}
-            expandedKeys={this.props.dependenciesViewState.treeNodeSelection ? this.props.dependenciesViewState.treeNodeSelection.expandedNodeIds : []}/>
+            onSelect={this.onMainTreeSelect}
+            onExpand={this.onMainTreeExpand}
+            expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}/>
 
-    }
-
-    private dependenciesDetails(client: ApolloClient<any>): React.ReactNode {
-
-        // return empty div if selected dependency is undefined
-        if (this.props.dependenciesViewState.selectedDependency === undefined ||
-            this.props.dependenciesViewState.selectedDependency.sourceNodeId === undefined ||
-            this.props.dependenciesViewState.selectedDependency.targetNodeId === undefined) {
-
-            return <div/>;
-        }
-
-        //
-        return <SlizaaDependencyTree sourceNodeId={this.props.dependenciesViewState.selectedDependency.sourceNodeId}
-                                     targetNodeId={this.props.dependenciesViewState.selectedDependency.targetNodeId}
-                                     databaseId={this.props.databaseId}
-                                     hierarchicalGraphId={this.props.hierarchicalGraphId}
-                                     client={client}/>
     }
 
     /**
@@ -140,13 +112,13 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
      */
     private dependenciesOverview(): React.ReactNode {
 
-        if (this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0) {
+        if (this.state.mainTreeNodeSelection.selectedNodeIds.length > 0) {
 
             const query = GQ_DSM_FOR_NODE_CHILDREN;
             const queryVariables = {
                 databaseId: this.props.databaseId,
                 hierarchicalGraphId: this.props.hierarchicalGraphId,
-                nodeId: this.props.dependenciesViewState.treeNodeSelection && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds && this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds.length > 0 ? this.props.dependenciesViewState.treeNodeSelection.selectedNodeIds[0] : "-1"
+                nodeId: this.state.mainTreeNodeSelection.selectedNodeIds[0]
             };
 
             return <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables}
@@ -173,9 +145,9 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
                                 stronglyConnectedComponents={stronglyConnectedComponents}
                                 horizontalBoxSize={35}
                                 verticalBoxSize={35}
-                                horizontalSideMarkerHeight={this.props.dependenciesViewState.dsmSettings.horizontalSideMarkerHeight}
-                                verticalSideMarkerWidth={this.props.dependenciesViewState.dsmSettings.verticalSideMarkerWidth}
-                                onSideMarkerResize={this.props.dispatchSidemarkerResize}
+                                horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
+                                verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
+                                onSideMarkerResize={this.onSideMarkerResize}
                                 onSelect={this.onSelectDependency}
                     />
                 }}
@@ -185,21 +157,113 @@ export class ViewDsm extends React.Component<IDependenciesViewProps, IDependenci
         return null;
     }
 
+    private dependenciesDetails(client: ApolloClient<any>): React.ReactNode {
+
+        // return empty div if selected dependency is undefined
+        if (this.state.mainDependencySelection === undefined) {
+            return <div/>;
+        }
+
+        //
+        return <SlizaaDependencyTree sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
+                                     targetNodeId={this.state.mainDependencySelection.targetNodeId}
+                                     databaseId={this.props.databaseId}
+                                     hierarchicalGraphId={this.props.hierarchicalGraphId}
+                                     client={client}/>
+    }
+
     private onSelectDependency = (aColumnNodeId: string | undefined, aRowNodeId: string | undefined): void => {
-        // TODO: WEIGHT
-        this.props.dispatchSelectDependencySelection(aRowNodeId, aColumnNodeId, 0);
+        if (aColumnNodeId !== undefined && aRowNodeId !== undefined) {
+            this.setState({
+                dependenciesTree: {
+                    selectionNodeType: NodeType.SOURCE,
+                    sourceTreeNodeSelection: {
+                        expandedNodeIds: ["-1"],
+                        selectedNodeIds: [],
+                    },
+                    targetTreeNodeSelection: {
+                        expandedNodeIds: ["-1"],
+                        selectedNodeIds: [],
+                    }
+                },
+                mainDependencySelection: {
+                    sourceNodeId: aRowNodeId,
+                    targetNodeId: aColumnNodeId,
+                    // TODO: weight
+                    weight: 0
+                }
+            });
+        } else {
+            this.setState({
+                mainDependencySelection: undefined
+            });
+        }
     }
 
     private onSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
-        this.setState({treeWidth: newWidth});
+        this.setState({
+            layout: {
+                ...this.state.layout,
+                treeWidth: newWidth,
+            }
+        });
     }
 
     private onHeightChanged = (id: string, newHeight: number): void => {
         if (id === "upperResizableBox") {
-            this.setState({upperHeight: newHeight});
+            this.setState(
+                {
+                    layout: {
+                        ...this.state.layout,
+                        upperHeight: newHeight,
+                    }
+                });
         } else if (id === "lowerResizableBox") {
-            this.setState({lowerHeight: newHeight});
+            this.setState(
+                {
+                    layout: {
+                        ...this.state.layout,
+                        lowerHeight: newHeight,
+                    }
+                });
         }
+    }
+
+    private onMainTreeExpand = (aExpandedNodeIds: string[]): void => {
+        this.setState(
+            {
+                mainTreeNodeSelection: {
+                    ...this.state.mainTreeNodeSelection,
+                    expandedNodeIds: aExpandedNodeIds,
+                }
+            });
+    }
+
+    private onMainTreeSelect = (aSelectedNodeIds: string[]): void => {
+        this.setState(
+            {
+                dependenciesTree: undefined,
+                mainDependencySelection: undefined,
+                mainTreeNodeSelection: {
+                    ...this.state.mainTreeNodeSelection,
+                    selectedNodeIds: aSelectedNodeIds,
+                },
+            });
+    }
+
+    private onSideMarkerResize = (aHorizontalSideMarkerHeight: number | undefined, aVerticalSideMarkerWidth: number | undefined): void => {
+
+        this.setState(
+            {
+                layout: {
+                    ...this.state.layout,
+                    dsmSetting: {
+                        horizontalSideMarkerHeight: aVerticalSideMarkerWidth ? aVerticalSideMarkerWidth : 0,
+                        verticalSideMarkerWidth: aHorizontalSideMarkerHeight ? aHorizontalSideMarkerHeight : 0,
+                    },
+                },
+            }
+        );
     }
 }
 
@@ -211,21 +275,4 @@ const mapStateToProps = (state: IAppState) => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch) => {
-    return {
-        dispatchExpandedNodes: (expandedNodeIds: string[]) => {
-            dispatch(action_DependenciesView_SetExpandedTreeNodes(expandedNodeIds));
-        },
-        dispatchSelectDependencySelection: (aSourceNodeId: string, aTargetNodeId: string, weight: number) => {
-            dispatch(actionSet_DependenciesView_DependencySelection(aSourceNodeId, aTargetNodeId, weight));
-        },
-        dispatchSelectedNodes: (selectedNodeIds: string[]) => {
-            dispatch(action_DependenciesView_SetSelectedTreeNodes(selectedNodeIds));
-        },
-        dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => {
-            dispatch(action_DependenciesView_SetDsmSidemarkerSize(verticalWidth, horizontalHeight));
-        },
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ViewDsm);
+export default connect(mapStateToProps)(DependenciesView);
