@@ -26,11 +26,12 @@ import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
 import {IAppState} from 'src/redux/IAppState';
 import {SlizaaDependencyTree} from "../../../components/slizaadependencytree";
+import {NodeType} from "../../../model/NodeType";
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from './__generated__/DsmForNodeChildren';
 import './DependenciesView.css';
 import {GQ_DSM_FOR_NODE_CHILDREN} from './GqlQueries';
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
-import {IDependenciesViewState, NodeType} from "./IDependenciesViewState";
+import {IDependenciesViewState} from "./IDependenciesViewState";
 
 
 export class DependenciesView extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
@@ -86,7 +87,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                         <ResizableBox id="lowerResizableBox"
                                       intitalHeight={this.state.layout.lowerHeight}
                                       onHeightChanged={this.onHeightChanged}>
-                            <Card title="Dependencies Details">
+                            <Card title="Dependencies Details" allowOverflow={true}>
                                 {this.dependenciesDetails(cl)}
                             </Card>
                         </ResizableBox>
@@ -103,7 +104,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             hierarchicalGraphId={this.props.hierarchicalGraphId}
             onSelect={this.onMainTreeSelect}
             onExpand={this.onMainTreeExpand}
-            expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}/>
+            expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
+            checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds} />
 
     }
 
@@ -165,11 +167,14 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         }
 
         //
-        return <SlizaaDependencyTree sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
-                                     targetNodeId={this.state.mainDependencySelection.targetNodeId}
+        return <SlizaaDependencyTree client={client}
                                      databaseId={this.props.databaseId}
                                      hierarchicalGraphId={this.props.hierarchicalGraphId}
-                                     client={client}/>
+                                     sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
+                                     targetNodeId={this.state.mainDependencySelection.targetNodeId}
+                                     selectedNodeIds={[]}
+                                     selectedNodesType={NodeType.SOURCE}
+        />
     }
 
     private onSelectDependency = (aColumnNodeId: string | undefined, aRowNodeId: string | undefined): void => {

@@ -20,7 +20,6 @@ import { ISlizaaNode } from 'src/model/ISlizaaNode';
 
 export interface ISTreeState {
     rootNodes: ISlizaaNode[];
-    expandedKeys: string[]; 
-    checkedKeys: string[];
-    focusedNodes: string[];
+    expandedNodeIds: string[];
+    selectedNodeIds: string[];
 }

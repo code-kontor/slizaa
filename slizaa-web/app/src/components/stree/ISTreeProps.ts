@@ -21,7 +21,8 @@ import { ISlizaaNode } from 'src/model/ISlizaaNode';
 export interface ISTreeProps {
   rootNode: ISlizaaNode
   expandedKeys?: string[]
-  checkedKeys?: string[]
+  selectedKeys?: string[]
+  markedKeys?: string[]
   onSelect?:  (selectedKeys: string[]) => void
   onExpand?: (expandedKeys: string[]) => void
   loadData?: (node: ISlizaaNode, callback: () => void) => Promise<{}>

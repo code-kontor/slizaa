@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IGlobalDependenciesViewState} from "../../../redux/IAppState";
+import gql from 'graphql-tag'
 
-export interface IDependenciesViewProps {
-    databaseId: string
-    hierarchicalGraphId: string
-    dependenciesViewState: IGlobalDependenciesViewState
-    dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
-}
+export const GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY = gql`
+    query ReferencedNodesForAggregatedDependencies($databaseId: ID!, $hierarchicalGraphId: ID!, $dependencySourceNodeId: ID!, $dependencyTargetNodeId: ID!, $selectedNodeIds: [ID!]!,  $selectedNodesType: NodeType!) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
+                referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
+            }
+        }
+    }`

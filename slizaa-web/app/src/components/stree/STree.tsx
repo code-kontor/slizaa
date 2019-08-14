@@ -16,165 +16,149 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Icon, Tree } from 'antd';
-import { AntTreeNode, AntTreeNodeCheckedEvent, AntTreeNodeExpandedEvent, AntTreeNodeSelectedEvent } from "antd/lib/tree";
+import {Icon, Tree} from 'antd';
+import {AntTreeNode, AntTreeNodeExpandedEvent, AntTreeNodeSelectedEvent} from "antd/lib/tree";
 import * as React from 'react';
-import { ISlizaaNode } from 'src/model/ISlizaaNode';
-import { ISTreeProps } from './ISTreeProps';
-import { ISTreeState } from './ISTreeState';
+import {ISlizaaNode} from 'src/model/ISlizaaNode';
+import {ISTreeProps} from './ISTreeProps';
+import {ISTreeState} from './ISTreeState';
 import './STree.css';
 
 export class STree extends React.Component<ISTreeProps, ISTreeState> {
 
-  constructor(props: ISTreeProps) {
-    super(props);
+    constructor(props: ISTreeProps) {
+        super(props);
 
-    this.state = {
-      checkedKeys: props.checkedKeys ? props.checkedKeys : [],
-      expandedKeys: props.expandedKeys ? props.expandedKeys : [],
-      focusedNodes: [],
-      rootNodes: [props.rootNode]
-    };
-  }
-
-  public componentWillReceiveProps(nextProps: ISTreeProps) {
-
-    this.state = {
-      checkedKeys: nextProps.checkedKeys ? nextProps.checkedKeys : [],
-      expandedKeys: nextProps.expandedKeys ? nextProps.expandedKeys : [],
-      focusedNodes: [],
-      rootNodes: [nextProps.rootNode]
-    };
-  }
-
-  public onExpand = (newExpandedKeys: string[], e: AntTreeNodeExpandedEvent) => {
-
-    const expandedKey = e.node.props.dataRef.key;
-
-    if (e.expanded) {
-      this.state.expandedKeys.push(expandedKey);
-    } else {
-      const index = this.state.expandedKeys.indexOf(expandedKey);
-      if (index > -1) {
-        this.state.expandedKeys.splice(index, 1);
-      }
+        this.state = {
+            expandedNodeIds: props.expandedKeys ? props.expandedKeys : [],
+            rootNodes: [props.rootNode],
+            selectedNodeIds: props.selectedKeys ? props.selectedKeys : [],
+        };
     }
 
-    this.setState({
-      expandedKeys: [...this.state.expandedKeys]
-    });
-    if (this.props.onExpand) {
-      this.props.onExpand(this.state.expandedKeys);
+    public componentWillReceiveProps(nextProps: ISTreeProps) {
+
+        this.state = {
+            expandedNodeIds: nextProps.expandedKeys ? nextProps.expandedKeys : [],
+            rootNodes: [nextProps.rootNode],
+            selectedNodeIds: nextProps.selectedKeys ? nextProps.selectedKeys : [],
+        };
     }
-  }
 
-  public onCheck = (checkedItems: ICheckedItems, e: AntTreeNodeCheckedEvent): void => {
-    // TODO: multiple check
-    const newCheckedKeys = !e.node.props.checked ? [e.node.props.dataRef.key] : [];
-    this.setState({
-      checkedKeys: newCheckedKeys
-    });
-    if (this.props.onSelect) {
-      this.props.onSelect(newCheckedKeys);
-    }
-  }
+    public renderTreeNodes = (treeNodes: ISlizaaNode[]) => {
 
-  public onSelect = (selectedKeys: string[], info: AntTreeNodeSelectedEvent) => {
-    this.setState({
-      focusedNodes: selectedKeys
-    });
-    if (this.props.onSelect) {
-      this.props.onSelect(selectedKeys);
-    }
-  }
+        return treeNodes.map((item: ISlizaaNode) => {
 
-  public loadData = (treeNode: AntTreeNode) => {
+            const isSelected = this.state.selectedNodeIds.indexOf(item.key) > -1;
+            const isExpanded = this.state.expandedNodeIds.indexOf(item.key) > -1;
+            const childNodes = isExpanded ? this.renderTreeNodes(item.children()) : null;
 
-    // tslint:disable-next-line:no-console
-    console.log("loadData: " + treeNode);
+            let className = 'slizaa-tree slizaa-tree-node ';
 
-    return Promise.resolve(true).then(async (resolve) => {
-      if (this.props.loadData) {
-
-        await this.props.loadData(treeNode.props.dataRef, () => {
-          this.setState({
-            rootNodes: [...this.state.rootNodes]
-          });
+            if (this.props.markedKeys !== undefined) {
+                className = this.props.markedKeys.indexOf(item.key) > -1 ? className + 'slizaa-tree-node-marked' : className + 'slizaa-tree-node-unmarked';
+            }
+            return (
+                <Tree.TreeNode
+                    dataRef={item}
+                    key={item.key}
+                    title={item.title}
+                    icon={this.fetchIcon(item)}
+                    isLeaf={!item.hasChildren}
+                    className={className}
+                    selected={isSelected}
+                >
+                    {childNodes}
+                </Tree.TreeNode>
+            );
+            ;
         });
-      }
-    });
-  }
-
-  public renderTreeNodes = (treeNodes: ISlizaaNode[]) => {
-
-    return treeNodes.map((item: ISlizaaNode) => {
-
-      const isExpanded = this.state.expandedKeys.indexOf(item.key) > -1;
-      const childNodes = isExpanded ? this.renderTreeNodes(item.children()) : null;
-
-      return (
-        <Tree.TreeNode
-          dataRef={item}
-          key={item.key}
-          title={item.title}
-          icon={this.fetchIcon(item)}
-          isLeaf={!item.hasChildren}
-          className={'slizaa-tree'}
-        >
-          {childNodes}
-        </Tree.TreeNode>
-      );
-      ;
-    });
-  }
-
-  public render() {
-
-    return (
-      <Tree
-        checkable={false}
-        checkStrictly={false}
-        defaultExpandedKeys={this.state.expandedKeys}
-        expandedKeys={this.state.expandedKeys}
-        defaultCheckedKeys={this.state.checkedKeys}
-        checkedKeys={this.state.checkedKeys}
-        autoExpandParent={true}
-        multiple={false}
-        selectable={true}
-        onSelect={this.onSelect}
-        onExpand={this.onExpand}
-        onCheck={this.onCheck}
-        loadData={this.loadData}
-        showIcon={true}
-        showLine={false}
-        style={{ overflow: "auto" }}
-        key={this.makeid(10)}
-      >
-        {this.renderTreeNodes(this.state.rootNodes)}
-      </Tree>
-    );
-  }
-
-  private fetchIcon(item: ISlizaaNode): React.ReactNode {
-    if (this.props.fetchIcon) {
-      return this.props.fetchIcon(item);
     }
-    return <Icon type="question" />;
-  }
 
-  private makeid = (length: number):string => {
-    let result           = '';
-    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    public render() {
+
+        return (
+            <Tree
+                checkable={false}
+                checkStrictly={false}
+                expandedKeys={this.state.expandedNodeIds}
+                defaultExpandedKeys={this.state.expandedNodeIds}
+                selectedKeys={this.state.selectedNodeIds}
+                defaultSelectedKeys={this.state.selectedNodeIds}
+                autoExpandParent={true}
+                multiple={false}
+                selectable={true}
+                onSelect={this.onSelect}
+                onExpand={this.onExpand}
+                loadData={this.loadData}
+                showIcon={true}
+                showLine={false}
+                style={{overflow: "auto"}}
+                key={this.createUniqueId(10)}
+            >
+                {this.renderTreeNodes(this.state.rootNodes)}
+            </Tree>
+        );
     }
-    return result;
-  }
-}
-interface ICheckedItems {
-  checked: string[];
-  halfChecked: string[];
+
+    private loadData = (treeNode: AntTreeNode) => {
+        return Promise.resolve(true).then(async (resolve) => {
+            if (this.props.loadData) {
+
+                await this.props.loadData(treeNode.props.dataRef, () => {
+                    this.setState({
+                        rootNodes: [...this.state.rootNodes]
+                    });
+                });
+            }
+        });
+    }
+
+    private onExpand = (newExpandedKeys: string[], e: AntTreeNodeExpandedEvent) => {
+        const expandedKey = e.node.props.dataRef.key;
+        if (e.expanded) {
+            this.state.expandedNodeIds.push(expandedKey);
+        } else {
+            const index = this.state.expandedNodeIds.indexOf(expandedKey);
+            if (index > -1) {
+                this.state.expandedNodeIds.splice(index, 1);
+            }
+        }
+
+        this.setState({
+            expandedNodeIds: [...this.state.expandedNodeIds]
+        });
+        if (this.props.onExpand) {
+            this.props.onExpand(this.state.expandedNodeIds);
+        }
+    }
+
+    private onSelect = (selectedKeys: string[], info: AntTreeNodeSelectedEvent) => {
+        this.setState({
+            selectedNodeIds: selectedKeys
+        });
+        if (this.props.onSelect) {
+            this.props.onSelect(selectedKeys);
+        }
+    }
+
+
+    private fetchIcon(item: ISlizaaNode): React.ReactNode {
+        if (this.props.fetchIcon) {
+            return this.props.fetchIcon(item);
+        }
+        return <Icon type="question"/>;
+    }
+
+    private createUniqueId = (length: number): string => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
 }
 
 export default STree;

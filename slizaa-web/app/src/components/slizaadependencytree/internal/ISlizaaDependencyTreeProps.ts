@@ -17,11 +17,15 @@
  */
 
 import ApolloClient from 'apollo-client';
+import {NodeType} from "../../../model/NodeType";
 
 export interface ISlizaaDependencyTreeProps {
-    sourceNodeId: string,
-    targetNodeId: string,
+    client: ApolloClient<any>,
     databaseId: string,
     hierarchicalGraphId: string,
-    client: ApolloClient<any>;
+    sourceNodeId: string,
+    targetNodeId: string,
+    selectedNodeIds: string[],
+    selectedNodesType: NodeType,
+    onNodesSelected?: (selectedNodeIds: string[], selectedNodesType: NodeType) => void
 }

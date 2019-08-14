@@ -53,7 +53,7 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
     return (
       <STree
         rootNode={rootNode}
-        checkedKeys={this.props.checkedKeys}
+        selectedKeys={this.props.checkedKeys}
         expandedKeys={this.props.expandedKeys}
         onExpand={this.onExpand}
         onSelect={this.onSelect}

@@ -24,7 +24,7 @@ import { SlizaaNode } from '../src/model/SlizaaNode';
 
 storiesOf('STree', module)
   .add('Simple STree', () => (
-    <STree rootNode={SlizaaNode.createRoot("Root", "default")} checkedKeys={["2-3","2-4"]} expandedKeys={["-1", "2", "2-3"]} loadData={fetchChildrenFunc()} />
+    <STree rootNode={SlizaaNode.createRoot("Root", "default")} selectedKeys={["2-3","2-4"]} expandedKeys={["-1", "2", "2-3"]} loadData={fetchChildrenFunc()} />
   ));
 
 function fetchChildrenFunc(): (parent: SlizaaNode) => Promise<{}> {
