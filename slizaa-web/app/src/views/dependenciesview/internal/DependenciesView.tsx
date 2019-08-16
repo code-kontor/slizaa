@@ -87,7 +87,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                         <ResizableBox id="lowerResizableBox"
                                       intitalHeight={this.state.layout.lowerHeight}
                                       onHeightChanged={this.onHeightChanged}>
-                            <Card title="Dependencies Details" allowOverflow={true}>
+                            <Card title="Dependencies Details" allowOverflow={false}>
                                 {this.dependenciesDetails(cl)}
                             </Card>
                         </ResizableBox>

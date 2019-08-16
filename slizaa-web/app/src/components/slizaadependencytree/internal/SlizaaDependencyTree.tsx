@@ -18,6 +18,7 @@
 import {Spin} from "antd";
 import ApolloClient from 'apollo-client';
 import * as React from "react";
+import {CSSProperties} from "react";
 import {Query} from "react-apollo";
 import {SlizaaIcon} from 'src/components/slizaaicon';
 import {ISlizaaNode} from "../../../model/ISlizaaNode";
@@ -86,6 +87,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
             {({loading, data, error}) => {
 
                 if (loading) {
+                    // https://stackoverflow.com/questions/55821045/reactjs-disable-mouse-events-in-child-components-of-parent
+                    // Todo: disable mouse events for sub component
                     return <Spin size="large"/>;
                 }
 
@@ -103,8 +106,10 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 const markedSourceNodeIds = this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
                 const markedTargetNodeIds = this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
 
-                return <div className="slizaa-dependency-tree-container">
-                    <div>
+                const styles: CSSProperties = {pointerEvents: "unset"};
+
+                return <div className="slizaa-dependency-tree" style={styles}>
+                    <div className="slizaa-dependency-tree-container">
                         <STree
                             rootNode={this.state.sourceNode}
                             onExpand={this.onSourceExpand}
@@ -116,7 +121,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                             fetchIcon={this.fetchIcon}
                         />
                     </div>
-                    <div>
+                    <div className="slizaa-dependency-tree-container">
                         <STree
                             rootNode={this.state.targetNode}
                             onExpand={this.onTargetExpand}

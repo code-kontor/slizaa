@@ -15,12 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-.slizaa-dependency-tree-container {
-
+.slizaa-dependency-tree {
+  display: flex;
+  height: 100%;
+  flex-flow: row;
 }
 
-.slizaa-dependency-tree-container > div {
-  float: left;
+.slizaa-dependency-tree-container {
   width: 50%;
+  height: 100%;
+  flex: 1 0 0px;
+  overflow: auto;
+}
+
+ul.ant-tree {
+  height: 100%;
 }
 
