@@ -19,7 +19,7 @@ import { Icon } from 'antd';
 import * as React from 'react';
 
 export const DependencyVisualisation = () => (
-  <svg x="0px" y="0px" width="16.422px" height="16.297px" viewBox="0 0 16.422 16.297" enable-background="new 0 0 16.422 16.297">
+  <svg x="0px" y="0px" width="16.422px" height="16.297px" viewBox="0 0 16.422 16.297" enableBackground="new 0 0 16.422 16.297">
     <rect x="0.5" y="0.5" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" width="5.328" height="5.328" />
     <rect x="10.594" y="3.823" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" width="5.328" height="5.328" />
     <rect x="3.865" y="10.469" fill="none" stroke="#FFFFFF" stroke-miterlimit="10" width="5.328" height="5.328" />
@@ -34,7 +34,7 @@ export const DependencyVisualisationIcon = (props: any) => (
 );
 
 export const SlizaaSvg = () => (
-  <svg version="1.1" x="0px" y="0px" width="493.923px" height="175.948px" viewBox="0 0 493.923 175.948" enable-background="new 0 0 493.923 175.948">
+  <svg version="1.1" x="0px" y="0px" width="493.923px" height="175.948px" viewBox="0 0 493.923 175.948" enableBackground="new 0 0 493.923 175.948">
   <g>
     <rect x="94.293" y="96.048" fill="#40382B" width="31.84" height="39.616"/>
     <path fill="#40382B" d="M39.458,96.048c1.309,2.004,1.975,4.522,1.975,7.572c0,3.54-1.26,6.429-3.776,8.674
