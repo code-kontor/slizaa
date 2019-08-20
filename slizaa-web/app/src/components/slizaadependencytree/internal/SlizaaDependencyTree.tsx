@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Spin} from "antd";
 import ApolloClient from 'apollo-client';
 import * as React from "react";
 import {CSSProperties} from "react";
@@ -86,47 +85,44 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
             {({loading, data, error}) => {
 
-                if (loading) {
-                    // https://stackoverflow.com/questions/55821045/reactjs-disable-mouse-events-in-child-components-of-parent
-                    // Todo: disable mouse events for sub component
-                    return <Spin size="large"/>;
-                }
-
                 if (error) {
                     return <h1>{error.message}</h1>
                 }
 
-                if (!data ||
-                    !data.hierarchicalGraph ||
-                    !data.hierarchicalGraph.dependencySetForAggregatedDependency ||
-                    !data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds) {
-                    return <div>UNDEFINED - TODO</div>
-                }
+                const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
+                const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency ||this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
 
-                const markedSourceNodeIds = this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
-                const markedTargetNodeIds = this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
+                // TODO: merge with expanded IDs
+                const sourcePredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.sourcePredecessors == null  ? [] : data.hierarchicalGraph.sourcePredecessors.predecessors.map((p) => p.id);
+                const targetPredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.targetPredecessors == null  ? [] : data.hierarchicalGraph.targetPredecessors.predecessors.map((p) => p.id);
 
-                const styles: CSSProperties = {pointerEvents: "unset"};
+                const combinedExpanedSourceNodeIds = sourcePredecessors.concat(this.state.expandedSourceNodeIds);
+                const combinedExpanedTargetNodeIds = targetPredecessors.concat(this.state.expandedTargetNodeIds);
 
-                return <div className="slizaa-dependency-tree" style={styles}>
-                    <div className="slizaa-dependency-tree-container">
+                //
+                const stylesNoEvents: CSSProperties = {pointerEvents: loading ? "none" : "unset"};
+                const stylesCursorWait: CSSProperties = {cursor: loading ? "wait" : "unset"};
+
+                return <div className="slizaa-dependency-tree" style={stylesCursorWait}>
+                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents}>
                         <STree
                             rootNode={this.state.sourceNode}
                             onExpand={this.onSourceExpand}
                             onSelect={this.onSourceSelect}
-                            expandedKeys={this.state.expandedSourceNodeIds}
+                            // expandedKeys={this.state.expandedSourceNodeIds}
+                            expandedKeys={combinedExpanedSourceNodeIds}
                             selectedKeys={selectedSourceNodeIds}
                             markedKeys={markedSourceNodeIds}
                             loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
                             fetchIcon={this.fetchIcon}
                         />
                     </div>
-                    <div className="slizaa-dependency-tree-container">
+                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents}>
                         <STree
                             rootNode={this.state.targetNode}
                             onExpand={this.onTargetExpand}
                             onSelect={this.onTargetSelect}
-                            expandedKeys={this.state.expandedTargetNodeIds}
+                            expandedKeys={combinedExpanedTargetNodeIds}
                             selectedKeys={selectedTargetNodeIds}
                             markedKeys={markedTargetNodeIds}
                             loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}

@@ -23,5 +23,15 @@ export const GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY = gql`
             dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
                 referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
             }
+            sourcePredecessors: node(id: $dependencySourceNodeId) {
+              predecessors {
+                id
+              }
+            }
+            targetPredecessors: node(id: $dependencyTargetNodeId) {
+              predecessors {
+                id
+              }
+          }
         }
     }`
