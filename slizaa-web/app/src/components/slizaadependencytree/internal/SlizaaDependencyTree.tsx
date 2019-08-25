@@ -104,8 +104,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 const stylesCursorWait: CSSProperties = {cursor: loading ? "wait" : "unset"};
 
                 return <div className="slizaa-dependency-tree" style={stylesCursorWait}>
-                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents}
-                         onScroll={this.handleScroll}>
+                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents} >
                         <STree
                             rootNode={this.state.sourceNode}
                             onExpand={this.onSourceExpand}
@@ -133,11 +132,6 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 </div>
             }}
         </Query>
-    }
-
-    private handleScroll(event: any) {
-        // tslint:disable-next-line:no-console
-        console.log(event);
     }
 
     private fetchIcon = (item: ISlizaaNode): React.ReactNode => {

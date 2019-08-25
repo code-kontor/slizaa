@@ -19,12 +19,17 @@
 import {Icon, Tree} from 'antd';
 import {AntTreeNode, AntTreeNodeExpandedEvent, AntTreeNodeSelectedEvent} from "antd/lib/tree";
 import * as React from 'react';
+import * as ReactDOM from "react-dom";
 import {ISlizaaNode} from 'src/model/ISlizaaNode';
 import {ISTreeProps} from './ISTreeProps';
 import {ISTreeState} from './ISTreeState';
 import './STree.css';
 
 export class STree extends React.Component<ISTreeProps, ISTreeState> {
+
+    private treeRef: Tree | null;
+    private scrollTop: number;
+    private scrollLeft: number;
 
     constructor(props: ISTreeProps) {
         super(props);
@@ -34,6 +39,14 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
             rootNodes: [props.rootNode],
             selectedNodeIds: props.selectedKeys ? props.selectedKeys : [],
         };
+    }
+
+    public componentWillUpdate(nextProps: Readonly<ISTreeProps>, nextState: Readonly<ISTreeState>, nextContext: any): void {
+        this.saveScrollPosition();
+    }
+
+    public componentDidUpdate(prevProps: Readonly<ISTreeProps>, prevState: Readonly<ISTreeState>, snapshot?: any): void {
+        this.restoreScrollPosition();
     }
 
     public componentWillReceiveProps(nextProps: ISTreeProps) {
@@ -79,6 +92,7 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
 
         return (
             <Tree
+                ref={elem => this.treeRef = elem}
                 checkable={false}
                 checkStrictly={false}
                 expandedKeys={this.state.expandedNodeIds}
@@ -99,6 +113,28 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
                 {this.renderTreeNodes(this.state.rootNodes)}
             </Tree>
         );
+    }
+
+    private saveScrollPosition = (): void => {
+        if (this.treeRef) {
+            const domNode = ReactDOM.findDOMNode(this.treeRef);
+            if (domNode && domNode instanceof Element) {
+                const element = domNode as Element;
+                this.scrollTop = element.scrollTop;
+                this.scrollLeft = element.scrollLeft;
+            }
+        }
+    }
+
+    private restoreScrollPosition = (): void => {
+        if (this.treeRef) {
+            const domNode = ReactDOM.findDOMNode(this.treeRef);
+            if (domNode && domNode instanceof Element) {
+                const element = domNode as Element;
+                element.scrollTop = this.scrollTop;
+                element.scrollLeft = this.scrollLeft;
+            }
+        }
     }
 
     private loadData = (treeNode: AntTreeNode) => {

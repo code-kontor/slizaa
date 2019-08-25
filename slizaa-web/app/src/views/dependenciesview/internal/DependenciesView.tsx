@@ -105,7 +105,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             onSelect={this.onMainTreeSelect}
             onExpand={this.onMainTreeExpand}
             expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
-            checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds} />
+            checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
 
     }
 
@@ -166,15 +166,76 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             return <div/>;
         }
 
+        const selNodeIds: string[] = this.state.dependenciesTree ?
+            (this.state.dependenciesTree.selectionNodeType === NodeType.SOURCE ?
+                this.state.dependenciesTree.sourceTreeNodeSelection.selectedNodeIds :
+                this.state.dependenciesTree.targetTreeNodeSelection.selectedNodeIds) :
+            [];
+
+        const selNodeType: NodeType = this.state.dependenciesTree ?
+            this.state.dependenciesTree.selectionNodeType :
+            NodeType.SOURCE;
+
         //
         return <SlizaaDependencyTree client={client}
                                      databaseId={this.props.databaseId}
                                      hierarchicalGraphId={this.props.hierarchicalGraphId}
                                      sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
                                      targetNodeId={this.state.mainDependencySelection.targetNodeId}
-                                     selectedNodeIds={[]}
-                                     selectedNodesType={NodeType.SOURCE}
+                                     selectedNodeIds={selNodeIds}
+                                     selectedNodesType={selNodeType}
+                                     onNodesSelected={this.onDependencyTreeNodesSelected}
         />
+    }
+
+    private onDependencyTreeNodesSelected = (aSelectedNodeIds: string[], aSelectedNodesType: NodeType): void => {
+
+        const expandedSourceNodeIds: string[] = this.state.dependenciesTree ? this.state.dependenciesTree.sourceTreeNodeSelection.selectedNodeIds : [];
+        const expandedTargetNodeIds: string[] = this.state.dependenciesTree ? this.state.dependenciesTree.targetTreeNodeSelection.selectedNodeIds : [];
+
+        if (aSelectedNodesType === NodeType.SOURCE) {
+            this.setState({
+                dependenciesTree: {
+                    selectionNodeType: NodeType.SOURCE,
+                    sourceTreeNodeSelection: {
+                        expandedNodeIds: expandedSourceNodeIds,
+                        selectedNodeIds: aSelectedNodeIds,
+                    },
+                    targetTreeNodeSelection: {
+                        expandedNodeIds: expandedTargetNodeIds,
+                        selectedNodeIds: [],
+                    }
+                }
+            });
+        } else if (aSelectedNodesType === NodeType.TARGET) {
+            this.setState({
+                dependenciesTree: {
+                    selectionNodeType: NodeType.TARGET,
+                    sourceTreeNodeSelection: {
+                        expandedNodeIds: expandedSourceNodeIds,
+                        selectedNodeIds: [],
+                    },
+                    targetTreeNodeSelection: {
+                        expandedNodeIds: expandedTargetNodeIds,
+                        selectedNodeIds: aSelectedNodeIds,
+                    }
+                }
+            });
+        } else {
+            this.setState({
+                dependenciesTree: {
+                    selectionNodeType: NodeType.SOURCE,
+                    sourceTreeNodeSelection: {
+                        expandedNodeIds: expandedSourceNodeIds,
+                        selectedNodeIds: [],
+                    },
+                    targetTreeNodeSelection: {
+                        expandedNodeIds: expandedTargetNodeIds,
+                        selectedNodeIds: [],
+                    }
+                }
+            });
+        }
     }
 
     private onSelectDependency = (aColumnNodeId: string | undefined, aRowNodeId: string | undefined): void => {
@@ -280,4 +341,8 @@ const mapStateToProps = (state: IAppState) => {
     };
 };
 
-export default connect(mapStateToProps)(DependenciesView);
+export default connect(mapStateToProps)
+
+(
+    DependenciesView
+);
