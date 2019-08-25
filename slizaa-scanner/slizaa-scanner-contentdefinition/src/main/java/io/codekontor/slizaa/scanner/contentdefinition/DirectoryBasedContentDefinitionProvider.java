@@ -36,113 +36,114 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProv
 
 public class DirectoryBasedContentDefinitionProvider extends AbstractContentDefinitionProvider<DirectoryBasedContentDefinitionProvider> {
 
-  /** - */
-  private List<File> _directoriesWithBinaryArtifacts;
+    /** - */
+    private List<File> _directoriesWithBinaryArtifacts;
 
-  /** - */
-  private final IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> _contentDefinitionProviderFactory;
-  
-  public boolean add(File e) {
-    return _directoriesWithBinaryArtifacts.add(e);
-  }
+    /** - */
+    private final IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> _contentDefinitionProviderFactory;
 
-  public boolean addAll(Collection<? extends File> c) {
-    return _directoriesWithBinaryArtifacts.addAll(c);
-  }
- 
-  
-  @Override
-  public IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> getContentDefinitionProviderFactory() {
-    return _contentDefinitionProviderFactory;
-  }
-  
-  @Override
-  public String toExternalRepresentation() {
-    return this._contentDefinitionProviderFactory.toExternalRepresentation(this);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void onInitializeProjectContent() {
-
-    // collect dirs
-    for (File directories : _directoriesWithBinaryArtifacts) {
-
-      //
-      for (File artifact : collectJars(directories)) {
-
-        NameAndVersionInfo info = NameAndVersionInfo.resolveNameAndVersion(artifact);
-
-        if (!info.isSource()) {
-
-          this.createFileBasedContentDefinition(info.getName(), info.getVersion(), new File[] { artifact }, null,
-              AnalyzeMode.BINARIES_ONLY);
-        }
-      }
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected void onDisposeProjectContent() {
-    //
-  }
-
-  /**
-   * 
-   * @return
-   */
-  List<File> getDirectoriesWithBinaryArtifacts() {
-    return _directoriesWithBinaryArtifacts;
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @param directory
-   * @return
-   */
-  private List<File> collectJars(File directory) {
-
-    // path
-    Path path = directory.toPath();
-
-    // create result
-    final List<File> result = new ArrayList<>();
-
-    //
-    try {
-      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          if (!attrs.isDirectory()) {
-            result.add(file.toFile());
-          }
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    } catch (IOException e) {
-      e.printStackTrace();
+    public boolean add(File e) {
+        return _directoriesWithBinaryArtifacts.add(e);
     }
 
-    //
-    return result;
-  }
-  
-  /**
-   * <p>
-   * Creates a new instance of type {@link DirectoryBasedContentDefinitionProvider}.
-   * </p>
-   */
-  DirectoryBasedContentDefinitionProvider(IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> contentDefinitionProviderFactory) {
-    _directoriesWithBinaryArtifacts = new ArrayList<>();
-    _contentDefinitionProviderFactory = checkNotNull(contentDefinitionProviderFactory);
-  }
+    public boolean addAll(Collection<? extends File> c) {
+        return _directoriesWithBinaryArtifacts.addAll(c);
+    }
+
+
+    @Override
+    public IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> getContentDefinitionProviderFactory() {
+        return _contentDefinitionProviderFactory;
+    }
+
+    @Override
+    public String toExternalRepresentation() {
+        return this._contentDefinitionProviderFactory.toExternalRepresentation(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onInitializeProjectContent() {
+
+        // collect dirs
+        for (File directories : _directoriesWithBinaryArtifacts) {
+
+            //
+            for (File artifact : collectJars(directories)) {
+
+                NameAndVersionInfo info = NameAndVersionInfo.resolveNameAndVersion(artifact);
+
+                if (!info.isSource()) {
+
+                    this.createFileBasedContentDefinition(info.getName(), info.getVersion(), new File[]{artifact}, null,
+                            AnalyzeMode.BINARIES_ONLY);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onDisposeProjectContent() {
+        //
+    }
+
+    /**
+     *
+     * @return
+     */
+    List<File> getDirectoriesWithBinaryArtifacts() {
+        return _directoriesWithBinaryArtifacts;
+    }
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param directory
+     * @return
+     */
+    private List<File> collectJars(File directory) {
+
+        // path
+        Path path = directory.toPath();
+
+        // create result
+        final List<File> result = new ArrayList<>();
+
+        //
+        try {
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (!attrs.isDirectory() &&
+                            (file.getFileName().toString().endsWith(".zip") || file.getFileName().toString().endsWith(".jar"))) {
+                        result.add(file.toFile());
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //
+        return result;
+    }
+
+    /**
+     * <p>
+     * Creates a new instance of type {@link DirectoryBasedContentDefinitionProvider}.
+     * </p>
+     */
+    DirectoryBasedContentDefinitionProvider(IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> contentDefinitionProviderFactory) {
+        _directoriesWithBinaryArtifacts = new ArrayList<>();
+        _contentDefinitionProviderFactory = checkNotNull(contentDefinitionProviderFactory);
+    }
 
 }

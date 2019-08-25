@@ -22,9 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
 
-import io.codekontor.slizaa.scanner.contentdefinition.FileBasedContentDefinitionProvider;
-import io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProvider;
-import io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory;
+import io.codekontor.slizaa.scanner.contentdefinition.*;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 
@@ -110,5 +108,21 @@ public class ContentDefinitionProviderFactory {
 
     //
     return provider;
+  }
+
+  public static IContentDefinitionProvider directoryContent(File directory) {
+
+    checkNotNull(directory);
+    checkState(directory.isDirectory(), "File '%s' is not a directory.", directory);
+
+    DirectoryBasedContentDefinitionProviderFactory contentDefinitionProviderFactory =
+            new DirectoryBasedContentDefinitionProviderFactory();
+
+    DirectoryBasedContentDefinitionProvider contentDefinitionProvider =
+            contentDefinitionProviderFactory.emptyContentDefinitionProvider();
+
+    contentDefinitionProvider.add(directory);
+
+    return contentDefinitionProvider;
   }
 }
