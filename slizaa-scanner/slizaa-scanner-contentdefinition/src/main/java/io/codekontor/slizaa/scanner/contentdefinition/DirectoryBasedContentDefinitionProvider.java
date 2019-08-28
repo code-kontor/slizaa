@@ -17,7 +17,10 @@
  */
 package io.codekontor.slizaa.scanner.contentdefinition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,9 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
-import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
-import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DirectoryBasedContentDefinitionProvider extends AbstractContentDefinitionProvider<DirectoryBasedContentDefinitionProvider> {
 
@@ -42,8 +43,17 @@ public class DirectoryBasedContentDefinitionProvider extends AbstractContentDefi
     /** - */
     private final IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> _contentDefinitionProviderFactory;
 
-    public boolean add(File e) {
-        return _directoriesWithBinaryArtifacts.add(e);
+    public boolean add(File directory) {
+        if (directory == null) {
+            throw new InvalidContentDefinitionException(String.format("Invalid content definition: Directory is null.", directory));
+        }
+        if (!directory.exists()) {
+            throw new InvalidContentDefinitionException(String.format("Invalid content definition: Directory '%s' does not exist.", directory));
+        }
+        if (!directory.isDirectory()) {
+            throw new InvalidContentDefinitionException(String.format("Invalid content definition: File '%s' is not a directory.", directory));
+        }
+        return _directoriesWithBinaryArtifacts.add(directory);
     }
 
     public boolean addAll(Collection<? extends File> c) {
@@ -145,5 +155,4 @@ public class DirectoryBasedContentDefinitionProvider extends AbstractContentDefi
         _directoriesWithBinaryArtifacts = new ArrayList<>();
         _contentDefinitionProviderFactory = checkNotNull(contentDefinitionProviderFactory);
     }
-
 }

@@ -18,7 +18,6 @@
 package io.codekontor.slizaa.server.command;
 
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -160,9 +159,6 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
         if (graphDatabase == null) {
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }
-
-        // TODO:
-        // slizaaService().getContentDefinitionProviderFactories();
 
         //
         graphDatabase.stop();

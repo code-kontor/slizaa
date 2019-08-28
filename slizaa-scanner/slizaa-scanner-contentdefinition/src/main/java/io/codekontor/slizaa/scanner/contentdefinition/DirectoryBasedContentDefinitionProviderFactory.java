@@ -17,11 +17,11 @@
  */
 package io.codekontor.slizaa.scanner.contentdefinition;
 
-import java.io.File;
-import java.util.stream.Collectors;
-
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
+
+import java.io.File;
+import java.util.stream.Collectors;
 
 public class DirectoryBasedContentDefinitionProviderFactory implements IContentDefinitionProviderFactory<DirectoryBasedContentDefinitionProvider> {
 
@@ -66,18 +66,29 @@ public class DirectoryBasedContentDefinitionProviderFactory implements IContentD
     }
     
     //
-    String[] filePaths = externalRepresentation.split(PATH_SEPARATOR);
+    String[] direcoryPaths = externalRepresentation.split(PATH_SEPARATOR);
     
     //
     DirectoryBasedContentDefinitionProvider contentDefinitionProvider = new DirectoryBasedContentDefinitionProvider(this);
-    for (String filePath : filePaths) {
-      File file = new File(filePath); 
-      contentDefinitionProvider.add(file);
+    for (String directoryPath : direcoryPaths) {
+      directoryPath = normalizePath(directoryPath);
+      File directory = new File(directoryPath);
+      contentDefinitionProvider.add(directory);
     }
     
     //
     return contentDefinitionProvider;
   }
 
-  
+
+  private static String normalizePath(String path) {
+
+    if (path == null) {
+      return null;
+    }
+    path = path.replace("\\", File.separator);
+    path = path.replace("/", File.separator);
+
+    return path;
+  }
 }
