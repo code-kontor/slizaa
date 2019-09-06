@@ -82,17 +82,13 @@ public class MvnBasedExtension extends ExtensionIdentifier implements IExtension
     IMvnResolverService mvnResolverService = resolverServiceFactory.newMvnResolverService().create();
     IMvnResolverService.IMvnResolverJob resolverJob = mvnResolverService.newMvnResolverJob();
     _dependencies.forEach(dep -> {
-      resolverJob.withDependency(dep.getDependency());
+      IMvnResolverService.IMvnResolverJobDependency dependency = resolverJob.withDependency(dep.getDependency());
       if (dep.getExclusionPatterns() != null) {
-        resolverJob.withExclusionPatterns(dep.getExclusionPatterns().toArray(new String[0]));
+        dependency.withExclusionPatterns(dep.getExclusionPatterns().toArray(new String[0]));
       }
     });
 
     return Arrays.asList(resolverJob.resolveToUrlArray());
-
-  }
-
-  public static void main(String[] args) {
 
   }
 }

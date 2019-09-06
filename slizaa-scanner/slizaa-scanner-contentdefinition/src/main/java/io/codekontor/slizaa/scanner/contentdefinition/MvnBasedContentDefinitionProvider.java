@@ -17,20 +17,17 @@
  */
 package io.codekontor.slizaa.scanner.contentdefinition;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.codekontor.mvnresolver.api.IMvnResolverService;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.codekontor.mvnresolver.MvnResolverServiceFactoryFactory;
-import io.codekontor.mvnresolver.api.IMvnCoordinate;
-import io.codekontor.mvnresolver.api.IMvnResolverService;
-import io.codekontor.mvnresolver.api.IMvnResolverServiceFactory;
-import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
-import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
-import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * <p>
@@ -48,7 +45,7 @@ public class MvnBasedContentDefinitionProvider
     private final IMvnResolverService _mvnResolverService;
 
     /** - */
-    private List<IMvnCoordinate> _mavenCoordinates;
+    private List<IMvnResolverService.IMvnCoordinate> _mavenCoordinates;
 
     /**
      *
@@ -81,13 +78,13 @@ public class MvnBasedContentDefinitionProvider
                 .map(coordinate -> _mvnResolverService.parseCoordinate(coordinate)).collect(Collectors.toList()));
     }
 
-    public IMvnCoordinate addArtifact(String coordinate) {
-        IMvnCoordinate mvnCoordinate = _mvnResolverService.parseCoordinate(coordinate);
+    public IMvnResolverService.IMvnCoordinate addArtifact(String coordinate) {
+        IMvnResolverService.IMvnCoordinate mvnCoordinate = _mvnResolverService.parseCoordinate(coordinate);
         _mavenCoordinates.add(mvnCoordinate);
         return mvnCoordinate;
     }
 
-    public List<IMvnCoordinate> getMavenCoordinates() {
+    public List<IMvnResolverService.IMvnCoordinate> getMavenCoordinates() {
         return _mavenCoordinates;
     }
 
@@ -96,7 +93,7 @@ public class MvnBasedContentDefinitionProvider
     protected void onInitializeProjectContent() {
 
         //
-        for (IMvnCoordinate mvnCoordinate : _mavenCoordinates) {
+        for (IMvnResolverService.IMvnCoordinate mvnCoordinate : _mavenCoordinates) {
 
             // TODO
             File resolvedFile = _mvnResolverService.resolveArtifact(String.format("%s:%s:%s", mvnCoordinate.getGroupId(),
