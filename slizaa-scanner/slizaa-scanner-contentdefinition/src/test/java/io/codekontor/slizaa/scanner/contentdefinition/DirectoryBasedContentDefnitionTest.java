@@ -20,6 +20,7 @@ package io.codekontor.slizaa.scanner.contentdefinition;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinition;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -37,6 +38,7 @@ public class DirectoryBasedContentDefnitionTest {
     }
 
     @Test
+    @Ignore
     public void testDirectoryBasedContentDefnition_1() {
 
         // TODO TEST-SETUP
