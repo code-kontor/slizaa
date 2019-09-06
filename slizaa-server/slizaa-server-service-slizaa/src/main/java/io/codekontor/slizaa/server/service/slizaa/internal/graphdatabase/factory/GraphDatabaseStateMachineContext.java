@@ -26,6 +26,7 @@ import io.codekontor.slizaa.core.progressmonitor.DefaultProgressMonitor;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporter;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl;
 import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.IGraphDatabaseStateMachineContext;
@@ -85,6 +86,12 @@ public class GraphDatabaseStateMachineContext extends AbstractGraphDatabaseState
 
     // delete all contained files
     clearDatabaseDirectory();
+
+    // re-initialize the content definition provider
+    if (getContentDefinitionProvider() instanceof AbstractContentDefinitionProvider) {
+      ((AbstractContentDefinitionProvider<?>)getContentDefinitionProvider()).dispose();
+      ((AbstractContentDefinitionProvider<?>)getContentDefinitionProvider()).initialize();
+    }
 
     // create the graph database
     _graphDb = executeWithCtxClassLoader(() -> {

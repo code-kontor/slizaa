@@ -93,7 +93,7 @@ public abstract class AbstractContentDefinitionProvider<T extends IContentDefini
    *
    * @return
    */
-  protected final void initialize() {
+  public final void initialize() {
 
     if (!_isInitialized) {
 
@@ -107,7 +107,7 @@ public abstract class AbstractContentDefinitionProvider<T extends IContentDefini
    * <p>
    * </p>
    */
-  protected void dispose() {
+  public void dispose() {
 
     if (_isInitialized) {
 

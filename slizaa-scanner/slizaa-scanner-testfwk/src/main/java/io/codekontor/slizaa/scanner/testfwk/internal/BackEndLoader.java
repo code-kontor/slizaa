@@ -87,7 +87,7 @@ public class BackEndLoader implements ITestFwkBackEnd {
 
     // create new maven resolver job...
     IMvnResolverService mvnResolverService = MvnResolverServiceFactoryFactory.createNewResolverServiceFactory()
-        .newMvnResolverService().withDefaultRemoteRepository()
+        .newMvnResolverService().withMavenCentralRepo(true)
         // TODO: Make configurable!
         .withRemoteRepository("oss_sonatype_snapshots", "https://oss.sonatype.org/content/repositories/snapshots")
         .create();

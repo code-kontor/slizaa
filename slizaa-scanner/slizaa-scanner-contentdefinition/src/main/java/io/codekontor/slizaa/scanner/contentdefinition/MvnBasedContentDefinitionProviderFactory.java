@@ -22,12 +22,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+import io.codekontor.mvnresolver.MvnResolverServiceFactoryFactory;
+import io.codekontor.mvnresolver.api.IMvnResolverService;
+import io.codekontor.mvnresolver.api.IMvnResolverServiceFactory;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.IConfigurableContentDefinitionProviderFactory;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 
 public class MvnBasedContentDefinitionProviderFactory
-    implements IContentDefinitionProviderFactory<MvnBasedContentDefinitionProvider> {
+    implements IConfigurableContentDefinitionProviderFactory<MvnBasedContentDefinitionProvider> {
 
   private static final String DELIMITER = ",";
+
+  private IMvnResolverService _mvnResolverService;
 
   @Override
   public String getFactoryId() {
@@ -51,7 +57,18 @@ public class MvnBasedContentDefinitionProviderFactory
 
   @Override
   public MvnBasedContentDefinitionProvider emptyContentDefinitionProvider() {
-    return new MvnBasedContentDefinitionProvider(this);
+
+    IMvnResolverService mvnResolverService = _mvnResolverService != null ?
+            _mvnResolverService :
+     MvnResolverServiceFactoryFactory.createNewResolverServiceFactory().newMvnResolverService()
+            .withMavenCentralRepo(true).create();
+
+    return new MvnBasedContentDefinitionProvider(this, mvnResolverService);
+  }
+
+  @Override
+  public void configure(IConfigurationContext context) {
+    _mvnResolverService = context.getService(IMvnResolverService.class);
   }
 
   @Override
