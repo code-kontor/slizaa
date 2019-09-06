@@ -1,11 +1,11 @@
 jdk:
 - openjdk8
 script:
-- gpg2 --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --batch --passphrase $PASSPHRASE --no-default-keyring --import .travis/pubkey.asc
-- gpg2 --allow-secret-key-import --batch --passphrase $PASSPHRASE --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring
+- gpg --keyring=$TRAVIS_BUILD_DIR/pubring.gpg --batch --passphrase $PASSPHRASE --no-default-keyring --import .travis/pubkey.asc
+- gpg --allow-secret-key-import --batch --passphrase $PASSPHRASE --keyring=$TRAVIS_BUILD_DIR/secring.gpg --no-default-keyring
   --import .travis/privkey.asc
 - mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-  -Dgpg.executable=gpg2 -Dgpg.keyname=AEF79D98 -Dgpg.passphrase=$PASSPHRASE -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg
+  -Dgpg.executable=gpg -Dgpg.keyname=AEF79D98 -Dgpg.passphrase=$PASSPHRASE -Dgpg.publicKeyring=$TRAVIS_BUILD_DIR/pubring.gpg
   -Dgpg.secretKeyring=$TRAVIS_BUILD_DIR/secring.gpg -P release -B --settings .travis/settings.xml
   clean deploy
 env:
@@ -14,6 +14,7 @@ env:
   - secure: CB2vjOnBVuiteFqMI50DpsEhvvelyJIp6l6+iNnTeyXtiT2yu2Sks/B1wikirDNiH9oPYAOYMu/y1jM3SW9pQAER11xFSQEIu9iEWfyE/9owDrSpLFDUSUGJxcN0aB2HP5znN1WaNokF3XmoVudz61t6aVvUkuasJMleMTLpSL5c6iZbyJ/C4SK790h9u1hTyrMtg+7UhlE0q0JKDf9Scsstzr+5Ihy1k2nEl986ce7Y+A2fXx0UFHJfzAFObTpi0xXBvXwitiJvfXhfnneNBk8bV4nIxur+h+wifA2ufL96tsUGtIs/MNrFiQD5DUd+WOKqjVtNDElYeX5YeJpXz3KwUMOZrKpViOOvWO4HnZHRK66K81B6bUZjvzNIv3WlBUNsysilfq4BFVzhahKCA+pD6KNuFmHObyHcnzH+C8SjhLn9vUk2nhS9IARNx4IamUiG/AEfgPDL4n6xMEp5UuHVHG2UnkonEMtTfbSxn8x8THgnBHYojEX4ek14S+2gIlUnjiAJyYoRRmAJ7pL6j3z1KTSjZ+w8RPgKLi2EdPxpu5k/Z3rZ4Sh63lu0e0OUZIokof7bvXorT3yQl4THzj7+ysjznSOvgM+UUm1faDUY7wShiC70ETw6VarVIPhswXdYkZCGCnEzPmQVq+W4XFYF1PSrs8we8ZsywbCywNA=
   - secure: Z4Z2cNLYwgDiLiATVDBwfoDRW4T8EUJCH+t+9qRN2wobAqI1pbBihO2pfmRh8hC+rAaiR9pBNso2C0RfkYmkpkNxECwp/fflzqlfn+H4doyJvx/lakGrFM0nR/TdhDu7HAhI+AVEuyArFhtWl/VKs7aQAo5qIzaOsVyGCQLnacHdYXbWAL13l/U0Z7k5rS410FA89TkuXH8HJFxiHIuY6vJMeAB07TWmj3Z4aRDx4LfJMtrz+bQnhekAEoGVwH00eolesFC4FWK+bPKUqHiUoAUJRtF1OGXBCkXcs4bbhxSfVt4YPz1YM9lOdX0UTU+dpfbigvFs82Bbs9TGoYIoIa7+Y6NY/uaom8l3D/6/ZBFxAdhzf9lsNCcDFLUTuqp7y5kxU7mFjkjwIC6+rbO/77HLn29gZSZKlLloIlTfSH8dsp8AMq0Dxlw93Xo69QrXtBXvo4xKs8WEojcZoueccdK9ehqxVc/b92yVTJ78cEmflSYFgftlLgcFNkygBajPda8GwNjb5ThWXMUe+wzdYVMP0iw4OToAnndgNQbBJtYkAOMapTjjDywpNe7hh1M7wVNO4Fg0Ume3NgGI6//7glveKQBZ0et0j77yRg2SlrFxxa18ze7b4GIdXQ8zu64v80XMyWp3ISDGsOsz8kiRVvNtcvhsZzELjO/C0x42yDU=
 before_install:
+- export GPG_TTY=$(tty)
 - openssl aes-256-cbc -K $encrypted_f9ab858c35d9_key -iv $encrypted_f9ab858c35d9_iv
   -in .travis/signingskeys.tar.enc -out .travis/signingskeys.tar -d
 - tar xvf .travis/signingskeys.tar
