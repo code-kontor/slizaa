@@ -53,7 +53,7 @@
         <dependency>
             <groupId>io.codekontor.mvnresolver</groupId>
             <artifactId>mvnresolver-uber</artifactId>
-            <version>${project.version}</version>
+            <version>${version-mvnresolver-uber}</version>
         </dependency>
     </dependencies>
 
