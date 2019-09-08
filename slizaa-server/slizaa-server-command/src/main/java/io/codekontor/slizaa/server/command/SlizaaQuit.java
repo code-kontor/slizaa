@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.command;
 
+import org.jline.reader.LineReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -25,9 +26,14 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.commands.Quit;
 
+import java.io.IOException;
+
 @ShellComponent
 @ShellCommandGroup("Built-In Commands")
 public class SlizaaQuit implements Quit.Command {
+
+    @Autowired
+    private LineReader reader;
 
     @Autowired
     private ConfigurableApplicationContext applicationContext;
@@ -36,14 +42,25 @@ public class SlizaaQuit implements Quit.Command {
             value = "Exit the shell.",
             key = {"quit", "exit"}
     )
-    public void quit() {
-        new Thread(() -> {
-            try {
-                SpringApplication.exit(applicationContext, () -> 0);
-                System.exit(0);
-            } catch (Exception e) {
 
+    public void quit() {
+
+        //b
+        String confirmation = ask("Do you really want to quit (y/n)? ");
+
+        if ("y".equalsIgnoreCase(confirmation)) {
+            try {
+                reader.getTerminal().close();
+            } catch (IOException e) {
+                // simply ignore
             }
-        }).start();
+            SpringApplication.exit(applicationContext, () -> 0);
+            System.exit(0);
+        }
+    }
+
+    private String ask(String question) {
+        String result = this.reader.readLine(question + ": ");
+        return result != null ? result.trim() : null;
     }
 }
