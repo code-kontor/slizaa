@@ -18,8 +18,8 @@
 import { Icon } from 'antd';
 import * as React from 'react';
 import { Query } from 'react-apollo';
-import { Svg, SvgVariables } from './__generated__/Svg';
-import {GQ_GET_SVG} from './GqlQueries';
+import {Svg, SvgVariables} from "../../../gqlqueries/__generated__/Svg";
+import {GQ_GET_SVG} from "../../../gqlqueries/GqlQueries";
 
 const svgCache = new Map();
 

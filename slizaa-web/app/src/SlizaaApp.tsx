@@ -17,7 +17,7 @@
  */
 import './SlizaaApp.css';
 
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import { defaultDataIdFromObject, InMemoryCache } from 'apollo-cache-inmemory';
 import ApolloClient from 'apollo-client';
 import { createHttpLink } from 'apollo-link-http';
 import * as React from "react";
@@ -31,13 +31,22 @@ import MainView from './views/mainview/internal/MainView';
 import { ServerConfigValidator } from './views/serverconfigwizard';
 
 // TODO: origin url
+// TODO!!
 const httpLink = createHttpLink({
   uri: 'http://localhost:8085/graphql/'
 });
 
 // create the apollo client instance
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    dataIdFromObject: object => {
+      // tslint:disable-next-line:no-console
+      console.log("CACHE: " + object.__typename)
+      switch (object.__typename) {
+        default: return defaultDataIdFromObject(object); // fall back to default handling
+      }
+    }
+  }),
   link: httpLink,
 });
 

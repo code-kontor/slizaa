@@ -20,19 +20,19 @@ import * as React from "react";
 import {CSSProperties} from "react";
 import {Query} from "react-apollo";
 import {SlizaaIcon} from 'src/components/slizaaicon';
-import {ISlizaaNode} from "../../../model/ISlizaaNode";
-import {NodeType} from "../../../model/NodeType";
-import {SlizaaNode} from "../../../model/SlizaaNode";
-import {fetchChildrenFilterByDependencySet} from "../../../model/SlizaaNodeChildrenResolver";
-import STree from "../../stree/STree";
-import {
-    ReferencedNodesForAggregatedDependencies,
-    ReferencedNodesForAggregatedDependenciesVariables
-} from "./__generated__/ReferencedNodesForAggregatedDependencies";
-import {GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY} from "./GqlQueries";
+import {ISlizaaNode} from "../../model/ISlizaaNode";
+import {NodeType} from "../../model/NodeType";
+import {SlizaaNode} from "../../model/SlizaaNode";
+import {fetchChildrenFilterByDependencySet} from "../../model/SlizaaNodeChildrenResolver";
+import STree from "../stree/STree";
 import {ISlizaaDependencyTreeProps} from "./ISlizaaDependencyTreeProps";
 import {ISlizaaDependencyTreeState} from "./ISlizaaDependencyTreeState";
 
+import {
+    ReferencedNodesForAggregatedDependencies,
+    ReferencedNodesForAggregatedDependenciesVariables
+} from "../../gqlqueries/__generated__/ReferencedNodesForAggregatedDependencies";
+import {GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY} from "../../gqlqueries/GqlQueries";
 import './SlizaaDependencyTree.css';
 
 export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeProps, ISlizaaDependencyTreeState> {
@@ -81,6 +81,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
         return <Query<ReferencedNodesForAggregatedDependencies, ReferencedNodesForAggregatedDependenciesVariables>
             query={GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY}
+            fetchPolicy={"cache-first"}
             variables={variables}>
 
             {({loading, data, error}) => {

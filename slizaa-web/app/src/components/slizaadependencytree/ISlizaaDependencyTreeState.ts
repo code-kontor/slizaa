@@ -15,25 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* tslint:disable */
-/* eslint-disable */
-// This file was automatically generated and should not be edited.
+import {NodeType} from "../../model/NodeType";
+import {SlizaaNode} from "../../model/SlizaaNode";
 
-// ====================================================
-// GraphQL query operation: HasInstalledExtensions
-// ====================================================
-
-export interface HasInstalledExtensions_serverConfiguration {
-  __typename: "ServerConfiguration";
-  /**
-   * Returns true if the backend contains installed extensions.
-   */
-  hasInstalledExtensions: boolean;
-}
-
-export interface HasInstalledExtensions {
-  /**
-   * Returns the server configuration
-   */
-  serverConfiguration: HasInstalledExtensions_serverConfiguration;
+export interface ISlizaaDependencyTreeState {
+    sourceNode: SlizaaNode,
+    targetNode: SlizaaNode,
+    selectedNodeIds: string[],
+    selectedNodesType: NodeType,
+    expandedSourceNodeIds: string[],
+    expandedTargetNodeIds: string[],
 }

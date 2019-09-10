@@ -19,9 +19,9 @@ import { Button, Dropdown, Icon, Menu } from 'antd';
 import { ClickParam } from 'antd/lib/menu';
 import * as React from 'react';
 import { Query } from 'react-apollo';
-import { GraphDatabasesWithHierarchicalGraphs } from './__generated__/GraphDatabasesWithHierarchicalGraphs';
-import { GQ_GRAPH_DATABASES_WITH_HIERARCHICAL_GRAPHS } from './GqlQueries';
 
+import {GraphDatabasesWithHierarchicalGraphs} from "../../gqlqueries/__generated__/GraphDatabasesWithHierarchicalGraphs";
+import {GQ_GRAPH_DATABASES_WITH_HIERARCHICAL_GRAPHS} from "../../gqlqueries/GqlQueries";
 import './SlizaaHgChooser.css';
 
 // tslint:disable-next-line:no-empty-interface

@@ -17,10 +17,13 @@
  */
 
 import ApolloClient from 'apollo-client';
-import { NodeType } from 'src/__generated__/query-types';
-import { NodeChildren, NodeChildrenVariables } from './__generated__/NodeChildren';
-import { NodeChildrenFilteredByDependencySet, NodeChildrenFilteredByDependencySetVariables } from './__generated__/NodeChildrenFilteredByDependencySet';
-import { NodeChildrenFilteredByDependencySetQuery, NodeChildrenQuery } from './GqlQueries';
+import { NodeType } from 'src/gqlqueries/query-types';
+import {NodeChildren, NodeChildrenVariables} from "../gqlqueries/__generated__/NodeChildren";
+import {
+    NodeChildrenFilteredByDependencySet,
+    NodeChildrenFilteredByDependencySetVariables
+} from "../gqlqueries/__generated__/NodeChildrenFilteredByDependencySet";
+import {NodeChildrenFilteredByDependencySetQuery, NodeChildrenQuery} from "../gqlqueries/GqlQueries";
 import { SlizaaNode } from "./SlizaaNode";
 
 export function fetchChildren( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {

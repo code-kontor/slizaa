@@ -18,8 +18,8 @@
 import { Select, Spin } from 'antd';
 import * as React from 'react';
 import { Query } from 'react-apollo';
-import { AvailableServerExtensions } from './__generated__/AvailableServerExtensions';
-import { GQ_AVAILABLE_SERVER_EXTENSIONS } from './GqlQueries';
+import {AvailableServerExtensions} from "../../../gqlqueries/__generated__/AvailableServerExtensions";
+import {GQ_AVAILABLE_SERVER_EXTENSIONS} from "../../../gqlqueries/GqlQueries";
 import { IServerExtension } from './ServerConfigWizard';
 
 interface IProps {

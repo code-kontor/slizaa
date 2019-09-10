@@ -18,43 +18,11 @@
 export interface IAppState {
     currentDatabase: string | undefined;
     currentHierarchicalGraph: string | undefined;
-    dependenciesViewState: IGlobalDependenciesViewState;
 }
 
-export interface IGlobalDependenciesViewState {
-    treeNodeSelection: ITreeNodeSelection;
-    dsmSettings: IDsmSettings;
-    selectedDependency?: IDependencySelection;
-}
-
-export interface IDependencySelection {
-    sourceNodeId: string;
-    targetNodeId: string;
-    weight: number;
-}
- export interface ITreeNodeSelection {
-    selectedNodeIds: string[];
-    expandedNodeIds: string[];
-}
-
-export interface IDsmSettings {
-    horizontalSideMarkerHeight: number;
-    verticalSideMarkerWidth: number;
-}
-
-export function defaultState() : IAppState {
+export function defaultState(): IAppState {
     return {
         currentDatabase: undefined,
         currentHierarchicalGraph: undefined,
-        dependenciesViewState: {
-            dsmSettings: {
-                horizontalSideMarkerHeight: 50,
-                verticalSideMarkerWidth: 50
-            },
-            treeNodeSelection: {
-                expandedNodeIds: [],
-                selectedNodeIds: []
-            }
-        }
     };
-  }
+}

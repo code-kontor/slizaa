@@ -18,8 +18,8 @@
 import { Spin } from 'antd';
 import * as React from 'react';
 import { Query } from 'react-apollo';
-import { HasInstalledExtensions } from './__generated__/HasInstalledExtensions'
-import { GQ_HAS_INSTALLED_EXTENSIONS } from './GqlQueries';
+import {HasInstalledExtensions} from "../../../gqlqueries/__generated__/HasInstalledExtensions";
+import {GQ_HAS_INSTALLED_EXTENSIONS} from "../../../gqlqueries/GqlQueries";
 import { ServerConfigWizard } from './ServerConfigWizard';
 
 export class ServerConfigValidator extends React.Component<{}, {}> {

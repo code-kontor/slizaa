@@ -20,7 +20,7 @@ import { defaultState, IAppState } from './IAppState';
 
 export function appReducer(state: IAppState = defaultState(), action: AppActions): IAppState {
 
-    //
+    // handle action
     if (action.type === "ACTION_SELECT_DATABASE") {
         return {
             ...state,
@@ -33,59 +33,7 @@ export function appReducer(state: IAppState = defaultState(), action: AppActions
             currentHierarchicalGraph: action.selectedHierarchicalGraphId
         }
     }
-    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_SELECTED_TREE_NODES") {
-        return {
-            ...state,
-            dependenciesViewState: {
-                ...state.dependenciesViewState,
-                selectedDependency: undefined,
-                treeNodeSelection: 
-                {
-                    ...state.dependenciesViewState.treeNodeSelection,
-                    selectedNodeIds: action.selectedNodeIds,
-                }
-            }
-        }
-    }
-    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_EXPANDED_TREE_NODES") {
-        return {
-            ...state,
-            dependenciesViewState: {
-                ...state.dependenciesViewState,
-                treeNodeSelection:
-                    {
-                        ...state.dependenciesViewState.treeNodeSelection,
-                        expandedNodeIds: action.expandedNodeIds,
-                    }
-            }
-        }
-    }
-    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_DEPENDENCY_SELECTION") {
-        return {
-            ...state,
-            dependenciesViewState: {
-                ...state.dependenciesViewState,
-                selectedDependency: 
-                {   
-                    sourceNodeId: action.sourceNode,
-                    targetNodeId: action.targetNode,
-                    weight: action.weight,
-                }
-            }
-        }
-    }
-    else if (action.type === "ACTION__DEPENDENCIES_VIEW__SET_DSM_SIDEMARKER_SIZE") {
-        return {
-            ...state,
-            dependenciesViewState: {
-                ...state.dependenciesViewState,
-                dsmSettings: {
-                    horizontalSideMarkerHeight: action.horizontalSideMarkerHeight,
-                    verticalSideMarkerWidth: action.verticalSideMarkerWidth
-                }
-            }
-        }
-    }
 
+    // default handling
     return state;
 }

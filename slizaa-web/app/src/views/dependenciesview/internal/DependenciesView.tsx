@@ -26,10 +26,10 @@ import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
 import {IAppState} from 'src/redux/IAppState';
 import {SlizaaDependencyTree} from "../../../components/slizaadependencytree";
+import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../../gqlqueries/__generated__/DsmForNodeChildren";
+import {GQ_DSM_FOR_NODE_CHILDREN} from "../../../gqlqueries/GqlQueries";
 import {NodeType} from "../../../model/NodeType";
-import {DsmForNodeChildren, DsmForNodeChildrenVariables} from './__generated__/DsmForNodeChildren';
 import './DependenciesView.css';
-import {GQ_DSM_FOR_NODE_CHILDREN} from './GqlQueries';
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
 import {IDependenciesViewState} from "./IDependenciesViewState";
 
@@ -124,7 +124,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             };
 
             return <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables}
-                                                                           fetchPolicy="no-cache">
+                                                                           fetchPolicy="cache-first">
                 {({loading, data, error}) => {
 
                     if (loading) {
@@ -336,7 +336,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
 const mapStateToProps = (state: IAppState) => {
     return {
         databaseId: state.currentDatabase,
-        dependenciesViewState: state.dependenciesViewState,
         hierarchicalGraphId: state.currentHierarchicalGraph
     };
 };

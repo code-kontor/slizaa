@@ -15,11 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IGlobalDependenciesViewState} from "../../../redux/IAppState";
 
 export interface IDependenciesViewProps {
     databaseId: string
     hierarchicalGraphId: string
-    dependenciesViewState: IGlobalDependenciesViewState
     dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
 }
