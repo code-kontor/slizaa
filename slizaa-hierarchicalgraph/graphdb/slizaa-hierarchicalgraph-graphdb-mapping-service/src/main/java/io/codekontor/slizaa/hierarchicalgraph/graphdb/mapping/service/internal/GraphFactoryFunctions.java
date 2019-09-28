@@ -210,8 +210,9 @@ public class GraphFactoryFunctions {
                     Node startNode = boltClient.getNode(proxyDependency.getIdStart());
                     Node targetNode = boltClient.getNode(proxyDependency.getIdTarget());
 
+                    // TODO!
                     System.out.println(
-                            "Dependency is null for " + proxyDependency.getIdStart() + " : " + proxyDependency.getIdTarget());
+                            "Missing start node for " + proxyDependency.getIdStart() + " : " + proxyDependency.getIdTarget());
                     System.out.println("StartNode: " + rootElement.lookupNode(proxyDependency.getIdStart()));
                     System.out.println("EndNode: " + rootElement.lookupNode(proxyDependency.getIdTarget()));
                     System.out.println(startNode.labels() + " : " + startNode.asMap());
