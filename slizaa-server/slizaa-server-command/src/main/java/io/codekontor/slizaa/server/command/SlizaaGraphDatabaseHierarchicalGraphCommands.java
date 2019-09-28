@@ -29,7 +29,7 @@ import org.springframework.shell.standard.ShellOption;
 public class SlizaaGraphDatabaseHierarchicalGraphCommands extends AbstractGraphDatabaseCommandComponent {
 
     @ShellMethod(value = "Create a new hierarchical graph.", key = "createHierarchicalGraph", group = "Slizaa Graph Databases Commands - Hierarchical Graphs")
-    public String createHierarchicalGraph(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-h", "--hierarchicalGraphId"}) String hierarchicalGraphIdentifier) {
+    public Object createHierarchicalGraph(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-h", "--hierarchicalGraphId"}) String hierarchicalGraphIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
@@ -57,7 +57,7 @@ public class SlizaaGraphDatabaseHierarchicalGraphCommands extends AbstractGraphD
     }
 
     @ShellMethod(value = "Delete an existing hierarchical graph.", key = "deleteHierarchicalGraph")
-    public String deleteHierarchicalGraph(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-h", "--hierarchicalGraphId"}) String hierarchicalGraphIdentifier) {
+    public Object deleteHierarchicalGraph(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-h", "--hierarchicalGraphId"}) String hierarchicalGraphIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();

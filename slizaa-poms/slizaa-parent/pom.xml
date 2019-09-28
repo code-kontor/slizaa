@@ -197,6 +197,8 @@
 						<exclude>src/main/resources/banner.txt</exclude>
 						<exclude>**/content-mapstruct.txt</exclude>
 						<exclude>**/application-dev.properties</exclude>
+						<exclude>**/*.asciidoc</exclude>
+						<exclude>**/*.log</exclude>
 						<exclude>slizaa-work/**</exclude>
 						<exclude>app/build/**</exclude>
 						<exclude>app/node/**</exclude>

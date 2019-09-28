@@ -35,7 +35,7 @@ public class SlizaaGraphDatabaseContentDefinitionCommands extends AbstractGraphD
     }
 
     @ShellMethod(value = "Define the content that should be analyzed.", key = "setContentDefinitionProvider", group = "Slizaa Graph Databases Commands - Content Definition")
-    public String setContentDefinitionProvider(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-f", "--factoryId"}) String contentDefinitionProviderFactoryId, @ShellOption({"-c", "--contentDefinition"}) String contentDefinition) {
+    public Object setContentDefinitionProvider(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-f", "--factoryId"}) String contentDefinitionProviderFactoryId, @ShellOption({"-c", "--contentDefinition"}) String contentDefinition) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();

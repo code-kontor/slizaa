@@ -22,6 +22,7 @@ import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import org.springframework.shell.table.Table;
 
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ import java.io.IOException;
 public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandComponent {
 
     @ShellMethod(value = "List all configured graph databases.", key = "listDBs")
-    public String listDBs() {
+    public Object listDBs() {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
@@ -43,7 +44,7 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
     }
 
     @ShellMethod(value = "Create a new graph databases.", key = "createDB")
-    public String createDB(String identifier) {
+    public Object createDB(@ShellOption(value = {"-d", "--databaseId"}, help = "The identifier of the database to create.") String databaseIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
@@ -52,20 +53,20 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
         }
 
         // check that the requested database exists
-        String checkDatabaseDoesNotExist = checkDatabaseDoesNotExist(identifier);
+        String checkDatabaseDoesNotExist = checkDatabaseDoesNotExist(databaseIdentifier);
         if (checkDatabaseDoesNotExist != null) {
             return checkDatabaseDoesNotExist;
         }
 
         //
-        slizaaService().newGraphDatabase(identifier);
+        slizaaService().newGraphDatabase(databaseIdentifier);
 
         // return the result
         return dumpGraphDatabases();
     }
 
     @ShellMethod(value = "Delete an existing graph database.", key = "deleteDB")
-    public String deleteDB(String identifier) {
+    public Object deleteDB(@ShellOption(value={"-d", "--databaseId"}, help = "The identifier of the database to delete.") String databaseIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
@@ -74,24 +75,21 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
         }
 
         // check that the requested database exists
-        String checkDatabaseExists = checkDatabaseExists(identifier);
+        String checkDatabaseExists = checkDatabaseExists(databaseIdentifier);
         if (checkDatabaseExists != null) {
             return checkDatabaseExists;
         }
 
         //
-        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(identifier);
+        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
         graphDatabase.terminate();
 
         // return the result
-        StringBuffer result = new StringBuffer();
-        result.append(String.format("Successfully deleted graph database '%s'.\n", identifier));
-        result.append(dumpGraphDatabases());
-        return result.toString();
+        return dumpGraphDatabases();
     }
 
     @ShellMethod(value = "Parse the definied content.", key = "parseDB")
-    public String parseDB(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier) {
+    public Object parseDB(@ShellOption(value={"-d", "--databaseId"}, help = "The identifier of the database to parse.") String databaseIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
@@ -121,7 +119,7 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
     }
 
     @ShellMethod(value = "Start the specified database.", key = "startDB")
-    public String startDB(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier) {
+    public Object startDB(@ShellOption(value={"-d", "--databaseId"}, help = "The identifier of the database to start.") String databaseIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
@@ -135,9 +133,6 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }
 
-        // TODO:
-        // slizaaService().getContentDefinitionProviderFactories();
-
         //
         graphDatabase.start();
 
@@ -146,7 +141,7 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
     }
 
     @ShellMethod(value = "Stop the specified database.", key = "stopDB")
-    public String stopDB(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier) {
+    public Object stopDB(@ShellOption(value={"-d", "--databaseId"}, help = "The identifier of the database to stop.") String databaseIdentifier) {
 
         // check the backend configuration
         String checkBackendConfigured = checkBackendConfigured();
