@@ -74,13 +74,13 @@ public abstract class AbstractGraphDatabaseCommandComponent {
 
     List<Object[]> rows = new ArrayList<>();
     rows.add(
-        new String[] { "DatabaseId", "State", "Port", "ContentDefinition", "HierarchicalGraphs", "Available_Actions" });
+        new String[] { "DatabaseId", "State", "Port", "Content Definition", "Hierarchical Graphs", "Available Actions" });
+
     if (_slizaaService.hasGraphDatabases()) {
       _slizaaService.getGraphDatabases().forEach(db -> {
 
-        ContentDefinition contentDefinition = db.getContentDefinition() != null
-            ? new ContentDefinition(db.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId(),
-                db.getContentDefinition().getContentDefinitionProviderFactory().getShortForm(),
+        String contentDefinition = db.getContentDefinition() != null
+            ? String.format("%s [%s]", db.getContentDefinition().getContentDefinitionProviderFactory().getShortForm(),
                 db.getContentDefinition().toExternalRepresentation())
             : null;
 
@@ -90,55 +90,22 @@ public abstract class AbstractGraphDatabaseCommandComponent {
         row[2] = db.getPort();
         row[3] = contentDefinition;
         row[4] = db.getHierarchicalGraphs().stream().map(hierarchicalGraph -> {
-          return new HierarchicalGraph(hierarchicalGraph.getIdentifier());
+          return hierarchicalGraph.getIdentifier();
         }).collect(Collectors.toList());
         row[5] = db.getAvailableActions().stream().map(action -> action.getName()).collect(Collectors.toList());
 
         rows.add(row);
       });
-    TableModel tableModel = new ArrayTableModel(rows.toArray(new Object[0][0]));
-    TableBuilder tableBuilder = new TableBuilder(tableModel);
-    tableBuilder.addInnerBorder(BorderStyle.fancy_light);
-    tableBuilder.addHeaderBorder(BorderStyle.fancy_double);
-    tableBuilder.on((row, column, model) -> row == 0).addSizer(new NoWrapSizeConstraints());
-    return tableBuilder.build();
 
-    }
-
-    else {
+      TableModel tableModel = new ArrayTableModel(rows.toArray(new Object[0][0]));
+      TableBuilder tableBuilder = new TableBuilder(tableModel);
+      tableBuilder.addHeaderAndVerticalsBorders(BorderStyle.oldschool);
+      // tableBuilder.on((row, column, model) -> row == 0 && row != 5).addSizer(new NoWrapSizeConstraints());
+      return tableBuilder.build();
+    } else {
       return "No database configured.\n";
     }
   }
-
-//  @NotNull
-//  protected String dumpGraphDatabases() {
-//
-//    StringBuffer stringBuffer = new StringBuffer("Graph Databases:\n");
-//
-//    if (_slizaaService.hasGraphDatabases()) {
-//
-//      _slizaaService.getGraphDatabases().forEach(db -> {
-//
-//        ContentDefinition contentDefinition = db.getContentDefinition() != null
-//            ? new ContentDefinition(db.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId(),
-//                db.getContentDefinition().getContentDefinitionProviderFactory().getShortForm(),
-//                db.getContentDefinition().toExternalRepresentation())
-//            : null;
-//
-//        GraphDatabase graphDatabase = new GraphDatabase(db.getIdentifier(), contentDefinition,
-//            db.getHierarchicalGraphs().stream().map(hierarchicalGraph -> {
-//              return new HierarchicalGraph(hierarchicalGraph.getIdentifier());
-//            }).collect(Collectors.toList()), db.getState().name(), db.getPort(),
-//            db.getAvailableActions().stream().map(action -> action.getName()).collect(Collectors.toList()));
-//
-//        stringBuffer.append(" - " + graphDatabase.toString() + "\n");
-//      });
-//    } else {
-//      stringBuffer.append("No database configured.\n");
-//    }
-//
-//    return stringBuffer.toString();
-//  }
 
   @NotNull
   protected String dumpContentDefinitionProviderFactories() {
