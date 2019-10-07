@@ -27,10 +27,10 @@ import org.springframework.shell.table.Table;
 import java.io.IOException;
 
 @ShellComponent
-@ShellCommandGroup("Slizaa Graph Databases Commands")
-public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandComponent {
+@ShellCommandGroup("Slizaa Database Commands")
+public class SlizaaDatabaseCommands extends AbstractGraphDatabaseCommandComponent {
 
-    @ShellMethod(value = "List all configured graph databases.", key = "listDBs")
+    @ShellMethod(value = "List all configured databases.", key = "listDBs")
     public Object listDBs() {
 
         // check the backend configuration
@@ -43,7 +43,7 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
         return dumpGraphDatabases();
     }
 
-    @ShellMethod(value = "Create a new graph databases.", key = "createDB")
+    @ShellMethod(value = "Create a new database.", key = "createDB")
     public Object createDB(@ShellOption(value = {"-d", "--databaseId"}, help = "The identifier of the database to create.") String databaseIdentifier) {
 
         // check the backend configuration
@@ -65,7 +65,7 @@ public class SlizaaGraphDatabaseCommands extends AbstractGraphDatabaseCommandCom
         return dumpGraphDatabases();
     }
 
-    @ShellMethod(value = "Delete an existing graph database.", key = "deleteDB")
+    @ShellMethod(value = "Delete an existing database.", key = "deleteDB")
     public Object deleteDB(@ShellOption(value={"-d", "--databaseId"}, help = "The identifier of the database to delete.") String databaseIdentifier) {
 
         // check the backend configuration

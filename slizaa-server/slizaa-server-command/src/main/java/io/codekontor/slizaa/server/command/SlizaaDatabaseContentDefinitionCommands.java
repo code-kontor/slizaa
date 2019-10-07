@@ -26,15 +26,15 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
-@ShellCommandGroup("Slizaa Graph Databases Commands - Content Definition")
-public class SlizaaGraphDatabaseContentDefinitionCommands extends AbstractGraphDatabaseCommandComponent {
+@ShellCommandGroup("Slizaa Database Commands - Content Definition")
+public class SlizaaDatabaseContentDefinitionCommands extends AbstractGraphDatabaseCommandComponent {
 
-    @ShellMethod(value = "List available content definition provider factories.", key = {"listContentDefinitionProviderFactories"}, group = "Slizaa Graph Databases Commands - Content Definition")
+    @ShellMethod(value = "List available content definition provider factories.", key = {"listContentDefinitionProviderFactories"}, group = "Slizaa Database Commands - Content Definition")
     public String listContentDefinitionProviderFactories() {
         return dumpContentDefinitionProviderFactories();
     }
 
-    @ShellMethod(value = "Define the content that should be analyzed.", key = "setContentDefinitionProvider", group = "Slizaa Graph Databases Commands - Content Definition")
+    @ShellMethod(value = "Define the content that should be analyzed.", key = "setContentDefinitionProvider", group = "Slizaa Database Commands - Content Definition")
     public Object setContentDefinitionProvider(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-f", "--factoryId"}) String contentDefinitionProviderFactoryId, @ShellOption({"-c", "--contentDefinition"}) String contentDefinition) {
 
         // check the backend configuration
