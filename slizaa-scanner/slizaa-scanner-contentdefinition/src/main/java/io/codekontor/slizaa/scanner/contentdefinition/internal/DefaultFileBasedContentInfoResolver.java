@@ -177,21 +177,7 @@ public class DefaultFileBasedContentInfoResolver implements IFileBasedProjectCon
     //
     String result = null;
 
-    // step 1: check if a symbolic name exists
-    if (_manifest != null) {
-
-      result = _manifest.getMainAttributes().getValue("Bundle-SymbolicName");
-
-      if (result != null) {
-        int end = result.indexOf(';');
-        if (end > 0) {
-          result = result.substring(0, end);
-        }
-        return result;
-      }
-    }
-
-    // try to read maven properties
+    // step 1: try to read maven properties
     Enumeration<JarEntry> entries = _jarFile.entries();
     while (entries.hasMoreElements()) {
       JarEntry jarEntry = (JarEntry) entries.nextElement();
@@ -205,7 +191,21 @@ public class DefaultFileBasedContentInfoResolver implements IFileBasedProjectCon
       }
     }
 
-    // step 2:
+    // step 2: check if a symbolic name exists
+    if (_manifest != null) {
+
+      result = _manifest.getMainAttributes().getValue("Bundle-SymbolicName");
+
+      if (result != null) {
+        int end = result.indexOf(';');
+        if (end > 0) {
+          result = result.substring(0, end);
+        }
+        return result;
+      }
+    }
+
+    // step 3:
     result = LogicalJarNameResolver.extractName(_file.getName());
     if (result != null) {
       return result;
