@@ -28,20 +28,15 @@ import { createStore } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { appReducer } from './redux/Reducers';
 import MainView from './views/mainview/internal/MainView';
-import { ServerConfigValidator } from './views/serverconfigwizard';
 
-// TODO: origin url
-// TODO!!
 const httpLink = createHttpLink({
-  uri: 'http://localhost:8085/graphql/'
+  uri: process.env.REACT_APP_SLIZAA_API_URL ? process.env.REACT_APP_SLIZAA_API_URL : window.location.href.replace(window.location.pathname, '/graphql/')
 });
 
 // create the apollo client instance
 const client = new ApolloClient({
-  cache: new InMemoryCache({
+    cache: new InMemoryCache({
     dataIdFromObject: object => {
-      // tslint:disable-next-line:no-console
-      console.log("CACHE: " + object.__typename)
       switch (object.__typename) {
         default: return defaultDataIdFromObject(object); // fall back to default handling
       }
@@ -58,9 +53,7 @@ class SlizaaApp extends Component {
     return (
       <ApolloProvider client={client}>
         <Provider store={store}>
-          <ServerConfigValidator>
             <MainView />
-          </ServerConfigValidator>  
         </Provider>
       </ApolloProvider>
     );
