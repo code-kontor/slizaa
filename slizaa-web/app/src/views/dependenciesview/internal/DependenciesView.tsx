@@ -36,10 +36,27 @@ import {IDependenciesViewState} from "./IDependenciesViewState";
 
 export class DependenciesView extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
 
+    public static getDerivedStateFromProps(props: IDependenciesViewProps, state: IDependenciesViewState) {
+        if (props.databaseId !== state.databaseId ||
+            props.hierarchicalGraphId !== state.hierarchicalGraphId ) {
+            return {
+                databaseId: props.databaseId,
+                hierarchicalGraphId: props.hierarchicalGraphId,
+                mainTreeNodeSelection: {
+                    expandedNodeIds: ["-1"],
+                    selectedNodeIds: [],
+                }
+            };
+        }
+        return null;
+    }
+
     constructor(props: IDependenciesViewProps) {
         super(props);
 
         this.state = {
+            databaseId: props.databaseId,
+            hierarchicalGraphId: props.hierarchicalGraphId,
             layout: {
                 dsmSetting: {
                     horizontalSideMarkerHeight: 10,
@@ -99,6 +116,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
 
     private hierarchicalGraph(client: ApolloClient<any>): React.ReactNode {
         return <HierarchicalGraphTree
+            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId}
             client={client}
             databaseId={this.props.databaseId}
             hierarchicalGraphId={this.props.hierarchicalGraphId}
@@ -177,7 +195,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             NodeType.SOURCE;
 
         //
-        return <SlizaaDependencyTree client={client}
+        return <SlizaaDependencyTree key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeId + "-" + this.state.mainDependencySelection.targetNodeId}
+                                     client={client}
                                      databaseId={this.props.databaseId}
                                      hierarchicalGraphId={this.props.hierarchicalGraphId}
                                      sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
@@ -340,8 +359,6 @@ const mapStateToProps = (state: IAppState) => {
     };
 };
 
-export default connect(mapStateToProps)
-
-(
+export default connect(mapStateToProps)(
     DependenciesView
 );

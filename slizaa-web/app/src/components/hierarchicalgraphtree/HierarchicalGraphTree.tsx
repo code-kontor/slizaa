@@ -30,6 +30,10 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
 
   constructor(props: WithApolloClient<IHierarchicalGraphTreeProps>) {
     super(props);
+
+    this.state = {
+      rootNode : SlizaaNode.createNode("-1", props.databaseId + "-" + props.hierarchicalGraphId, "default", true)
+    };
   }
 
   public onExpand = (expandedKeys: string[]) => {
@@ -49,10 +53,9 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
   }
 
   public render() {
-    const rootNode = SlizaaNode.createRoot("Root", "default");
     return (
       <STree
-        rootNode={rootNode}
+        rootNode={this.state.rootNode}
         selectedKeys={this.props.checkedKeys}
         expandedKeys={this.props.expandedKeys}
         onExpand={this.onExpand}

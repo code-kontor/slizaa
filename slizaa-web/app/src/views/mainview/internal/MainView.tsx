@@ -23,7 +23,7 @@ import { Dispatch } from 'redux';
 import { SlizaaHgChooser } from 'src/components/slizaahgchooser';
 import { actionSelectDatabase, actionSelectHierarchicalGraph } from 'src/redux/Actions';
 import { IAppState } from 'src/redux/IAppState';
-import ViewDsm from 'src/views/dependenciesview/internal/DependenciesView';
+import DependenciesView from 'src/views/dependenciesview/internal/DependenciesView';
 
 import { SelectParam } from 'antd/lib/menu';
 import './MainView.css';
@@ -97,7 +97,7 @@ export class MainView extends React.Component<IProps, IState> {
               </Menu>
             </Layout.Sider>
             <Layout.Content style={{ padding: 8, minHeight: 280 }}>
-              <Route exact={true} path="/" component={ViewDsm} />
+              <Route exact={true} path="/" component={DependenciesView} />
             </Layout.Content>
           </Layout>
         </Layout>

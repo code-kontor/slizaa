@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// tslint:disable-next-line:no-empty-interface
-export interface IHierarchicalGraphTreeState
- {
-    //
+import {ISlizaaNode} from "../../model/ISlizaaNode";
+
+export interface IHierarchicalGraphTreeState {
+    rootNode: ISlizaaNode
 }

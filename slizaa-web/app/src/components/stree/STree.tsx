@@ -50,12 +50,11 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
     }
 
     public componentWillReceiveProps(nextProps: ISTreeProps) {
-
-        this.state = {
+        this.setState( {
             expandedNodeIds: nextProps.expandedKeys ? nextProps.expandedKeys : [],
             rootNodes: [nextProps.rootNode],
             selectedNodeIds: nextProps.selectedKeys ? nextProps.selectedKeys : [],
-        };
+        });
     }
 
     public renderTreeNodes = (treeNodes: ISlizaaNode[]) => {

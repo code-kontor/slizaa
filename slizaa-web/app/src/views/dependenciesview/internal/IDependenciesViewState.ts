@@ -18,6 +18,8 @@
 import {NodeType} from "../../../model/NodeType";
 
 export interface IDependenciesViewState {
+    databaseId: string
+    hierarchicalGraphId: string
     layout: IIDependenciesViewLayout
     mainTreeNodeSelection: ITreeNodeSelection
     mainDependencySelection?: IDependencySelection

@@ -50,7 +50,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         };
     }
 
-    public componentWillReceiveProps(nextProps: ISlizaaDependencyTreeProps) {
+/*    public componentWillReceiveProps(nextProps: ISlizaaDependencyTreeProps) {
 
         if (nextProps.sourceNodeId !== this.props.sourceNodeId ||
             nextProps.selectedNodeIds !== this.props.selectedNodeIds ||
@@ -63,7 +63,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 targetNode: SlizaaNode.createRoot("Root", "default"),
             })
         }
-    }
+    }*/
 
     public render() {
 
