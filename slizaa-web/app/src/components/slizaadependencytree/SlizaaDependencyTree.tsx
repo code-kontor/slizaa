@@ -50,21 +50,6 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         };
     }
 
-/*    public componentWillReceiveProps(nextProps: ISlizaaDependencyTreeProps) {
-
-        if (nextProps.sourceNodeId !== this.props.sourceNodeId ||
-            nextProps.selectedNodeIds !== this.props.selectedNodeIds ||
-            nextProps.selectedNodesType !== this.props.selectedNodesType) {
-
-            this.setState({
-                selectedNodeIds: nextProps.selectedNodeIds,
-                selectedNodesType: nextProps.selectedNodesType,
-                sourceNode: SlizaaNode.createRoot("Root", "default"),
-                targetNode: SlizaaNode.createRoot("Root", "default"),
-            })
-        }
-    }*/
-
     public render() {
 
         const selectedSourceNodeIds = this.state.selectedNodesType === NodeType.SOURCE ? this.state.selectedNodeIds : [];
@@ -104,31 +89,43 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 const stylesNoEvents: CSSProperties = {pointerEvents: loading ? "none" : "unset"};
                 const stylesCursorWait: CSSProperties = {cursor: loading ? "wait" : "unset"};
 
+                const hasDependencies = data &&
+                    data.hierarchicalGraph &&
+                    data.hierarchicalGraph.dependencySetForAggregatedDependency &&
+                    data.hierarchicalGraph.dependencySetForAggregatedDependency.size !== 0;
+
+                const elementLeft = hasDependencies ?
+                    <STree
+                        rootNode={this.state.sourceNode}
+                        onExpand={this.onSourceExpand}
+                        onSelect={this.onSourceSelect}
+                        expandedKeys={combinedExpanedSourceNodeIds}
+                        selectedKeys={selectedSourceNodeIds}
+                        markedKeys={markedSourceNodeIds}
+                        loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
+                        fetchIcon={this.fetchIcon}
+                    /> :
+                    <div/>
+
+                const elementRight = hasDependencies ?
+                    <STree
+                        rootNode={this.state.targetNode}
+                        onExpand={this.onTargetExpand}
+                        onSelect={this.onTargetSelect}
+                        expandedKeys={combinedExpanedTargetNodeIds}
+                        selectedKeys={selectedTargetNodeIds}
+                        markedKeys={markedTargetNodeIds}
+                        loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
+                        fetchIcon={this.fetchIcon}
+                    /> :
+                    <div/>
+
                 return <div className="slizaa-dependency-tree" style={stylesCursorWait}>
-                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents} >
-                        <STree
-                            rootNode={this.state.sourceNode}
-                            onExpand={this.onSourceExpand}
-                            onSelect={this.onSourceSelect}
-                            // expandedKeys={this.state.expandedSourceNodeIds}
-                            expandedKeys={combinedExpanedSourceNodeIds}
-                            selectedKeys={selectedSourceNodeIds}
-                            markedKeys={markedSourceNodeIds}
-                            loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
-                            fetchIcon={this.fetchIcon}
-                        />
+                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents}>
+                        {elementLeft}
                     </div>
                     <div className="slizaa-dependency-tree-container" style={stylesNoEvents}>
-                        <STree
-                            rootNode={this.state.targetNode}
-                            onExpand={this.onTargetExpand}
-                            onSelect={this.onTargetSelect}
-                            expandedKeys={combinedExpanedTargetNodeIds}
-                            selectedKeys={selectedTargetNodeIds}
-                            markedKeys={markedTargetNodeIds}
-                            loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
-                            fetchIcon={this.fetchIcon}
-                        />
+                        {elementRight}
                     </div>
                 </div>
             }}

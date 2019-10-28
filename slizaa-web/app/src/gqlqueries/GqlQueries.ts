@@ -109,6 +109,7 @@ export const GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY = gql`
     query ReferencedNodesForAggregatedDependencies($databaseId: ID!, $hierarchicalGraphId: ID!, $dependencySourceNodeId: ID!, $dependencyTargetNodeId: ID!, $selectedNodeIds: [ID!]!,  $selectedNodesType: NodeType!) {
         hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
             dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
+                size
                 referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
             }
             sourcePredecessors: node(id: $dependencySourceNodeId) {

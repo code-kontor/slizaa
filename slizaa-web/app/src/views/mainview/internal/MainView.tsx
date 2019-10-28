@@ -107,8 +107,6 @@ export class MainView extends React.Component<IProps, IState> {
   }
 
   protected onSelect = (p: SelectParam) => {
-    // tslint:disable-next-line:no-console
-    console.log(p);
     this.setState({ ...this.state, selectedKeys: p.selectedKeys });
   }
 

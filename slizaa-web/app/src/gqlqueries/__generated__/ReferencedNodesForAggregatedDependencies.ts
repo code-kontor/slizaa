@@ -27,6 +27,7 @@ import { NodeType } from "./../query-types";
 
 export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_dependencySetForAggregatedDependency {
   __typename: "DependencySet";
+  size: number;
   referencedNodeIds: string[];
 }
 
@@ -40,6 +41,10 @@ export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_sour
 
 export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_sourcePredecessors {
   __typename: "Node";
+  /**
+   * The symbolicName for this node
+   */
+  id: string;
   predecessors: ReferencedNodesForAggregatedDependencies_hierarchicalGraph_sourcePredecessors_predecessors[];
 }
 
@@ -53,6 +58,10 @@ export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_targ
 
 export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_targetPredecessors {
   __typename: "Node";
+  /**
+   * The symbolicName for this node
+   */
+  id: string;
   predecessors: ReferencedNodesForAggregatedDependencies_hierarchicalGraph_targetPredecessors_predecessors[];
 }
 
