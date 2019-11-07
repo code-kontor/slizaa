@@ -207,6 +207,11 @@
 						<exclude>**/static/assets/slizaa/**</exclude>
 						<exclude>**/.env.development</exclude>
 						<exclude>**/yarn.lock</exclude>
+						<exclude>**/*.genmodel</exclude>
+						<exclude>**/*.ecore</exclude>
+						<exclude>**/bnd.bnd</exclude>
+						<exclude>**/*.cypher</exclude>
+						<exclude>**/*.graphqls</exclude>
 					</excludes>
 					<mapping>
 						<tsx>SLASHSTAR_STYLE</tsx>

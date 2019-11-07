@@ -29,7 +29,7 @@ import org.springframework.shell.standard.ShellOption;
 @ShellCommandGroup("Slizaa Database Commands - Content Definition")
 public class SlizaaDatabaseContentDefinitionCommands extends AbstractGraphDatabaseCommandComponent {
 
-    @ShellMethod(value = "List available content definition provider factories.", key = {"listContentDefinitionProviderFactories"}, group = "Slizaa Database Commands - Content Definition")
+    @ShellMethod(value = "List available content definition provider factories.", key = {"listContentDefinitionProviderFactories"})
     public String listContentDefinitionProviderFactories() {
         return dumpContentDefinitionProviderFactories();
     }

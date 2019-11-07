@@ -28,7 +28,7 @@ import org.springframework.shell.standard.ShellOption;
 @ShellCommandGroup("Slizaa Database Commands - Hierarchical Graphs")
 public class SlizaaDatabaseHierarchicalGraphCommands extends AbstractGraphDatabaseCommandComponent {
 
-    @ShellMethod(value = "Create a new hierarchical graph.", key = "createHierarchicalGraph", group = "Slizaa Databases Commands - Hierarchical Graphs")
+    @ShellMethod(value = "Create a new hierarchical graph.", key = "createHierarchicalGraph")
     public Object createHierarchicalGraph(@ShellOption({"-d", "--databaseId"}) String databaseIdentifier, @ShellOption({"-h", "--hierarchicalGraphId"}) String hierarchicalGraphIdentifier) {
 
         // check the backend configuration
