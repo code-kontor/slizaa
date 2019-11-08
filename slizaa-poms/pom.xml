@@ -21,7 +21,7 @@
 
   <groupId>io.codekontor.slizaa</groupId>
   <artifactId>slizaa-poms</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0.M3</version>
   <packaging>pom</packaging>
 
   <properties>

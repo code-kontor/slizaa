@@ -26,7 +26,7 @@
 	<parent>
 		<groupId>io.codekontor.slizaa</groupId>
 		<artifactId>slizaa-parent</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0.M3</version>
 		<relativePath>../../../slizaa-poms/slizaa-parent/pom.xml</relativePath>
 	</parent>
 
@@ -56,7 +56,7 @@
 		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-core-progressmonitor</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>1.0.0.M3</version>
 		</dependency>
 
 		<!-- -->
@@ -103,7 +103,7 @@
 			<plugin>
 				<groupId>io.codekontor.slizaa.mojos</groupId>
 				<artifactId>ecoregenerator-maven-plugin</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
+				<version>1.0.0.M3</version>
 				<executions>
 					<execution>
 						<id>generateFromEcore</id>
