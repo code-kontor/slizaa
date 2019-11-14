@@ -18,6 +18,7 @@
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
 import { DSM } from '../src/components/dsm';
+import {IDsmSelection} from "../src/components/dsm/IDsmProps";
 
 function createCells(count: number): Array<{ row: number, column: number, value: number }> {
   const result: Array<{ row: number, column: number, value: number }> = [];
@@ -37,9 +38,9 @@ function createLabels(count: number): Array<{ id: string, text: string }> {
   return result;
 }
 
-function handleOnHover(column: string | undefined, row: string | undefined) {
+function handleOnHover(selection: IDsmSelection | undefined) {
   // tslint:disable-next-line
-  console.log("Row: " + row + " , Column: " + column);
+  console.log(selection !== undefined ? selection.sourceLabel.text + " : " + selection.targetLabel.text : "undefined");
 }
 
 storiesOf('DSM', module)

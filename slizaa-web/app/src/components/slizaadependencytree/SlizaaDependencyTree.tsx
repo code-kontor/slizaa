@@ -144,9 +144,9 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
     }
 
-    private onSourceSelect = (selectedItems: string[]): void => {
+    private onSourceSelect = (selectedNodes: ISlizaaNode[]): void => {
         this.setState({
-            selectedNodeIds: selectedItems,
+            selectedNodeIds: selectedNodes.map((node) => node.key),
             selectedNodesType: NodeType.SOURCE
         })
     }
@@ -157,9 +157,9 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         })
     }
 
-    private onTargetSelect = (selectedItems: string[]): void => {
+    private onTargetSelect = (selectedItems: ISlizaaNode[]): void => {
         this.setState({
-            selectedNodeIds: selectedItems,
+            selectedNodeIds: selectedItems.map((node) => node.key),
             selectedNodesType: NodeType.TARGET
         })
     }

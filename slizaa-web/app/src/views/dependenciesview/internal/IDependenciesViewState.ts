@@ -39,7 +39,9 @@ export interface ITreeNodeSelection {
 
 export interface IDependencySelection {
     sourceNodeId: string;
+    sourceNodeText: string;
     targetNodeId: string;
+    targetNodeText: string;
     weight: number;
 }
 

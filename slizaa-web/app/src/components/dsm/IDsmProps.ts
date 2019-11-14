@@ -24,9 +24,8 @@ export interface IDsmProps {
     horizontalSideMarkerHeight: number;
     verticalSideMarkerWidth: number;
     onSideMarkerResize?: (horizontalSideMarkerHeight: number | undefined, verticalSideMarkerWidth: number | undefined) => void;
-    // TODO: Callback-Signature - Generics in TypeScript?
-    onHover?:  (columnElementId: string | undefined, rowElementId: string | undefined) => void;
-    onSelect?: (columnElementId: string | undefined, rowElementId: string | undefined) => void;
+    onHover?:  (selection: IDsmSelection | undefined) => void;
+    onSelect?: (selection: IDsmSelection | undefined) => void;
 }
 
 export interface IDsmLabel {
@@ -39,6 +38,12 @@ export interface IDsmCell {
     row: number;
     column: number;
     value: number;
+}
+
+export interface IDsmSelection {
+    selectedCell : IDsmCell;
+    sourceLabel: IDsmLabel;
+    targetLabel: IDsmLabel;
 }
 
 export interface IDsmStronglyConnectedComponent {

@@ -19,7 +19,7 @@ import * as React from 'react';
 import { setupCanvas } from './DpiFixer';
 import './DSM.css';
 import { DefaultColorScheme, IDsmColorScheme } from './IDsmColorScheme';
-import {IDsmProps} from "./IDsmProps";
+import {IDsmCell, IDsmProps, IDsmSelection} from "./IDsmProps";
 
 export class DSM extends React.Component<IDsmProps, {}> {
 
@@ -50,13 +50,23 @@ export class DSM extends React.Component<IDsmProps, {}> {
     private newlySelectedX: number | undefined;
     private newlySelectedY: number | undefined;
     private sccNodePositions: number[];
-    private matrixLabels: string[][];
+    private matrixElements: IDsmCell[][];
 
     constructor(props: IDsmProps) {
         super(props);
 
         this.horizontalSideMarkerHeight = props.horizontalSideMarkerHeight;
         this.verticalSideMarkerWidth = props.verticalSideMarkerWidth;
+    }
+
+    public shouldComponentUpdate(nextProps: Readonly<IDsmProps>, nextState: Readonly<{}>, nextContext: any): boolean {
+        return nextProps.labels !== this.props.labels ||
+        nextProps.cells !== this.props.cells ||
+        nextProps.stronglyConnectedComponents !== this.props.stronglyConnectedComponents ||
+        nextProps.horizontalBoxSize !== this.props.horizontalBoxSize ||
+        nextProps.verticalBoxSize !== this.props.verticalBoxSize ||
+        nextProps.horizontalSideMarkerHeight !== this.props.horizontalSideMarkerHeight ||
+        nextProps.verticalSideMarkerWidth !== this.props.verticalSideMarkerWidth;
     }
 
     public componentWillReceiveProps(nextProps: IDsmProps) {
@@ -90,10 +100,15 @@ export class DSM extends React.Component<IDsmProps, {}> {
                         this.newlySelectedY = position[1];
                         requestAnimationFrame(this.updateMarkedLayer);
                         if (this.props.onSelect) {
-                            this.props.onSelect(
-                                this.newlySelectedX !== undefined ? this.props.labels[this.newlySelectedX].id : undefined,
-                                this.newlySelectedY !== undefined ? this.props.labels[this.newlySelectedY].id : undefined,
-                            );
+                            const selection : IDsmSelection | undefined =
+                                this.newlySelectedX !== undefined && this.newlySelectedY !== undefined ?
+                            {
+                                selectedCell: this.matrixElements[this.newlySelectedX][this.newlySelectedY],
+                                sourceLabel: this.props.labels[this.newlySelectedY],
+                                targetLabel: this.props.labels[this.newlySelectedX]
+                            } :
+                                    undefined;
+                            this.props.onSelect(selection);
                         }
                     }
                 }).bind(this)
@@ -109,6 +124,9 @@ export class DSM extends React.Component<IDsmProps, {}> {
                     this.newlyMarkedX = undefined;
                     this.newlyMarkedY = undefined;
                     requestAnimationFrame(this.updateMarkedLayer);
+                    if (this.props.onHover) {
+                        this.props.onHover(undefined);
+                    }
                 }).bind(this)
 
                 this.markedCellLayerrenderingContext.canvas.onmousemove = ((event: MouseEvent) => {
@@ -169,10 +187,15 @@ export class DSM extends React.Component<IDsmProps, {}> {
                             this.newlyMarkedY = position[1];
 
                             if (this.props.onHover) {
-                                this.props.onHover(
-                                    this.newlyMarkedX === undefined ? undefined : this.props.labels[this.newlyMarkedX].id ,
-                                    this.newlyMarkedY === undefined ? undefined : this.props.labels[this.newlyMarkedY].id ,
-                                );
+                                const selection : IDsmSelection | undefined =
+                                    this.newlyMarkedX !== undefined && this.newlyMarkedY !== undefined ?
+                                        {
+                                            selectedCell: this.matrixElements[this.newlyMarkedX][this.newlyMarkedY],
+                                            sourceLabel: this.props.labels[this.newlyMarkedY],
+                                            targetLabel: this.props.labels[this.newlyMarkedX]
+                                        } :
+                                        undefined;
+                                this.props.onHover(selection);
                             }
                         }
                     }
@@ -187,6 +210,8 @@ export class DSM extends React.Component<IDsmProps, {}> {
     }
 
     public render() {
+        // tslint:disable-next-line:no-console
+        console.log("RENDER!!")
         return (
             <div id="stage">
                 <canvas id="markedCellLayer" ref={ref => (this.markedCellLayerCanvasRef = ref)} />
@@ -231,12 +256,12 @@ export class DSM extends React.Component<IDsmProps, {}> {
 
             // create structures
             this.sccNodePositions = [].concat.apply([], this.props.stronglyConnectedComponents.map(scc => scc.nodePositions));
-            this.matrixLabels = new Array(this.props.labels.length);
-            for (let index = 0; index < this.matrixLabels.length; index++) {
-                this.matrixLabels[index] = new Array(this.props.labels.length);
+            this.matrixElements = new Array(this.props.labels.length);
+            for (let index = 0; index < this.matrixElements.length; index++) {
+                this.matrixElements[index] = new Array(this.props.labels.length);
             }
             this.props.cells.forEach(cell => {
-                this.matrixLabels[cell.column][cell.row] = '' + cell.value;
+                this.matrixElements[cell.column][cell.row] = cell;
             });
 
             // draw the horizontal bar

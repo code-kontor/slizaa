@@ -15,16 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {IDependencySelection} from "../internal/IDependenciesViewState";
 
-import { ISlizaaNode } from 'src/model/ISlizaaNode';
-
-export interface ISTreeProps {
-  rootNode: ISlizaaNode
-  expandedKeys?: string[]
-  selectedKeys?: string[]
-  markedKeys?: string[]
-  onSelect?:  (selectedKeys: ISlizaaNode[]) => void
-  onExpand?: (expandedKeys: string[]) => void
-  loadData?: (node: ISlizaaNode, callback: () => void) => Promise<{}>
-  fetchIcon?: (node: ISlizaaNode) => React.ReactNode
+export class IDsmPartState {
+    public hoveredDependency?: IDependencySelection
 }

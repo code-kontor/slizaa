@@ -21,14 +21,16 @@ import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
 import {connect} from 'react-redux';
 import {Card} from 'src/components/card';
-import {DSM} from 'src/components/dsm';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
 import {IAppState} from 'src/redux/IAppState';
+import {IDsmSelection} from "../../../components/dsm/IDsmProps";
 import {SlizaaDependencyTree} from "../../../components/slizaadependencytree";
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../../gqlqueries/__generated__/DsmForNodeChildren";
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../../gqlqueries/GqlQueries";
+import {ISlizaaNode} from "../../../model/ISlizaaNode";
 import {NodeType} from "../../../model/NodeType";
+import {DependencyOverviewPart} from "../dsmPart/DsmPart";
 import './DependenciesView.css';
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
 import {IDependenciesViewState} from "./IDependenciesViewState";
@@ -38,7 +40,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
 
     public static getDerivedStateFromProps(props: IDependenciesViewProps, state: IDependenciesViewState) {
         if (props.databaseId !== state.databaseId ||
-            props.hierarchicalGraphId !== state.hierarchicalGraphId ) {
+            props.hierarchicalGraphId !== state.hierarchicalGraphId) {
             return {
                 databaseId: props.databaseId,
                 hierarchicalGraphId: props.hierarchicalGraphId,
@@ -95,7 +97,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                                                        </Card>
                                                    }
                                                    right={
-                                                       <Card title="Dependencies Overview">
+                                                       <Card title="Dependencies Overview"
+                                                             allowOverflow={false}>
                                                            {this.dependenciesOverview()}
                                                        </Card>
                                                    }
@@ -160,16 +163,18 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     // get  the data
                     const {orderedNodes, cells, stronglyConnectedComponents} = data.hierarchicalGraph.node.children.dependencyMatrix
 
-                    return <DSM labels={orderedNodes}
-                                cells={cells}
-                                stronglyConnectedComponents={stronglyConnectedComponents}
-                                horizontalBoxSize={35}
-                                verticalBoxSize={35}
-                                horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
-                                verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
-                                onSideMarkerResize={this.onSideMarkerResize}
-                                onSelect={this.onSelectDependency}
-                    />
+                    return <DependencyOverviewPart
+                                 labels={orderedNodes}
+                                 cells={cells}
+                                 stronglyConnectedComponents={stronglyConnectedComponents}
+                                 horizontalBoxSize={35}
+                                 verticalBoxSize={35}
+                                 horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
+                                 verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
+                                 onSideMarkerResize={this.onSideMarkerResize}
+                                 onSelect={this.onSelectDependency}
+                                 dependencySelection={this.state.mainDependencySelection}
+                            />
                 }}
             </Query>
 
@@ -195,15 +200,16 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             NodeType.SOURCE;
 
         //
-        return <SlizaaDependencyTree key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeId + "-" + this.state.mainDependencySelection.targetNodeId}
-                                     client={client}
-                                     databaseId={this.props.databaseId}
-                                     hierarchicalGraphId={this.props.hierarchicalGraphId}
-                                     sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
-                                     targetNodeId={this.state.mainDependencySelection.targetNodeId}
-                                     selectedNodeIds={selNodeIds}
-                                     selectedNodesType={selNodeType}
-                                     onNodesSelected={this.onDependencyTreeNodesSelected}
+        return <SlizaaDependencyTree
+            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeId + "-" + this.state.mainDependencySelection.targetNodeId}
+            client={client}
+            databaseId={this.props.databaseId}
+            hierarchicalGraphId={this.props.hierarchicalGraphId}
+            sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
+            targetNodeId={this.state.mainDependencySelection.targetNodeId}
+            selectedNodeIds={selNodeIds}
+            selectedNodesType={selNodeType}
+            onNodesSelected={this.onDependencyTreeNodesSelected}
         />
     }
 
@@ -257,8 +263,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         }
     }
 
-    private onSelectDependency = (aColumnNodeId: string | undefined, aRowNodeId: string | undefined): void => {
-        if (aColumnNodeId !== undefined && aRowNodeId !== undefined) {
+    private onSelectDependency = (aSelection: IDsmSelection | undefined): void => {
+        if (aSelection !== undefined) {
             this.setState({
                 dependenciesTree: {
                     selectionNodeType: NodeType.SOURCE,
@@ -272,10 +278,11 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     }
                 },
                 mainDependencySelection: {
-                    sourceNodeId: aRowNodeId,
-                    targetNodeId: aColumnNodeId,
-                    // TODO: weight
-                    weight: 0
+                    sourceNodeId: aSelection.sourceLabel.id,
+                    sourceNodeText: aSelection.sourceLabel.text,
+                    targetNodeId: aSelection.targetLabel.id,
+                    targetNodeText: aSelection.targetLabel.text,
+                    weight: aSelection.selectedCell.value
                 }
             });
         } else {
@@ -284,6 +291,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             });
         }
     }
+
+
 
     private onSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
         this.setState({
@@ -324,14 +333,14 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             });
     }
 
-    private onMainTreeSelect = (aSelectedNodeIds: string[]): void => {
+    private onMainTreeSelect = (aSelectedNodes: ISlizaaNode[]): void => {
         this.setState(
             {
                 dependenciesTree: undefined,
                 mainDependencySelection: undefined,
                 mainTreeNodeSelection: {
                     ...this.state.mainTreeNodeSelection,
-                    selectedNodeIds: aSelectedNodeIds,
+                    selectedNodeIds: aSelectedNodes.map(v => v.key),
                 },
             });
     }

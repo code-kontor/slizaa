@@ -28,11 +28,14 @@ import './STree.css';
 export class STree extends React.Component<ISTreeProps, ISTreeState> {
 
     private treeRef: Tree | null;
+    private nodeCache: Map<string, ISlizaaNode>;
     private scrollTop: number;
     private scrollLeft: number;
 
     constructor(props: ISTreeProps) {
         super(props);
+
+        this.nodeCache = new Map();
 
         this.state = {
             expandedNodeIds: props.expandedKeys ? props.expandedKeys : [],
@@ -50,7 +53,7 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
     }
 
     public componentWillReceiveProps(nextProps: ISTreeProps) {
-        this.setState( {
+        this.setState({
             expandedNodeIds: nextProps.expandedKeys ? nextProps.expandedKeys : [],
             rootNodes: [nextProps.rootNode],
             selectedNodeIds: nextProps.selectedKeys ? nextProps.selectedKeys : [],
@@ -60,6 +63,7 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
     public renderTreeNodes = (treeNodes: ISlizaaNode[]) => {
 
         return treeNodes.map((item: ISlizaaNode) => {
+            this.nodeCache.set(item.key, item);
 
             const isSelected = this.state.selectedNodeIds.indexOf(item.key) > -1;
             const isExpanded = this.state.expandedNodeIds.indexOf(item.key) > -1;
@@ -173,7 +177,8 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
             selectedNodeIds: selectedKeys
         });
         if (this.props.onSelect) {
-            this.props.onSelect(selectedKeys);
+            const nodes: ISlizaaNode[] = selectedKeys.map((v) => this.nodeCache.get(v)).filter((v) => v !== undefined) as ISlizaaNode[];
+            this.props.onSelect(nodes);
         }
     }
 
