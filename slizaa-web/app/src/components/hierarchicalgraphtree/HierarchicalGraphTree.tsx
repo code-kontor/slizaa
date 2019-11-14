@@ -40,8 +40,8 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
     this.props.onExpand(expandedKeys);
   }
 
-  public onSelect = (selectedKeys: string[]) => {
-    this.props.onSelect(selectedKeys);
+  public onSelect = (selectedNodes: ISlizaaNode[]) => {
+    this.props.onSelect(selectedNodes);
   }
 
   public fetchIcon = (item: ISlizaaNode): React.ReactNode => {

@@ -17,25 +17,46 @@
  */
 .ant-tree li {
     padding: 0px 0px;
-  }
-  
-  .ant-tree li ul {
+}
+
+.ant-tree li ul {
     margin: 0;
     padding: 0 0 0 5px;
-  }
-  
-  .ant-tree li .ant-tree-node-content-wrapper {
+}
+
+.ant-tree li .ant-tree-node-content-wrapper {
     padding: 0px 0px;
-  }
+}
 
-  .ant-card {
+.ant-card {
     display: flex;
     align-items: stretch;
     height: 100%;
-  }
+}
 
-  .ant-card-body {
+.ant-card-body {
     display: flex;
     align-items: stretch;
     height: 100%;
-  }
+}
+
+div.dsm-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+div.dsm-selection {
+    overflow: hidden;
+    min-height: 28px;
+    height: 28px;
+    font-size: 12px;
+    margin-top: 8px;
+    margin-bottom: -5px;
+}
+
+div.dsm {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+}

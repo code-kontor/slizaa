@@ -16,11 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ISlizaaNode} from "../../model/ISlizaaNode";
+
 export interface IHierarchicalGraphTreeProps {
   databaseId: string
   hierarchicalGraphId: string
   expandedKeys?: string[]
   checkedKeys?: string[]
-  onSelect:  (selectedKeys: string[]) => void
+  onSelect:  (selectedNodes: ISlizaaNode[]) => void
   onExpand: (expandedKeys: string[]) => void
 }
