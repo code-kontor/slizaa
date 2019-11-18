@@ -15,8 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IDependencySelection} from "../internal/IDependenciesViewState";
+import * as React from "react";
+import {SlizaaIcon} from "../../../components/slizaaicon";
+import './ImageLabel.css';
 
-export class IDsmPartState {
-    public hoveredDependency?: IDependencySelection
+interface IImageLabelProps {
+    iconId?: string
+    label: string
 }
+
+export const ImageLabel = ({ iconId, label }: IImageLabelProps) => <div className="image-label-container">
+    <SlizaaIcon iconId={iconId !== undefined ? iconId :""} />
+    <div className="image-label-text">{label}</div>
+</div>

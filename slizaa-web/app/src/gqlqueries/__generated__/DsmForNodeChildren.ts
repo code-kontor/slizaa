@@ -33,6 +33,7 @@ export interface DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMa
    * The text label
    */
   text: string;
+  iconIdentifier: string;
 }
 
 export interface DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix_cells {

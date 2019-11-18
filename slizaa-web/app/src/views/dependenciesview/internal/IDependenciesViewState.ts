@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {IDsmLabel} from "../../../components/dsm/IDsmProps";
 import {NodeType} from "../../../model/NodeType";
 
 export interface IDependenciesViewState {
@@ -38,10 +39,8 @@ export interface ITreeNodeSelection {
 }
 
 export interface IDependencySelection {
-    sourceNodeId: string;
-    sourceNodeText: string;
-    targetNodeId: string;
-    targetNodeText: string;
+    sourceNodeLabel: IDsmLabel;
+    targetNodeLabel: IDsmLabel;
     weight: number;
 }
 

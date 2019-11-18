@@ -30,7 +30,7 @@ import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../../gqlqueri
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../../gqlqueries/GqlQueries";
 import {ISlizaaNode} from "../../../model/ISlizaaNode";
 import {NodeType} from "../../../model/NodeType";
-import {DependencyOverviewPart} from "../dsmPart/DsmPart";
+import {DependencyOverviewPart} from "../dsmPart/DependencyOverviewPart";
 import './DependenciesView.css';
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
 import {IDependenciesViewState} from "./IDependenciesViewState";
@@ -99,7 +99,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                                                    right={
                                                        <Card title="Dependencies Overview"
                                                              allowOverflow={false}>
-                                                           {this.dependenciesOverview()}
+                                                           {this.dependenciesOverview(cl)}
                                                        </Card>
                                                    }
                             />
@@ -133,7 +133,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
     /**
      * Creates the dependencies overview component.
      */
-    private dependenciesOverview(): React.ReactNode {
+    private dependenciesOverview(client: ApolloClient<any>): React.ReactNode {
 
         if (this.state.mainTreeNodeSelection.selectedNodeIds.length > 0) {
 
@@ -201,12 +201,12 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
 
         //
         return <SlizaaDependencyTree
-            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeId + "-" + this.state.mainDependencySelection.targetNodeId}
+            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeLabel.id + "-" + this.state.mainDependencySelection.targetNodeLabel.id}
             client={client}
             databaseId={this.props.databaseId}
             hierarchicalGraphId={this.props.hierarchicalGraphId}
-            sourceNodeId={this.state.mainDependencySelection.sourceNodeId}
-            targetNodeId={this.state.mainDependencySelection.targetNodeId}
+            sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
+            targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
             selectedNodeIds={selNodeIds}
             selectedNodesType={selNodeType}
             onNodesSelected={this.onDependencyTreeNodesSelected}
@@ -278,10 +278,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     }
                 },
                 mainDependencySelection: {
-                    sourceNodeId: aSelection.sourceLabel.id,
-                    sourceNodeText: aSelection.sourceLabel.text,
-                    targetNodeId: aSelection.targetLabel.id,
-                    targetNodeText: aSelection.targetLabel.text,
+                    sourceNodeLabel: aSelection.sourceLabel,
+                    targetNodeLabel: aSelection.targetLabel,
                     weight: aSelection.selectedCell.value
                 }
             });

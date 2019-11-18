@@ -26,12 +26,13 @@ export interface IDsmProps {
     onSideMarkerResize?: (horizontalSideMarkerHeight: number | undefined, verticalSideMarkerWidth: number | undefined) => void;
     onHover?:  (selection: IDsmSelection | undefined) => void;
     onSelect?: (selection: IDsmSelection | undefined) => void;
+    iconProvider?: (label: IDsmLabel) => Promise<string>;
 }
 
 export interface IDsmLabel {
     id: string;
     text: string;
-    iconUrl?: string;
+    iconIdentifier: string;
 }
 
 export interface IDsmCell {

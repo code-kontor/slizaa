@@ -59,6 +59,7 @@ export const GQ_DSM_FOR_NODE_CHILDREN = gql`query DsmForNodeChildren($databaseId
                     orderedNodes {
                         id
                         text
+                        iconIdentifier
                     }
                     cells {
                         row

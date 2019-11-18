@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import * as React from 'react';
-import { setupCanvas } from './DpiFixer';
+import {setupCanvas} from './DpiFixer';
 import './DSM.css';
-import { DefaultColorScheme, IDsmColorScheme } from './IDsmColorScheme';
+import {DefaultColorScheme, IDsmColorScheme} from './IDsmColorScheme';
 import {IDsmCell, IDsmProps, IDsmSelection} from "./IDsmProps";
 
 export class DSM extends React.Component<IDsmProps, {}> {
@@ -51,6 +51,7 @@ export class DSM extends React.Component<IDsmProps, {}> {
     private newlySelectedY: number | undefined;
     private sccNodePositions: number[];
     private matrixElements: IDsmCell[][];
+    private svgStrings: string[];
 
     constructor(props: IDsmProps) {
         super(props);
@@ -61,12 +62,12 @@ export class DSM extends React.Component<IDsmProps, {}> {
 
     public shouldComponentUpdate(nextProps: Readonly<IDsmProps>, nextState: Readonly<{}>, nextContext: any): boolean {
         return nextProps.labels !== this.props.labels ||
-        nextProps.cells !== this.props.cells ||
-        nextProps.stronglyConnectedComponents !== this.props.stronglyConnectedComponents ||
-        nextProps.horizontalBoxSize !== this.props.horizontalBoxSize ||
-        nextProps.verticalBoxSize !== this.props.verticalBoxSize ||
-        nextProps.horizontalSideMarkerHeight !== this.props.horizontalSideMarkerHeight ||
-        nextProps.verticalSideMarkerWidth !== this.props.verticalSideMarkerWidth;
+            nextProps.cells !== this.props.cells ||
+            nextProps.stronglyConnectedComponents !== this.props.stronglyConnectedComponents ||
+            nextProps.horizontalBoxSize !== this.props.horizontalBoxSize ||
+            nextProps.verticalBoxSize !== this.props.verticalBoxSize ||
+            nextProps.horizontalSideMarkerHeight !== this.props.horizontalSideMarkerHeight ||
+            nextProps.verticalSideMarkerWidth !== this.props.verticalSideMarkerWidth;
     }
 
     public componentWillReceiveProps(nextProps: IDsmProps) {
@@ -94,19 +95,19 @@ export class DSM extends React.Component<IDsmProps, {}> {
                 this.markedCellLayerrenderingContext.canvas.onmouseup = ((event: MouseEvent) => {
                     this.mouseDown = false;
 
-                    if (!this.horizontalResize && ! this.verticalResize) {
+                    if (!this.horizontalResize && !this.verticalResize) {
                         const position = this.computePosition(event.offsetX, event.offsetY);
                         this.newlySelectedX = position[0];
                         this.newlySelectedY = position[1];
                         requestAnimationFrame(this.updateMarkedLayer);
                         if (this.props.onSelect) {
-                            const selection : IDsmSelection | undefined =
+                            const selection: IDsmSelection | undefined =
                                 this.newlySelectedX !== undefined && this.newlySelectedY !== undefined ?
-                            {
-                                selectedCell: this.matrixElements[this.newlySelectedX][this.newlySelectedY],
-                                sourceLabel: this.props.labels[this.newlySelectedY],
-                                targetLabel: this.props.labels[this.newlySelectedX]
-                            } :
+                                    {
+                                        selectedCell: this.matrixElements[this.newlySelectedX][this.newlySelectedY],
+                                        sourceLabel: this.props.labels[this.newlySelectedY],
+                                        targetLabel: this.props.labels[this.newlySelectedX]
+                                    } :
                                     undefined;
                             this.props.onSelect(selection);
                         }
@@ -138,27 +139,26 @@ export class DSM extends React.Component<IDsmProps, {}> {
                             this.horizontalResize && event.offsetY !== this.horizontalSideMarkerHeight) {
                             this.horizontalSideMarkerHeight = event.offsetY;
                             this.verticalSideMarkerWidth = event.offsetX;
-                            requestAnimationFrame(this.draw);
+                            requestAnimationFrame(this.loadIconsAndDraw);
                             if (this.props.onSideMarkerResize) {
                                 this.props.onSideMarkerResize(event.offsetX, event.offsetY);
                             }
                         } else if (this.verticalResize && event.offsetX !== this.verticalSideMarkerWidth) {
                             this.horizontalSideMarkerHeight = this.horizontalSideMarkerHeight;
                             this.verticalSideMarkerWidth = event.offsetX;
-                            requestAnimationFrame(this.draw);
+                            requestAnimationFrame(this.loadIconsAndDraw);
                             if (this.props.onSideMarkerResize) {
                                 this.props.onSideMarkerResize(event.offsetX, this.horizontalSideMarkerHeight);
                             }
                         } else if (this.horizontalResize && event.offsetY !== this.horizontalSideMarkerHeight) {
                             this.horizontalSideMarkerHeight = event.offsetY;
                             this.verticalSideMarkerWidth = this.verticalSideMarkerWidth;
-                            requestAnimationFrame(this.draw);
+                            requestAnimationFrame(this.loadIconsAndDraw);
                             if (this.props.onSideMarkerResize) {
                                 this.props.onSideMarkerResize(this.verticalSideMarkerWidth, event.offsetY);
                             }
                         }
-                    }
-                    else {
+                    } else {
 
                         // check if we are in a 'resize' area
                         this.verticalResize = event.offsetX > this.verticalSideMarkerWidth - 2 * this.SEP_SIZE &&
@@ -187,7 +187,7 @@ export class DSM extends React.Component<IDsmProps, {}> {
                             this.newlyMarkedY = position[1];
 
                             if (this.props.onHover) {
-                                const selection : IDsmSelection | undefined =
+                                const selection: IDsmSelection | undefined =
                                     this.newlyMarkedX !== undefined && this.newlyMarkedY !== undefined ?
                                         {
                                             selectedCell: this.matrixElements[this.newlyMarkedX][this.newlyMarkedY],
@@ -201,26 +201,24 @@ export class DSM extends React.Component<IDsmProps, {}> {
                     }
                 }).bind(this)
             }
-            this.draw();
+            this.loadIconsAndDraw();
         }
     }
 
     public componentDidUpdate() {
-        this.draw();
+        this.loadIconsAndDraw();
     }
 
     public render() {
-        // tslint:disable-next-line:no-console
-        console.log("RENDER!!")
         return (
             <div id="stage">
-                <canvas id="markedCellLayer" ref={ref => (this.markedCellLayerCanvasRef = ref)} />
-                <canvas id="main" ref={ref => (this.canvasRef = ref)} />
+                <canvas id="markedCellLayer" ref={ref => (this.markedCellLayerCanvasRef = ref)}/>
+                <canvas id="main" ref={ref => (this.canvasRef = ref)}/>
             </div>
         );
     }
 
-    private computePosition = (offsetX: number, offsetY: number) : [number | undefined, number | undefined] => {
+    private computePosition = (offsetX: number, offsetY: number): [number | undefined, number | undefined] => {
 
         let x: number | undefined =
             Math.floor((offsetX - this.verticalSideMarkerWidth) / this.getBoxSize().getHorizontalBoxSize())
@@ -228,10 +226,32 @@ export class DSM extends React.Component<IDsmProps, {}> {
         let y: number | undefined =
             Math.floor((offsetY - this.horizontalSideMarkerHeight) / this.getBoxSize().getVerticalBoxSize())
 
-        if (x < 0 || x >= this.props.labels.length) { x = undefined }
-        if (y < 0 || y >= this.props.labels.length) { y = undefined }
+        if (x < 0 || x >= this.props.labels.length) {
+            x = undefined
+        }
+        if (y < 0 || y >= this.props.labels.length) {
+            y = undefined
+        }
 
         return [x, y];
+    }
+
+    private loadIconsAndDraw = () => {
+
+        if (this.props.iconProvider !== undefined) {
+            this.svgStrings = new Array(this.props.labels.length);
+            const promises = new Array(this.props.labels.length);
+            for (let index = 0; index < this.svgStrings.length; index++) {
+                promises[index] = this.props.iconProvider(this.props.labels[index]);
+            }
+            Promise.all(promises).then(values => {
+                for(let i=0; i<values.length; i++){
+                    this.svgStrings[i] = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(values[i]);
+                }
+            }).then(values => this.draw());
+        } else {
+            this.draw();
+        }
     }
 
     private draw = () => {
@@ -257,6 +277,7 @@ export class DSM extends React.Component<IDsmProps, {}> {
             // create structures
             this.sccNodePositions = [].concat.apply([], this.props.stronglyConnectedComponents.map(scc => scc.nodePositions));
             this.matrixElements = new Array(this.props.labels.length);
+
             for (let index = 0; index < this.matrixElements.length; index++) {
                 this.matrixElements[index] = new Array(this.props.labels.length);
             }
@@ -452,7 +473,6 @@ export class DSM extends React.Component<IDsmProps, {}> {
         }
         renderingContext.stroke();
 
-        // step 3: re-draw the text
         // ...set the clipping area
         renderingContext.beginPath();
         renderingContext.rect(
@@ -462,13 +482,34 @@ export class DSM extends React.Component<IDsmProps, {}> {
             this.getVerticalSliceSize(y + 1) - this.getVerticalSliceSize(y));
         renderingContext.clip();
 
-        // ...draw rotated text
+        // step 3: draw the image
+        let textPadding = 0;
+        if (this.svgStrings !== undefined && this.svgStrings[y] !== undefined) {
+            const img = new Image();
+            img.src = this.svgStrings[y];
+            img.onload = () => {
+                renderingContext.save();
+                renderingContext.beginPath();
+                renderingContext.rect(
+                    0,
+                    this.horizontalSideMarkerHeight + this.getVerticalSliceSize(y),
+                    this.verticalSideMarkerWidth - (this.SEP_SIZE + this.TEXT_CLIP_PADDING),
+                    this.getVerticalSliceSize(y + 1) - this.getVerticalSliceSize(y));
+                renderingContext.clip();
+                renderingContext.drawImage(img, (this.getBoxSize().getVerticalBoxSize() - 18) / 2, this.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + (this.getBoxSize().getVerticalBoxSize() - 18) / 2);
+                renderingContext.restore();
+            }
+            renderingContext.drawImage(img, (this.getBoxSize().getVerticalBoxSize() - 18) / 2, this.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + (this.getBoxSize().getVerticalBoxSize() - 18) / 2);
+            textPadding = 18 + 5;
+        }
+
+        // step 4: re-draw the text
         renderingContext.fillStyle = this.colorScheme.getSideMarkerTextColor();
         renderingContext.font = this.FONT;
         renderingContext.textAlign = "left";
         renderingContext.textBaseline = "middle";
         renderingContext.fillText(this.props.labels[y].text,
-            10,
+            textPadding + ((this.getBoxSize().getVerticalBoxSize() - 18) / 2),
             this.horizontalSideMarkerHeight + this.getVerticalSliceSize(y) + this.getBoxSize().getVerticalBoxSize() / 2);
 
         renderingContext.restore();
@@ -506,21 +547,48 @@ export class DSM extends React.Component<IDsmProps, {}> {
         }
         renderingContext.stroke();
 
-        // step 2: re-draw the text
         // ...set the clipping area
         renderingContext.beginPath();
         renderingContext.rect(this.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), 0,
             this.getHorizontalSliceSize(x + 1) - this.getHorizontalSliceSize(x), this.horizontalSideMarkerHeight - (this.SEP_SIZE + this.TEXT_CLIP_PADDING));
         renderingContext.clip();
 
-        // ...draw rotated text
+        // step 3: draw the image
+        let textPadding = 0;
+        if (this.svgStrings !== undefined && this.svgStrings[x] !== undefined) {
+            const img = new Image();
+            img.src = this.svgStrings[x];
+            const xPosition = this.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + (this.getBoxSize().getHorizontalBoxSize() - 18) / 2;
+            const yPosition = (this.getBoxSize().getVerticalBoxSize() - 18) / 2;
+            img.onload = () => {
+                renderingContext.save();
+                renderingContext.beginPath();
+                renderingContext.rect(this.verticalSideMarkerWidth + this.getHorizontalSliceSize(x), 0,
+                    this.getHorizontalSliceSize(x + 1) - this.getHorizontalSliceSize(x), this.horizontalSideMarkerHeight - (this.SEP_SIZE + this.TEXT_CLIP_PADDING));
+                renderingContext.clip();
+                renderingContext.translate(xPosition + 9, yPosition + 9);
+                renderingContext.rotate(Math.PI / 2);
+                renderingContext.translate(-(xPosition + 9), -(yPosition + 9));
+                renderingContext.drawImage(img, xPosition, yPosition);
+                renderingContext.restore();
+            }
+            renderingContext.save();
+            renderingContext.translate(xPosition + 9, yPosition + 9);
+            renderingContext.rotate(Math.PI / 2);
+            renderingContext.translate(-(xPosition + 9), -(yPosition + 9));
+            renderingContext.drawImage(img, this.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + (this.getBoxSize().getHorizontalBoxSize() - 18) / 2, (this.getBoxSize().getVerticalBoxSize() - 18) / 2);
+            renderingContext.restore();
+            textPadding = 15;
+        }
+
+        // step 4: re-draw the text
         renderingContext.translate(this.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + this.getBoxSize().getHorizontalBoxSize() / 2, 10);
         renderingContext.rotate(1 * Math.PI / 2);
         renderingContext.fillStyle = this.colorScheme.getSideMarkerTextColor();
         renderingContext.font = this.FONT;
         renderingContext.textAlign = "left";
         renderingContext.textBaseline = "middle";
-        renderingContext.fillText(this.props.labels[x].text, 0, 0);
+        renderingContext.fillText(this.props.labels[x].text, textPadding, 0);
 
         renderingContext.restore();
     }

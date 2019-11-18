@@ -39,24 +39,3 @@
     align-items: stretch;
     height: 100%;
 }
-
-div.dsm-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-div.dsm-selection {
-    overflow: hidden;
-    min-height: 28px;
-    height: 28px;
-    font-size: 12px;
-    margin-top: 8px;
-    margin-bottom: -5px;
-}
-
-div.dsm {
-    overflow: auto;
-    height: 100%;
-    width: 100%;
-}

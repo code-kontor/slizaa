@@ -15,4 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-export { SlizaaIcon, fetchSvg } from './internal/SlizaaIcon';
+import {IDsmProps} from "../../../components/dsm/IDsmProps";
+import {IDependencySelection} from "../internal/IDependenciesViewState";
+
+export interface IDependencyOverviewPartProps extends IDsmProps {
+    dependencySelection?: IDependencySelection
+}

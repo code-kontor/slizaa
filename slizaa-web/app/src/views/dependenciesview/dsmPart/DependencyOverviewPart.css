@@ -1,4 +1,4 @@
-/*
+/**
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,4 +15,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-export { SlizaaIcon, fetchSvg } from './internal/SlizaaIcon';
+div.dsm-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+div.dsm-selection {
+    overflow: hidden;
+    min-height: 28px;
+    height: 28px;
+    font-size: 12px;
+    border-bottom: #C8CEd3 solid thin;
+}
+
+div.dsm {
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+}
+
+.selected-dependency-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.selected-dependency-container-arrow {
+    padding-left: 5px;
+    padding-right: 5px;
+}
