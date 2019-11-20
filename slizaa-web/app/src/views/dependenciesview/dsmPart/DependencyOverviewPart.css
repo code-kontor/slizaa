@@ -40,7 +40,11 @@ div.dsm {
     flex-direction: row;
 }
 
-.selected-dependency-container-arrow {
+.selected-dependency-arrow {
     padding-left: 5px;
     padding-right: 5px;
+}
+
+.selected-dependency-weight {
+    padding-left: 5px;
 }

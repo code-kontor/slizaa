@@ -92,8 +92,9 @@ export class DependencyOverviewPart extends React.Component<IDependencyOverviewP
         if (aSelection !== undefined) {
             element = <div className="selected-dependency-container">
                 <ImageLabel iconId={aSelection.sourceNodeLabel.iconIdentifier} label={aSelection.sourceNodeLabel.text}/>
-                <div className="selected-dependency-container-arrow">⟹</div>
+                <div className="selected-dependency-arrow">⟹</div>
                 <ImageLabel iconId={aSelection.targetNodeLabel.iconIdentifier} label={aSelection.targetNodeLabel.text}/>
+                <div className="selected-dependency-weight">({aSelection.weight} Dependencies)</div>
             </div>
         } else {
             element = <div className="selected-dependency-container"/>

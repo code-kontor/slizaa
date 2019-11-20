@@ -190,7 +190,7 @@ export class DSM extends React.Component<IDsmProps, {}> {
                                 const selection: IDsmSelection | undefined =
                                     this.newlyMarkedX !== undefined && this.newlyMarkedY !== undefined ?
                                         {
-                                            selectedCell: this.matrixElements[this.newlyMarkedX][this.newlyMarkedY],
+                                            selectedCell: this.matrixElements[this.newlyMarkedY][this.newlyMarkedX],
                                             sourceLabel: this.props.labels[this.newlyMarkedY],
                                             targetLabel: this.props.labels[this.newlyMarkedX]
                                         } :
