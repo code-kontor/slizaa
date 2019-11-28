@@ -170,11 +170,13 @@ public abstract class AbstractGraphDatabaseStatemachineContext implements IGraph
   }
 
   protected void clearDatabaseDirectory() {
-    try {
-      Files.walk(_databaseDirectory.toPath(), FileVisitOption.FOLLOW_LINKS).sorted(Comparator.reverseOrder())
-          .map(Path::toFile).forEach(File::delete);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+      if (_databaseDirectory.exists()) {
+          try {
+              Files.walk(_databaseDirectory.toPath(), FileVisitOption.FOLLOW_LINKS).sorted(Comparator.reverseOrder())
+                      .map(Path::toFile).forEach(File::delete);
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+      }
   }
 }

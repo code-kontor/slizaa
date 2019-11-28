@@ -19,10 +19,13 @@ package io.codekontor.slizaa.server.service.slizaa.internal.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
+import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.IGraphDatabaseConfiguration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +33,8 @@ import java.util.List;
  *
  * @author Gerd W&uuml;therich (gw@code-kontor.io)
  */
-@JsonAutoDetect(getterVisibility=Visibility.NONE)
-public class GraphDatabaseConfiguration {
+@JsonAutoDetect(getterVisibility = Visibility.NONE)
+public class GraphDatabaseConfiguration implements IGraphDatabaseConfiguration {
 
   @JsonProperty("identifier")
   private String                                            _identifier;
@@ -48,6 +51,9 @@ public class GraphDatabaseConfiguration {
   @JsonProperty("contentDefinition")
   private GraphDatabaseContentDefinitionConfiguration       _contentDefinition;
 
+  @JsonIgnore
+  private File                                              _databaseDirectory;
+
   protected GraphDatabaseConfiguration() {
   }
 
@@ -63,8 +69,8 @@ public class GraphDatabaseConfiguration {
     //
     if (graphDatabase.getContentDefinition() != null) {
 
-      String contentDefinitionFactoryId = graphDatabase.getContentDefinition()
-          .getContentDefinitionProviderFactory().getFactoryId();
+      String contentDefinitionFactoryId = graphDatabase.getContentDefinition().getContentDefinitionProviderFactory()
+          .getFactoryId();
 
       String externalRepresenation = graphDatabase.getContentDefinition().toExternalRepresentation();
 
@@ -85,11 +91,20 @@ public class GraphDatabaseConfiguration {
     return _port;
   }
 
+  @Override
+  public File getDirectory() {
+    return _databaseDirectory;
+  }
+
   public List<GraphDatabaseHierarchicalGraphConfiguration> getHierarchicalGraphs() {
     return _hierarchicalGraphs;
   }
 
   public GraphDatabaseContentDefinitionConfiguration getContentDefinition() {
     return _contentDefinition;
+  }
+
+  public void setDatabaseDirectory(File databaseDirectory) {
+    _databaseDirectory = databaseDirectory;
   }
 }

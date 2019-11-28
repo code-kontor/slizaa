@@ -19,7 +19,6 @@ package io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,19 +43,16 @@ public class GraphDatabaseFactory {
 
   /**
    * 
-   * @param id
-   * @param databaseDirectory
-   * @param port
+   * @param configuration
    * @return
    */
-  public IGraphDatabase newInstance(String id, File databaseDirectory, int port) {
+  public IGraphDatabase newInstance(IGraphDatabaseConfiguration configuration) {
 
-    checkNotNull(id);
-    checkNotNull(databaseDirectory);
+    checkNotNull(configuration);
 
     // create the database directory
-    if (!databaseDirectory.exists()) {
-      databaseDirectory.mkdirs();
+    if (!configuration.getDirectory().exists()) {
+      configuration.getDirectory().mkdirs();
     }
 
     // create the new state machine
@@ -64,7 +60,9 @@ public class GraphDatabaseFactory {
 
     // create the state machine context
     IGraphDatabaseStateMachineContext stateMachineContext = _graphDatabaseStateMachineContextFactory
-        .createGraphDatabaseStateMachineContext(id, databaseDirectory, port);
+        .createGraphDatabaseStateMachineContext(configuration.getIdentifier(), configuration.getDirectory(), configuration.getPort());
+
+    // HERE!!
 
     // create the structure database
     GraphDatabaseImpl structureDatabase = new GraphDatabaseImpl(statemachine, stateMachineContext);

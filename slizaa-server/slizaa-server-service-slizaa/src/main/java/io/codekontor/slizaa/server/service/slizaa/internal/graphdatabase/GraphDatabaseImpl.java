@@ -166,7 +166,12 @@ public class GraphDatabaseImpl implements IGraphDatabase {
 
   @Override
   public void start() {
-    trigger(GraphDatabaseTrigger.START);
+    // ugly work-around: the statemachine may has not triggered all lambda expressions yet
+    try {
+      trigger(GraphDatabaseTrigger.START);
+    } catch (IllegalStateException e) {
+      trigger(GraphDatabaseTrigger.START);
+    }
   }
 
   @Override
@@ -213,7 +218,6 @@ public class GraphDatabaseImpl implements IGraphDatabase {
   }
 
   private void trigger(GraphDatabaseTrigger trigger) {
-
     if (!this._stateMachine.sendEvent(trigger)) {
       throw new IllegalStateException(String.format("Trigger '%s' not accepted in state '%s'.", trigger,
           this._stateMachine.getState().getId().name()));

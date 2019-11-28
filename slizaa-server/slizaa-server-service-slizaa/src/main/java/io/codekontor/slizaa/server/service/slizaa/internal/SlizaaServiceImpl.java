@@ -32,11 +32,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.swing.text.GapContent;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import io.codekontor.slizaa.server.service.selection.IModifiableSelectionService;
-import io.codekontor.slizaa.server.service.selection.ISelectionService;
+import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.IGraphDatabaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.codekontor.slizaa.core.boltclient.IBoltClientFactory;
@@ -136,8 +135,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
         try {
 
           // create
-          GraphDatabaseImpl graphDatabase = createStructureDatabaseIfAbsent(dbConfig.getIdentifier(),
-              dbConfig.getPort());
+          GraphDatabaseImpl graphDatabase = createStructureDatabaseIfAbsent(dbConfig);
 
           //
           if (dbConfig.getContentDefinition() != null) {
@@ -161,6 +159,14 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
             // ...and start the database
             if (dbConfig.isRunning()) {
+//              java.lang.IllegalStateException: Trigger 'START' not accepted in state 'NOT_RUNNING'.
+//                      at io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.GraphDatabaseImpl.trigger(GraphDatabaseImpl.java:218)
+//              at io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.GraphDatabaseImpl.start(GraphDatabaseImpl.java:169)
+//              at io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl.initialize(SlizaaServiceImpl.java:162)
+//              at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//              at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+//              at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+//              at java.lang.reflect.Method.invoke(Method.java:498)
               graphDatabase.start();
             }
           }
@@ -250,7 +256,8 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     }
 
     // create the result
-    IGraphDatabase result = createStructureDatabaseIfAbsent(identifier, SlizaaSocketUtils.findAvailableTcpPort());
+    IGraphDatabase result = createStructureDatabaseIfAbsent(
+            new NewGraphDatabaseConfiguration(identifier, SlizaaSocketUtils.findAvailableTcpPort()));
 
     // store the configuration
     storeConfig();
@@ -334,14 +341,47 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     return result;
   }
 
-  private GraphDatabaseImpl createStructureDatabaseIfAbsent(String identifier, int port) {
-    return (GraphDatabaseImpl) _structureDatabases.computeIfAbsent(identifier, id -> _graphDatabaseFactory
-        .newInstance(id, new File(_serviceProperties.getDatabaseRootDirectoryAsFile(), identifier), port));
+  private GraphDatabaseImpl createStructureDatabaseIfAbsent(IGraphDatabaseConfiguration configuration) {
+
+    if (configuration instanceof GraphDatabaseConfiguration) {
+      ((GraphDatabaseConfiguration)configuration).setDatabaseDirectory(
+              new File(_serviceProperties.getDatabaseRootDirectoryAsFile(), configuration.getIdentifier()));
+    }
+
+    return (GraphDatabaseImpl) _structureDatabases.computeIfAbsent(configuration.getIdentifier(), id -> _graphDatabaseFactory
+        .newInstance(configuration));
   }
 
   private void checkConfigured() {
     if (!this._backendService.hasInstalledExtensions()) {
       throw new RuntimeException("NOT CONFIGURED");
+    }
+  }
+
+  private class NewGraphDatabaseConfiguration implements IGraphDatabaseConfiguration {
+
+    private String _identifier;
+
+    private int _port;
+
+    public NewGraphDatabaseConfiguration(String identifier, int port) {
+      _identifier = identifier;
+      _port = port;
+    }
+
+    @Override
+    public String getIdentifier() {
+      return _identifier;
+    }
+
+    @Override
+    public int getPort() {
+      return _port;
+    }
+
+    @Override
+    public File getDirectory() {
+      return new File(_serviceProperties.getDatabaseRootDirectoryAsFile(), _identifier);
     }
   }
 }
