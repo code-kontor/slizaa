@@ -24,6 +24,20 @@ import org.junit.Test;
 public class ImageKeyTest {
 
 	@Test
+	public void longKey_0() {
+		String key = ImageKey.longKey(true, "main", "test/upperLeft", "test/upperRight", "test/lowerLeft", "test/lowerRight");
+		assertThat(key).isEqualTo("main?ul=test%2FupperLeft&ur=test%2FupperRight&ll=test%2FlowerLeft&lr=test%2FlowerRight");
+
+		ImageKey.DecodedKey decodedKey = ImageKey.decode(key);
+		assertThat(decodedKey.main).isEqualTo("main");
+		assertThat(decodedKey.isOverlayImage).isEqualTo(true);
+		assertThat(decodedKey.upperLeft).isEqualTo("test/upperLeft");
+		assertThat(decodedKey.upperRight).isEqualTo("test/upperRight");
+		assertThat(decodedKey.lowerLeft).isEqualTo("test/lowerLeft");
+		assertThat(decodedKey.lowerRight).isEqualTo("test/lowerRight");
+	}
+
+	@Test
 	public void longKey_1() {
 		String key = ImageKey.longKey(true, "main", "upperLeft", "upperRight", "lowerLeft", "lowerRight");
 		assertThat(key).isEqualTo("main?ul=upperLeft&ur=upperRight&ll=lowerLeft&lr=lowerRight");

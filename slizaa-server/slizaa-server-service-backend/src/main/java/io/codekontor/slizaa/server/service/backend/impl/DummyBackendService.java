@@ -64,7 +64,6 @@ public class DummyBackendService implements IModifiableBackendService, IBackendS
 
     File file = new File(System.getProperty("user.dir") + File.separatorChar + "src" + File.separatorChar + "test"
         + File.separatorChar + "resources" + File.separatorChar + path);
-    System.out.println(file.getAbsolutePath());
     if (file.exists()) {
       FileSystemResource fileSystemResource = new FileSystemResource(file.getAbsolutePath());
       if (fileSystemResource.exists()) {

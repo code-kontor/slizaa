@@ -20,6 +20,10 @@ package io.codekontor.slizaa.server.service.svg.impl;
 
 import com.google.common.base.Preconditions;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 public class ImageKey {
 
     public static class DecodedKey {
@@ -60,16 +64,16 @@ public class ImageKey {
                         key.isOverlayImage = false;
                     }
                     case "ul": {
-                        key.upperLeft = keyValue[1];
+                        key.upperLeft = urlDecode(keyValue[1]);
                     }
                     case "ur": {
-                        key.upperRight = keyValue[1];
+                        key.upperRight = urlDecode(keyValue[1]);
                     }
                     case "ll": {
-                        key.lowerLeft = keyValue[1];
+                        key.lowerLeft = urlDecode(keyValue[1]);
                     }
                     case "lr": {
-                        key.lowerRight = keyValue[1];
+                        key.lowerRight = urlDecode(keyValue[1]);
                     }
                 }
             }
@@ -81,22 +85,22 @@ public class ImageKey {
 
     public static String longKey(boolean isOverlayImage, String main, String upperLeft, String upperRight, String lowerLeft, String lowerRight) {
 
-        StringBuilder result = new StringBuilder(Preconditions.checkNotNull(main, "Parameter 'main' must not be null."));
+        StringBuilder builder = new StringBuilder(Preconditions.checkNotNull(main, "Parameter 'main' must not be null."));
 
         if (notEmpty(upperLeft) || notEmpty(upperRight) || notEmpty(lowerLeft) || notEmpty(lowerRight) || !isOverlayImage) {
-            result.append("?");
+            builder.append("?");
         }
 
         boolean prependAmpersand = false;
         if (!isOverlayImage) {
-            prependAmpersand = append("ol", "0", prependAmpersand, result);
+            prependAmpersand = append("ol", "0", prependAmpersand, builder);
         }
-        prependAmpersand = append("ul", upperLeft, prependAmpersand, result) || prependAmpersand;
-        prependAmpersand = append("ur", upperRight, prependAmpersand, result) || prependAmpersand;
-        prependAmpersand = append("ll", lowerLeft, prependAmpersand, result) || prependAmpersand;
-        prependAmpersand = append("lr", lowerRight, prependAmpersand, result) || prependAmpersand;
+        prependAmpersand = append("ul", upperLeft != null ? urlEncode(upperLeft) : null, prependAmpersand, builder) || prependAmpersand;
+        prependAmpersand = append("ur", upperRight != null ? urlEncode(upperRight) : null, prependAmpersand, builder) || prependAmpersand;
+        prependAmpersand = append("ll", lowerLeft != null ? urlEncode(lowerLeft) : null, prependAmpersand, builder) || prependAmpersand;
+        prependAmpersand = append("lr", lowerRight != null ? urlEncode(lowerRight) : null, prependAmpersand, builder) || prependAmpersand;
 
-        return result.toString();
+        return builder.toString();
     }
 
     public static String shortKey(String key) {
@@ -126,5 +130,21 @@ public class ImageKey {
 
     private static boolean notEmpty(String string) {
         return string != null && !string.isEmpty();
+    }
+
+    private static String urlDecode(String string) {
+        try {
+            return URLDecoder.decode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return string;
+        }
+    }
+
+    private static String urlEncode(String string) {
+        try {
+            return URLEncoder.encode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return string;
+        }
     }
 }

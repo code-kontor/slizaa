@@ -55,14 +55,6 @@ public class SvgServiceTest {
   @Test
   public void test() throws Exception {
 
-//    String key = ImageKey.key("bumm", "bamm", "bemm", null, "hurz");
-//
-//    String shortendKey = _svgService.getOrCreateKey("bumm", "bamm", "bemm", null, "hurz");
-//
-//    Map<String, String> map = _configurationService.load(SvgServiceImpl.CONFIGURATION_ID, HashMap.class);
-//    assertThat(map).containsKey(key);
-//    assertThat(map.get(key)).isEqualTo(shortendKey);
-
     //
     OverlaySvgIcon overlaySvgIcon = new OverlaySvgIcon(true);
 
@@ -76,9 +68,9 @@ public class SvgServiceTest {
     document = XMLWriterDOM.read(_backendService.loadResourceFromExtensions("icons/private_ovr.svg"));
     overlaySvgIcon.setUpperLeftNodes(document.getDocumentElement().getChildNodes());
 
-/*    System.out.println();
+    System.out.println();
     System.out.println(overlaySvgIcon.create());
-    System.out.println();*/
+    System.out.println();
 
 //    for (int i = 0; i < nodeList.getLength(); i++) {
 //      
