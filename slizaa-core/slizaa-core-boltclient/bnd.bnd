@@ -1,2 +1,0 @@
--exportcontents: io.codekontor.slizaa.core.boltclient.*, !io.codekontor.slizaa.core.boltclient.internal.*
--sources: true

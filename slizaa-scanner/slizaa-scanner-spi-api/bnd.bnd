@@ -1,4 +1,0 @@
-Export-Package: !*.internal*, io.codekontor.slizaa.scanner.spi.*, io.codekontor.slizaa.scanner.api.*
-Slizaa-SpiApi: true
--includeresource: OSGI-OPT/src=src/main/java
--snapshot: BUILD-${tstamp}
