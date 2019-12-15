@@ -73,6 +73,30 @@ public class Utilities {
     resolveProxyDependencies(Arrays.asList(dependencies), progressMonitor);
   }
 
+  public static void resolveProxyDependency(HGCoreDependency dependency) {
+
+    //
+    if (dependency == null) {
+      return;
+    }
+
+    //
+    if (!dependency.getRootNode().hasExtension(IProxyDependencyResolver.class)) {
+      return;
+    }
+
+    if (dependency instanceof ExtendedHGProxyDependencyImpl
+        && !((ExtendedHGProxyDependencyImpl) dependency).isResolved()) {
+
+      //
+      ExtendedHGProxyDependencyImpl extendedDependency = (ExtendedHGProxyDependencyImpl) dependency;
+      DependencyResolution dependencyResolution = new DependencyResolution(
+          extendedDependency.onResolveProxyDependency(), extendedDependency);
+      dependencyResolution.waitForCompletion();
+      dependencyResolution.getDependency().setResolved(true);
+    }
+  }
+
   /**
    * <p>
    * </p>
@@ -110,15 +134,7 @@ public class Utilities {
 
     // wait for completion the result
     for (DependencyResolution dependencyResolution : dependencyResolutions) {
-
-      //
       dependencyResolution.waitForCompletion();
-
-      //
-      if (!dependencyResolution.getDependency().getResolvedCoreDependencies().isEmpty()) {
-        removeDependency(dependencyResolution.getDependency(), true);
-      } 
-
       dependencyResolution.getDependency().setResolved(true);
     }
   }

@@ -186,13 +186,16 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="dependencySource" eType="#//IDependencySource"
         containment="true" eOpposite="#//IDependencySource/dependency"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="proxyDependencyParent"
-        eType="#//HGProxyDependency" eOpposite="#//HGProxyDependency/resolvedCoreDependencies"/>
+        eType="#//HGProxyDependency" eOpposite="#//HGProxyDependency/accumulatedCoreDependencies"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="HGProxyDependency" eSuperTypes="#//HGCoreDependency">
     <eOperations name="resolveProxyDependencies"/>
+    <eOperations name="getCoreDependencies" upperBound="-1" eType="#//HGCoreDependency">
+      <eParameters name="sourceOrTarget" lowerBound="1" eType="#//SourceOrTarget"/>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resolved" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
         changeable="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="resolvedCoreDependencies"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="accumulatedCoreDependencies"
         upperBound="-1" eType="#//HGCoreDependency" eOpposite="#//HGCoreDependency/proxyDependencyParent"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="NodeToCoreDependencyMap" instanceClassName="java.util.Map$Entry">

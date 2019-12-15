@@ -20,8 +20,11 @@ package io.codekontor.slizaa.hierarchicalgraph.core.model.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.BasicEMap;
@@ -546,12 +549,12 @@ public class ExtendedHGNodeTrait {
       List<HGCoreDependency> temp = new ArrayList<>();
 
       // add all direct dependencies
-      temp.addAll(getOutgoingCoreDependencies());
+      temp.addAll(filterResolvedDependenciesOfProxyDependencies(_hgNode.getOutgoingCoreDependencies(), dep -> dep.getFrom()));
 
       // add children
       if (_hgNode.children != null) {
         for (HGNode child : _hgNode.children) {
-          Utilities.getTrait(child).ifPresent((t) -> temp.addAll(t.getAccumulatedOutgoingCoreDependencies()));
+          Utilities.getTrait(child).ifPresent((t) -> temp.addAll(filterResolvedDependenciesOfProxyDependencies(t.getAccumulatedOutgoingCoreDependencies(), dep -> dep.getFrom())));
         }
       }
 
@@ -587,12 +590,12 @@ public class ExtendedHGNodeTrait {
       List<HGCoreDependency> temp = new ArrayList<>();
 
       // add all direct dependencies
-      temp.addAll(_hgNode.getIncomingCoreDependencies());
+      temp.addAll(filterResolvedDependenciesOfProxyDependencies(_hgNode.getIncomingCoreDependencies(), dep -> dep.getTo()));
 
       // and children
       if (_hgNode.children != null) {
         for (HGNode child : _hgNode.children) {
-          Utilities.getTrait(child).ifPresent((t) -> temp.addAll(t.getAccumulatedIncomingCoreDependencies()));
+          Utilities.getTrait(child).ifPresent((t) -> temp.addAll(filterResolvedDependenciesOfProxyDependencies(t.getAccumulatedIncomingCoreDependencies(), dep -> dep.getTo())));
         }
       }
 
@@ -621,5 +624,18 @@ public class ExtendedHGNodeTrait {
     }
 
     return Optional.empty();
+  }
+
+  private List<HGCoreDependency> filterResolvedDependenciesOfProxyDependencies(
+      Collection<HGCoreDependency> dependencies, Function<HGCoreDependency, HGNode> depToNode) {
+
+    return dependencies.stream().filter(dep -> {
+      if (dep.getProxyDependencyParent() == null) {
+        return true;
+      } else {
+        HGNode currentProxyDependencyParentNode = depToNode.apply(dep.getProxyDependencyParent());
+        return currentProxyDependencyParentNode.isPredecessorOf(_hgNode) /* || currentProxyDependencyParentNode.equals(_hgNode) */;
+      }
+    }).collect(Collectors.toList());
   }
 }

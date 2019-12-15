@@ -170,8 +170,8 @@ public class DependencySet {
 
         checkNotNull(dependencies).forEach((c) -> {
             if (c instanceof HGProxyDependency && ((HGProxyDependency) c).isResolved()
-                    && ((HGProxyDependency) c).getResolvedCoreDependencies().size() > 0) {
-                coreDependencies.addAll(((HGProxyDependency) c).getResolvedCoreDependencies());
+                    && ((HGProxyDependency) c).getAccumulatedCoreDependencies().size() > 0) {
+                coreDependencies.addAll(((HGProxyDependency) c).getAccumulatedCoreDependencies());
             } else {
                 coreDependencies.add(c);
             }

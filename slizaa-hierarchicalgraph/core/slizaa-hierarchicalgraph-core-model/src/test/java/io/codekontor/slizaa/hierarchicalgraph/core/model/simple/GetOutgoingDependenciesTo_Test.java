@@ -44,7 +44,7 @@ public class GetOutgoingDependenciesTo_Test {
 
     assertThat(aggregatedDependency.getAggregatedWeight()).isEqualTo(4);
     assertThat(aggregatedDependency.getCoreDependencies()).hasSize(4).containsOnly(_model.a1_b1_core1(),
-        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.a3_b3_core1());
+        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.dep_a3_b3_proxy1());
 
     //
     aggregatedDependency = _model.a2().getOutgoingDependenciesTo(_model.b2());
@@ -52,13 +52,13 @@ public class GetOutgoingDependenciesTo_Test {
 
     assertThat(aggregatedDependency.getAggregatedWeight()).isEqualTo(2);
     assertThat(aggregatedDependency.getCoreDependencies()).hasSize(2).containsOnly(_model.a2_b2_core1(),
-        _model.a3_b3_core1());
+        _model.dep_a3_b3_proxy1());
 
     //
     aggregatedDependency = _model.a3().getOutgoingDependenciesTo(_model.b3());
     assertThat(aggregatedDependency).isNotNull();
     assertThat(aggregatedDependency.getAggregatedWeight()).isEqualTo(1);
-    assertThat(aggregatedDependency.getCoreDependencies()).containsExactly(_model.a3_b3_core1());
+    assertThat(aggregatedDependency.getCoreDependencies()).containsExactly(_model.dep_a3_b3_proxy1());
   }
 
   @Test

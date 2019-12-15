@@ -19,8 +19,12 @@ package io.codekontor.slizaa.hierarchicalgraph.core.model.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
@@ -58,18 +62,24 @@ public class ExtendedHGProxyDependencyImpl extends HGProxyDependencyImpl {
     return Optional.empty();
   }
 
+  @Override
+  public List<HGCoreDependency> getCoreDependencies(SourceOrTarget sourceOrTarget) {
+    checkNotNull(sourceOrTarget);
+    return getAccumulatedCoreDependencies().stream()
+            .filter(d -> SourceOrTarget.SOURCE.equals(sourceOrTarget) ? d.getFrom().equals(getFrom()) : d.getTo().equals(getTo()))
+            .collect(Collectors.toList());
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
   public void resolveProxyDependencies() {
-
-    //
     if (!resolved) {
-      Utilities.resolveProxyDependencies(null, this);
+      Utilities.resolveProxyDependency(this);
     }
   }
-
+  
   /**
    * <p>
    * </p>

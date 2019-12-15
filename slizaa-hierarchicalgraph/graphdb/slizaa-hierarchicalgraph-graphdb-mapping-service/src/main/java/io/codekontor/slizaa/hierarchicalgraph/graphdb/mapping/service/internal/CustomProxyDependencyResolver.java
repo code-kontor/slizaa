@@ -105,7 +105,7 @@ public class CustomProxyDependencyResolver implements IProxyDependencyResolver {
           (id, type) -> GraphFactoryFunctions.createDependencySource(id, type, null), false, null);
 
       //
-      this._proxyDependency.getResolvedCoreDependencies().addAll(coreDependencies);
+      this._proxyDependency.getAccumulatedCoreDependencies().addAll(coreDependencies);
     }
   }
 }

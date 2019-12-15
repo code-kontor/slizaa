@@ -22,6 +22,7 @@ import static io.codekontor.slizaa.hierarchicalgraph.core.model.Hierarchicalgrap
 
 import java.util.List;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.ExtendedHGProxyDependencyImpl;
 import org.junit.Before;
 import org.junit.Rule;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
@@ -95,13 +96,13 @@ public abstract class AbstractResolverTest implements IProxyDependencyResolver {
   public IProxyDependencyResolverJob resolveProxyDependency(HGProxyDependency dependencyToResolve) {
 
     this._newDependency_1 = createNewCoreDependency(dependencyToResolve.getFrom(), dependencyToResolve.getTo(),
-        "NEW_USAGE", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
+        "NEW_USAGE_1", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
 
     this._newDependency_2 = createNewCoreDependency(dependencyToResolve.getFrom(), dependencyToResolve.getTo(),
-        "NEW_USAGE", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
+        "NEW_USAGE_2", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
 
-    dependencyToResolve.getResolvedCoreDependencies().add(this._newDependency_1);
-    dependencyToResolve.getResolvedCoreDependencies().add(this._newDependency_2);
+    dependencyToResolve.getAccumulatedCoreDependencies().add(this._newDependency_1);
+    dependencyToResolve.getAccumulatedCoreDependencies().add(this._newDependency_2);
 
     // return null as we resolved the dependencies immediately
     return null;
@@ -137,17 +138,17 @@ public abstract class AbstractResolverTest implements IProxyDependencyResolver {
     assertThat(aggregatedDependency.getAggregatedWeight()).isEqualTo(4);
     assertThat(aggregatedDependency.getCoreDependencies()).isNotNull();
     assertThat(aggregatedDependency.getCoreDependencies()).hasSize(4).contains(this._model.a1_b1_core1(),
-        this._model.a1_b1_core2(), this._model.a2_b2_core1(), this._model.a3_b3_core1());
+        this._model.a1_b1_core2(), this._model.a2_b2_core1(), this._model.dep_a3_b3_proxy1());
 
     //
     List<HGCoreDependency> outgoingDependencies = this._model.a1().getAccumulatedOutgoingCoreDependencies();
     assertThat(outgoingDependencies).hasSize(4).contains(this._model.a1_b1_core1(), this._model.a1_b1_core2(),
-        this._model.a2_b2_core1(), this._model.a3_b3_core1());
+        this._model.a2_b2_core1(), this._model.dep_a3_b3_proxy1());
 
     //
     List<HGCoreDependency> incomingDependencies = this._model.b1().getAccumulatedIncomingCoreDependencies();
     assertThat(incomingDependencies).hasSize(4).contains(this._model.a1_b1_core1(), this._model.a1_b1_core2(),
-        this._model.a2_b2_core1(), this._model.a3_b3_core1());
+        this._model.a2_b2_core1(), this._model.dep_a3_b3_proxy1());
   }
 
   /**
@@ -156,24 +157,14 @@ public abstract class AbstractResolverTest implements IProxyDependencyResolver {
    */
   private void assertDependenciesAfterResolve() {
 
-    // we have to re-read the aggregated dependency
-    List<HGCoreDependency> incomingDeps = this._model.b1().getAccumulatedIncomingCoreDependencies();
-    assertThat(incomingDeps).isNotNull();
-    assertThat(incomingDeps).hasSize(5);
-    assertThat(incomingDeps).contains(this._model.a1_b1_core1(), this._model.a1_b1_core2(), this._model.a2_b2_core1(),
-        getNewDependency_1(), getNewDependency_2());
+    // should be same as before
+    assertDependenciesBeforeResolve();
 
-    List<HGCoreDependency> outgoingDeps = this._model.a1().getAccumulatedOutgoingCoreDependencies();
-    assertThat(outgoingDeps).isNotNull();
-    assertThat(outgoingDeps).hasSize(5);
-    assertThat(outgoingDeps).contains(this._model.a1_b1_core1(), this._model.a1_b1_core2(), this._model.a2_b2_core1(),
-        getNewDependency_1(), getNewDependency_2());
+    HGProxyDependency proxyDependency = _model.dep_a3_b3_proxy1();
 
-    //
-    HGAggregatedDependency aggregatedDependency = this._model.a1().getOutgoingDependenciesTo(this._model.b1());
-    assertThat(aggregatedDependency.getAggregatedWeight()).isEqualTo(4);
-    assertThat(aggregatedDependency.getCoreDependencies()).isNotNull();
-    assertThat(aggregatedDependency.getCoreDependencies()).hasSize(5).contains(this._model.a1_b1_core1(),
-        this._model.a1_b1_core2(), this._model.a2_b2_core1(), getNewDependency_1(), getNewDependency_2());
+    assertThat(proxyDependency.isResolved());
+    assertThat(proxyDependency.getAccumulatedCoreDependencies()).hasSize(2);
+
+    // proxyDependency.getAccumulatedCoreDependencies().forEach(dep -> System.out.println(dep.getType() + " -> " + dep.getProxyDependencyParent().getType()));
   }
 }

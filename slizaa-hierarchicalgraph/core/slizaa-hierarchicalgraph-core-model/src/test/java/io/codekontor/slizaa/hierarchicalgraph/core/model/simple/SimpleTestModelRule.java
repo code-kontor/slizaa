@@ -72,7 +72,7 @@ public class SimpleTestModelRule implements TestRule {
   private HGCoreDependency  _dep_a2_b2_core1;
 
   /** - */
-  private HGProxyDependency _dep_a3_b3_core1;
+  private HGProxyDependency _dep_a3_b3_proxy1;
 
   /** - */
   private HGRootNode        _rootNode;
@@ -201,10 +201,10 @@ public class SimpleTestModelRule implements TestRule {
    * <p>
    * </p>
    *
-   * @return the dep_a3_b3_core1
+   * @return the dep_a3_b3_proxy1
    */
-  public HGProxyDependency a3_b3_core1() {
-    return this._dep_a3_b3_core1;
+  public HGProxyDependency dep_a3_b3_proxy1() {
+    return this._dep_a3_b3_proxy1;
   }
 
   /**
@@ -232,11 +232,11 @@ public class SimpleTestModelRule implements TestRule {
     this._a3 = createNewNode(this._rootNode, this._a2, nodeSourceSupplier);
     this._b3 = createNewNode(this._rootNode, this._b2, nodeSourceSupplier);
 
-    this._dep_a1_b1_core1 = createNewCoreDependency(this._a1, this._b1, "USES", dependencySourceSupplier, false);
-    this._dep_a1_b1_core2 = createNewCoreDependency(this._a1, this._b1, "DEPENDS_ON", dependencySourceSupplier, false);
-    this._dep_a2_b2_core1 = createNewCoreDependency(this._a2, this._b2, "USES", dependencySourceSupplier, false);
+    this._dep_a1_b1_core1 = createNewCoreDependency(this._a1, this._b1, "CORE_DEP", dependencySourceSupplier, false);
+    this._dep_a1_b1_core2 = createNewCoreDependency(this._a1, this._b1, "CORE_DEP", dependencySourceSupplier, false);
+    this._dep_a2_b2_core1 = createNewCoreDependency(this._a2, this._b2, "CORE_DEP", dependencySourceSupplier, false);
 
-    this._dep_a3_b3_core1 = createNewProxyDependency(this._a3, this._b3, "DEPENDS_ON", dependencySourceSupplier, false);
+    this._dep_a3_b3_proxy1 = createNewProxyDependency(this._a3, this._b3, "PROXY_DEP", dependencySourceSupplier, false);
   }
 
 }

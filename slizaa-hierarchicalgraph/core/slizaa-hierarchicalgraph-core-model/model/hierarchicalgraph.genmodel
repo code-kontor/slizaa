@@ -144,8 +144,11 @@
     </genClasses>
     <genClasses ecoreClass="hierarchicalgraph.ecore#//HGProxyDependency">
       <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//HGProxyDependency/resolved"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//HGProxyDependency/resolvedCoreDependencies"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//HGProxyDependency/accumulatedCoreDependencies"/>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGProxyDependency/resolveProxyDependencies"/>
+      <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGProxyDependency/getCoreDependencies">
+        <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGProxyDependency/getCoreDependencies/sourceOrTarget"/>
+      </genOperations>
     </genClasses>
     <genClasses ecoreClass="hierarchicalgraph.ecore#//NodeToCoreDependencyMap">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//NodeToCoreDependencyMap/key"/>

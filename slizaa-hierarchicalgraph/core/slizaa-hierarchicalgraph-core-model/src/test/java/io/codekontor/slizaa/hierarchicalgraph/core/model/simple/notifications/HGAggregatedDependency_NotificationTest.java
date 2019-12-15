@@ -71,7 +71,7 @@ public class HGAggregatedDependency_NotificationTest {
     assertThat(this._aggregatedDependency).isNotNull();
     assertThat(this._aggregatedDependency.getAggregatedWeight()).isEqualTo(4);
     assertThat(this._aggregatedDependency.getCoreDependencies()).hasSize(4).containsOnly(_model.a1_b1_core1(),
-        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.a3_b3_core1());
+        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.dep_a3_b3_proxy1());
 
     //
     this._adapter = new AdapterImpl() {
@@ -114,6 +114,6 @@ public class HGAggregatedDependency_NotificationTest {
     //
     assertThat(this._aggregatedDependency.getAggregatedWeight()).isEqualTo(5);
     assertThat(this._aggregatedDependency.getCoreDependencies()).hasSize(5).containsOnly(_model.a1_b1_core1(),
-        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.a3_b3_core1(), newCoreDependdency);
+        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.dep_a3_b3_proxy1(), newCoreDependdency);
   }
 }

@@ -46,17 +46,17 @@ public class GetIncomingDependencies_Test {
         _model.a1_b1_core2());
 
     assertThat(_model.b1().getAccumulatedIncomingCoreDependencies()).hasSize(4).containsOnly(_model.a1_b1_core1(),
-        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.a3_b3_core1());
+        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.dep_a3_b3_proxy1());
 
     //
     assertThat(_model.b2().getIncomingCoreDependencies()).hasSize(1).containsOnly(_model.a2_b2_core1());
 
     assertThat(_model.b2().getAccumulatedIncomingCoreDependencies()).hasSize(2).containsOnly(_model.a2_b2_core1(),
-        _model.a3_b3_core1());
+        _model.dep_a3_b3_proxy1());
 
     //
-    assertThat(_model.b3().getIncomingCoreDependencies()).hasSize(1).containsOnly(_model.a3_b3_core1());
+    assertThat(_model.b3().getIncomingCoreDependencies()).hasSize(1).containsOnly(_model.dep_a3_b3_proxy1());
 
-    assertThat(_model.b3().getAccumulatedIncomingCoreDependencies()).hasSize(1).containsOnly(_model.a3_b3_core1());
+    assertThat(_model.b3().getAccumulatedIncomingCoreDependencies()).hasSize(1).containsOnly(_model.dep_a3_b3_proxy1());
   }
 }

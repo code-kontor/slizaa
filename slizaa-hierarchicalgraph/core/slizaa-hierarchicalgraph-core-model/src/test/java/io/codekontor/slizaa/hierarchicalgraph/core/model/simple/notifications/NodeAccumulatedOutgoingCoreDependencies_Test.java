@@ -72,7 +72,7 @@ public class NodeAccumulatedOutgoingCoreDependencies_Test {
     assertThat(this._node.getAccumulatedOutgoingCoreDependencies()).isNotNull();
     assertThat(this._node.getAccumulatedOutgoingCoreDependencies()).hasSize(4);
     assertThat(this._node.getAccumulatedOutgoingCoreDependencies()).containsOnly(_model.a1_b1_core1(),
-        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.a3_b3_core1());
+        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.dep_a3_b3_proxy1());
 
     //
     this._adapter = new AdapterImpl() {
@@ -115,7 +115,7 @@ public class NodeAccumulatedOutgoingCoreDependencies_Test {
     //
     assertThat(this._node.getAccumulatedOutgoingCoreDependencies()).hasSize(5);
     assertThat(this._node.getAccumulatedOutgoingCoreDependencies()).containsOnly(_model.a1_b1_core1(),
-        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.a3_b3_core1(), newCoreDependency);
+        _model.a1_b1_core2(), _model.a2_b2_core1(), _model.dep_a3_b3_proxy1(), newCoreDependency);
   }
 
 }

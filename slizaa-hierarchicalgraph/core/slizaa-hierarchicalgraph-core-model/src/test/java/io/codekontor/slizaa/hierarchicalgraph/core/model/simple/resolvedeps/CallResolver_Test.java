@@ -76,7 +76,7 @@ public class CallResolver_Test {
     this._aggregatedDependency.resolveProxyDependencies();
 
     //
-    verify(this._resolver).resolveProxyDependency(this._model.a3_b3_core1());
+    verify(this._resolver).resolveProxyDependency(this._model.dep_a3_b3_proxy1());
     verifyNoMoreInteractions(this._resolver);
 
     //
