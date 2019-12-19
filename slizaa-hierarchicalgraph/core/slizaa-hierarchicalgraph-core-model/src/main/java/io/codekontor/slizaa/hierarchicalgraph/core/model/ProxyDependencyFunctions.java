@@ -102,7 +102,7 @@ public class ProxyDependencyFunctions {
     }
 
     //
-    Utilities.resolveProxyDependencies(proxyDependencies, progressMonitor);
+    Utilities.resolveProxyDependencies(proxyDependencies);
   }
 
   /**
@@ -129,7 +129,7 @@ public class ProxyDependencyFunctions {
     }
 
     //
-    Utilities.resolveProxyDependencies(proxyDependencies, progressMonitor);
+    Utilities.resolveProxyDependencies(proxyDependencies);
   }
 
   /**

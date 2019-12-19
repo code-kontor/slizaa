@@ -17,12 +17,11 @@
  */
 package io.codekontor.slizaa.server.service.selection;
 
+import java.util.Collection;
+import java.util.Set;
+
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 public interface ISelectionService {
 
@@ -33,8 +32,4 @@ public interface ISelectionService {
     Set<HGNode> getReferencedSourceNodes(HGAggregatedDependency aggregatedDependency, Collection<HGNode> selectedTargetNodes, boolean includePredecessors);
 
     Set<HGNode> getReferencedTargetNodes(HGAggregatedDependency aggregatedDependency, Collection<HGNode> selectedSourceNodes, boolean includePredecessors);
-
-    Set<HGNode> getSourceNodes(HGAggregatedDependency aggregatedDependency, boolean includedPredecessors);
-
-    Set<HGNode> getTargetNodes(HGAggregatedDependency aggregatedDependency, boolean includedPredecessors);
 }

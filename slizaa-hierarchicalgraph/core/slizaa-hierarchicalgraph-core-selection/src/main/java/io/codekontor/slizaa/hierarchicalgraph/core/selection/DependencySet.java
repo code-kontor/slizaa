@@ -17,13 +17,19 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.core.selection;
 
-import static com.google.common.base.Preconditions.*;
-
-import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.google.common.collect.Sets;
+
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.Utilities;
 
 /**
  * Represents a set of {@link HGCoreDependency HGCoreDependencies}.
@@ -71,9 +77,13 @@ public class DependencySet {
 
     private final Collection<HGCoreDependency> _unfilteredCoreDependencies;
 
-    private final Map<HGNode, Set<HGCoreDependency>> _sourceNode2CoreDependenciesMap;
+    private Map<HGNode, Set<HGCoreDependency>> _sourceNode2CoreDependenciesMap;
 
-    private final Map<HGNode, Set<HGCoreDependency>> _targetNode2CoreDependenciesMap;
+    private Map<HGNode, Set<HGCoreDependency>> _targetNode2CoreDependenciesMap;
+
+    private Map<HGNode, Set<HGProxyDependency>> _sourceNode2UnresolvedProxyDependenciesMap;
+
+    private Map<HGNode, Set<HGProxyDependency>> _targetNode2UnresolvedProxyDependenciesMap;
 
     private Set<HGNode> _unfilteredSourceNodes;
 
@@ -88,23 +98,7 @@ public class DependencySet {
         //
         _unfilteredCoreDependencies = Collections.unmodifiableCollection(checkNotNull(dependencies));
 
-        //
-        _sourceNode2CoreDependenciesMap = new HashMap<>();
-        _targetNode2CoreDependenciesMap = new HashMap<>();
-        _unfilteredSourceNodes = new HashSet<HGNode>();
-        _unfilteredSourceNodePredecessors = new HashSet<HGNode>();
-        _unfilteredTargetNodes = new HashSet<HGNode>();
-        _unfilteredTargetNodePredecessors = new HashSet<HGNode>();
-
-        //
-        getResolvedCoreDependenciesOrProxyDependencyOtherwise(_unfilteredCoreDependencies).forEach(dep -> {
-            _sourceNode2CoreDependenciesMap.computeIfAbsent(dep.getFrom(), key -> new HashSet<>()).add(dep);
-            _targetNode2CoreDependenciesMap.computeIfAbsent(dep.getTo(), key -> new HashSet<>()).add(dep);
-            _unfilteredSourceNodes.add(dep.getFrom());
-            _unfilteredSourceNodePredecessors.addAll(dep.getFrom().getPredecessors());
-            _unfilteredTargetNodes.add(dep.getTo());
-            _unfilteredTargetNodePredecessors.addAll(dep.getTo().getPredecessors());
-        });
+        initialize();
     }
 
     public ReferencedNodes computeReferencedNodes(HGNode selectedNode, SourceOrTarget selectedNodesType) {
@@ -141,7 +135,40 @@ public class DependencySet {
         return _unfilteredCoreDependencies;
     }
 
-    public Set<HGNode> getUnfilteredSourceNodes(boolean includePredecessors) {
+    public Set<HGNode> getFilteredSourceNodeChildren(HGNode node) {
+
+        // auto-resolve proxy dependencies
+        if (!this._sourceNode2UnresolvedProxyDependenciesMap.isEmpty()) {
+
+            // find unresolved dependencies
+            Set<HGNode> unresolvedNodes = this._sourceNode2UnresolvedProxyDependenciesMap.keySet().stream()
+                    .filter(n -> n.equals(node) || node.getPredecessors().contains(n))
+                    .collect(Collectors.toSet());
+
+            // resolve it
+            unresolvedNodes.forEach(n -> {
+                _sourceNode2UnresolvedProxyDependenciesMap.remove(n).forEach(proxyDep -> {
+                    proxyDep.resolveProxyDependencies();
+                    // TODO cache dependency
+                });
+            });
+        }
+
+        Set<HGNode> nodeSet = getUnfilteredSourceNodes(true);
+        return node.getChildren().stream().filter(n -> nodeSet.contains(n)).collect(Collectors.toSet());
+    }
+
+    public Set<HGNode> getFilteredTargetNodeChildren(HGNode node) {
+        // TODO: AutoResolve for Incoming/Outgoing ProxyDependencies
+        Set<HGNode> nodeSet = getUnfilteredTargetNodes(true);
+        return node.getChildren().stream().filter(n -> nodeSet.contains(n)).collect(Collectors.toSet());
+    }
+
+    public void resolveAllProxyDependencies() {
+        Utilities.resolveProxyDependencies(_unfilteredCoreDependencies);
+    }
+
+    Set<HGNode> getUnfilteredSourceNodes(boolean includePredecessors) {
         return  includePredecessors ?
                 Stream.of(_unfilteredSourceNodes, _unfilteredSourceNodePredecessors)
                     .flatMap(Set::stream)
@@ -149,7 +176,7 @@ public class DependencySet {
                 _unfilteredSourceNodes;
     }
 
-    public Set<HGNode> getUnfilteredTargetNodes(boolean includePredecessors) {
+    Set<HGNode> getUnfilteredTargetNodes(boolean includePredecessors) {
         return  includePredecessors ?
                 Stream.of(_unfilteredTargetNodes, _unfilteredTargetNodePredecessors)
                         .flatMap(Set::stream)
@@ -157,27 +184,30 @@ public class DependencySet {
                 _unfilteredTargetNodes;
     }
 
-    /**
-     * <p>
-     * </p>
-     *
-     * @return
-     */
-    private static Set<HGCoreDependency> getResolvedCoreDependenciesOrProxyDependencyOtherwise(Collection<HGCoreDependency> dependencies) {
-
-        //
-        Set<HGCoreDependency> coreDependencies = new HashSet<>();
-
-        checkNotNull(dependencies).forEach((c) -> {
-            if (c instanceof HGProxyDependency && ((HGProxyDependency) c).isResolved()
-                    && ((HGProxyDependency) c).getAccumulatedCoreDependencies().size() > 0) {
-                coreDependencies.addAll(((HGProxyDependency) c).getAccumulatedCoreDependencies());
-            } else {
-                coreDependencies.add(c);
+    private void initialize() {
+        _sourceNode2CoreDependenciesMap = new HashMap<>();
+        _targetNode2CoreDependenciesMap = new HashMap<>();
+        _sourceNode2UnresolvedProxyDependenciesMap = new HashMap<>();
+        _targetNode2UnresolvedProxyDependenciesMap = new HashMap<>();
+        _unfilteredSourceNodes = new HashSet<HGNode>();
+        _unfilteredSourceNodePredecessors = new HashSet<HGNode>();
+        _unfilteredTargetNodes = new HashSet<HGNode>();
+        _unfilteredTargetNodePredecessors = new HashSet<HGNode>();
+        _unfilteredCoreDependencies.forEach(dep -> {
+            cacheDependency(dep);
+            if (dep instanceof HGProxyDependency) {
+                _targetNode2UnresolvedProxyDependenciesMap.computeIfAbsent(dep.getTo(), n -> new HashSet<>()).add((HGProxyDependency)dep);
+                _sourceNode2UnresolvedProxyDependenciesMap.computeIfAbsent(dep.getFrom(), n -> new HashSet<>()).add((HGProxyDependency)dep);
             }
         });
+    }
 
-        //
-        return coreDependencies;
+    private void cacheDependency(HGCoreDependency coreDependency) {
+        _sourceNode2CoreDependenciesMap.computeIfAbsent(coreDependency.getFrom(), key -> new HashSet<>()).add(coreDependency);
+        _targetNode2CoreDependenciesMap.computeIfAbsent(coreDependency.getTo(), key -> new HashSet<>()).add(coreDependency);
+        _unfilteredSourceNodes.add(coreDependency.getFrom());
+        _unfilteredSourceNodePredecessors.addAll(coreDependency.getFrom().getPredecessors());
+        _unfilteredTargetNodes.add(coreDependency.getTo());
+        _unfilteredTargetNodePredecessors.addAll(coreDependency.getTo().getPredecessors());
     }
 }

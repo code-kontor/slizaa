@@ -58,32 +58,6 @@ public class DependencySet {
         return _aggregatedDependency.getCoreDependencies().size();
     }
 
-    public List<Node> nodes(NodeType nodeType, boolean includedPredecessors) {
-
-        if (_aggregatedDependency == null) {
-            return Collections.emptyList();
-        }
-
-        Set<HGNode> nodes = checkNotNull(nodeType).equals(NodeType.SOURCE) ?
-                _selectionService.getSourceNodes(_aggregatedDependency, includedPredecessors) :
-                _selectionService.getTargetNodes(_aggregatedDependency, includedPredecessors);
-
-        return NodeUtils.toNodes(nodes);
-    }
-
-    public List<String> nodeIds(NodeType nodeType, boolean includedPredecessors) {
-
-        if (_aggregatedDependency == null) {
-            return Collections.emptyList();
-        }
-
-        Set<HGNode> nodes = checkNotNull(nodeType).equals(NodeType.SOURCE) ?
-                _selectionService.getSourceNodes(_aggregatedDependency, includedPredecessors) :
-                _selectionService.getTargetNodes(_aggregatedDependency, includedPredecessors);
-
-        return NodeUtils.toNodeIds(nodes);
-    }
-
     public List<Node> referencedNodes(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
 
         if (_aggregatedDependency == null) {

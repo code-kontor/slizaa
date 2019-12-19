@@ -59,34 +59,14 @@ public class SelectionServiceImpl extends AbstractSelectionService implements IM
         return getReferencedNodes(aggregatedDependency, selectedSourceNodes, SourceOrTarget.SOURCE, includePredecessors);
     }
 
-    @Override
-    public Set<HGNode> getSourceNodes(HGAggregatedDependency aggregatedDependency, boolean includedPredecessors) {
-        return getNodes(aggregatedDependency, SourceOrTarget.SOURCE, includedPredecessors);
-    }
-
-    @Override
-    public Set<HGNode> getTargetNodes(HGAggregatedDependency aggregatedDependency, boolean includedPredecessors) {
-        return getNodes(aggregatedDependency, SourceOrTarget.TARGET, includedPredecessors);
-    }
-
-    private Set<HGNode> getNodes(HGAggregatedDependency aggregatedDependency, SourceOrTarget nodeType, boolean includePredecessors) {
-        checkNotNull(aggregatedDependency);
-        checkNotNull(nodeType);
-
-        DependencySet dependencySet = getDependenciesSelection(aggregatedDependency);
-        return nodeType.equals(SourceOrTarget.SOURCE) ? dependencySet.getUnfilteredSourceNodes(includePredecessors) :
-                dependencySet.getUnfilteredTargetNodes(includePredecessors);
-    }
-
     private Set<HGNode> getFilteredChildren(HGAggregatedDependency aggregatedDependency, HGNode node, SourceOrTarget nodeType) {
         checkNotNull(node);
         checkNotNull(aggregatedDependency);
         checkNotNull(nodeType);
 
         DependencySet dependencySet = getDependenciesSelection(aggregatedDependency);
-        Set<HGNode> nodeSet = nodeType.equals(SourceOrTarget.SOURCE) ? dependencySet.getUnfilteredSourceNodes(true) :
-                dependencySet.getUnfilteredTargetNodes(true);
-        return node.getChildren().stream().filter(n -> nodeSet.contains(n)).collect(Collectors.toSet());
+        return nodeType.equals(SourceOrTarget.SOURCE) ? dependencySet.getFilteredSourceNodeChildren(node) :
+                dependencySet.getFilteredTargetNodeChildren(node);
     }
 
     private Set<HGNode> getReferencedNodes(HGAggregatedDependency aggregatedDependency, Collection<HGNode> selectedNodes, SourceOrTarget nodeType, boolean includePredecessors) {

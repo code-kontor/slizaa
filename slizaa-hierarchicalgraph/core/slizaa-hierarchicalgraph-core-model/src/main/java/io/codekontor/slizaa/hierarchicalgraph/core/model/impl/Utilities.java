@@ -27,10 +27,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IProxyDependencyResolver;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IProxyDependencyResolver.IProxyDependencyResolverJob;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.removeDependency;
@@ -69,8 +66,8 @@ public class Utilities {
    *
    * @param dependencies
    */
-  public static void resolveProxyDependencies(IProgressMonitor progressMonitor, HGCoreDependency... dependencies) {
-    resolveProxyDependencies(Arrays.asList(dependencies), progressMonitor);
+  public static void resolveProxyDependencies(HGCoreDependency... dependencies) {
+    resolveProxyDependencies(Arrays.asList(dependencies));
   }
 
   public static void resolveProxyDependency(HGCoreDependency dependency) {
@@ -103,8 +100,7 @@ public class Utilities {
    *
    * @param dependencies
    */
-  public static void resolveProxyDependencies(List<? extends HGCoreDependency> dependencies,
-      IProgressMonitor progressMonitor) {
+  public static void resolveProxyDependencies(Collection<? extends HGCoreDependency> dependencies) {
 
     //
     if (dependencies == null || dependencies.isEmpty()) {
@@ -112,7 +108,7 @@ public class Utilities {
     }
 
     //
-    if (!dependencies.get(0).getRootNode().hasExtension(IProxyDependencyResolver.class)) {
+    if (!dependencies.iterator().next().getRootNode().hasExtension(IProxyDependencyResolver.class)) {
       return;
     }
 

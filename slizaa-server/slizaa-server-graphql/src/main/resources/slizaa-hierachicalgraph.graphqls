@@ -103,10 +103,6 @@ type DependencySet{
 
     size: Int!
 
-    nodes(nodeType: NodeType!, includedPredecessors: Boolean): [Node!]!
-
-    nodeIds(nodeType: NodeType!, includedPredecessors: Boolean): [String!]!
-
     referencedNodes(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [Node!]!
 
     referencedNodeIds(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [String!]!

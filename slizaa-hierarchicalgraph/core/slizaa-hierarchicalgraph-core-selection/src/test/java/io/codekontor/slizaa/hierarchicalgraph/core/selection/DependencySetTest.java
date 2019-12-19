@@ -19,46 +19,57 @@ package io.codekontor.slizaa.hierarchicalgraph.core.selection;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-
-import static org.assertj.core.api.Assertions.*;
-
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class DependencySetTest extends AbstractSelectionsTest {
 
+    private HGAggregatedDependency aggregatedDependency;
+    private DependencySet dependencySet;
+
+    @Before
+    public void initialize() {
+        aggregatedDependency = dependency(20483, 7676);
+        dependencySet = new DependencySet(aggregatedDependency.getCoreDependencies());
+    }
+
     @Test
-    public void testDependencyTest() {
-
-        HGAggregatedDependency aggregatedDependency = dependency(20483, 7676);
-        DependencySet dependencySet = new DependencySet(aggregatedDependency.getCoreDependencies());
-
-        // test unfiltered dependencies
+    public void testUnfilteredDependencies() {
         assertThat(dependencySet.getUnfilteredCoreDependencies()).hasSize(9);
         assertThat(dependencySet.getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency.getCoreDependencies());
+    }
 
-        // test unfiltered source nodes
+    @Test
+    public void testUnfilteredSourceNodes() {
+
         Set<HGNode> sourceNodesWithPredecessors = aggregatedDependency.getCoreDependencies().stream()
                 .flatMap(dep -> NodeSelections.getPredecessors(dep.getFrom(), true).stream())
                 .collect(Collectors.toSet());
         assertThat(dependencySet.getUnfilteredSourceNodes(true)).containsAll(sourceNodesWithPredecessors);
+    }
 
-        // test unfiltered target nodes
+    @Test
+    public void testUnfilteredTargetNodes() {
+
         Set<HGNode> targetNodesWithPredecessors = aggregatedDependency.getCoreDependencies().stream()
                 .flatMap(dep -> NodeSelections.getPredecessors(dep.getTo(), true).stream())
                 .collect(Collectors.toSet());
         assertThat(dependencySet.getUnfilteredTargetNodes(true)).containsAll(targetNodesWithPredecessors);
+    }
 
-        // test filtered dependencies
+    @Test
+    public void testFilteredDependencies() {
+
         DependencySet.ReferencedNodes referencedNodes = dependencySet.computeReferencedNodes(node(7193), SourceOrTarget.SOURCE);
         assertThat(referencedNodes.getFilteredCoreDependencies()).containsOnlyElementsOf(dependencySet.getUnfilteredCoreDependencies().stream().filter(dep -> dep.getFrom().getIdentifier().equals(Long.valueOf(7193))).collect(Collectors.toList()));
         assertThat(referencedNodes.getSelectedNodesWithSuccessorsAndPredecessors()).containsExactlyInAnyOrder(node(7193),
                 node(20483),node(577), rootNode());
-
-        referencedNodes.getFilteredNodes(false).forEach(node -> System.out.println(" - " + node.getIdentifier()));
 
         assertThat(referencedNodes.getFilteredNodes(false)).containsExactlyInAnyOrder(node(6518),node(7544),node(8075));
     }
