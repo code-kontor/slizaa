@@ -66,7 +66,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
         return <Query<ReferencedNodesForAggregatedDependencies, ReferencedNodesForAggregatedDependenciesVariables>
             query={GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY}
-            fetchPolicy={"cache-first"}
+            fetchPolicy={"no-cache"}
             variables={variables}>
 
             {({loading, data, error}) => {
@@ -75,6 +75,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                     return <h1>{error.message}</h1>
                 }
 
+
                 const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
                 const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
 
@@ -82,8 +83,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 const sourcePredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.sourcePredecessors == null ? [] : data.hierarchicalGraph.sourcePredecessors.predecessors.map((p) => p.id);
                 const targetPredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.targetPredecessors == null ? [] : data.hierarchicalGraph.targetPredecessors.predecessors.map((p) => p.id);
 
-                const combinedExpanedSourceNodeIds = sourcePredecessors.concat(this.state.expandedSourceNodeIds);
-                const combinedExpanedTargetNodeIds = targetPredecessors.concat(this.state.expandedTargetNodeIds);
+                const combinedExpandedSourceNodeIds = sourcePredecessors.concat(this.state.expandedSourceNodeIds);
+                const combinedExpandedTargetNodeIds = targetPredecessors.concat(this.state.expandedTargetNodeIds);
 
                 //
                 const stylesNoEvents: CSSProperties = {pointerEvents: loading ? "none" : "unset"};
@@ -99,7 +100,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                         rootNode={this.state.sourceNode}
                         onExpand={this.onSourceExpand}
                         onSelect={this.onSourceSelect}
-                        expandedKeys={combinedExpanedSourceNodeIds}
+                        expandedKeys={combinedExpandedSourceNodeIds}
                         selectedKeys={selectedSourceNodeIds}
                         markedKeys={markedSourceNodeIds}
                         loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
@@ -112,7 +113,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                         rootNode={this.state.targetNode}
                         onExpand={this.onTargetExpand}
                         onSelect={this.onTargetSelect}
-                        expandedKeys={combinedExpanedTargetNodeIds}
+                        expandedKeys={combinedExpandedTargetNodeIds}
                         selectedKeys={selectedTargetNodeIds}
                         markedKeys={markedTargetNodeIds}
                         loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}

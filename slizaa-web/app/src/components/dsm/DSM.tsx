@@ -578,7 +578,7 @@ export class DSM extends React.Component<IDsmProps, {}> {
             renderingContext.translate(-(xPosition + 9), -(yPosition + 9));
             renderingContext.drawImage(img, this.verticalSideMarkerWidth + this.getHorizontalSliceSize(x) + (this.getBoxSize().getHorizontalBoxSize() - 18) / 2, (this.getBoxSize().getVerticalBoxSize() - 18) / 2);
             renderingContext.restore();
-            textPadding = 15;
+            textPadding = 22;
         }
 
         // step 4: re-draw the text
