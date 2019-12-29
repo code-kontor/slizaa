@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.internal;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeLabelProvider;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
@@ -158,6 +159,7 @@ public class DefaultMappingService implements IMappingService {
             rootNode.registerExtension(IMappingProvider.class, mappingDescriptor);
             rootNode.registerExtension(INodeComparator.class, mappingDescriptor.getNodeComparator());
             rootNode.registerExtension(ILabelDefinitionProvider.class, mappingDescriptor.getLabelDefinitionProvider());
+            rootNode.registerExtension(INodeLabelProvider.class, new NodeLabelProviderAdapter(mappingDescriptor.getLabelDefinitionProvider()));
 
             //
             rootNode.registerExtension(IAutoExpandInterceptor.class, node -> {

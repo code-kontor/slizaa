@@ -276,6 +276,11 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
     return this._trait.isSuccessorOf(node);
   }
 
+  @Override
+  public String toString() {
+    return _trait.toString(this.getClass());
+  }
+
   public void onExpand() {
     this._trait.onExpand();
   }

@@ -110,6 +110,11 @@ public class ExtendedHGNodeImpl extends HGNodeImpl {
     return _trait;
   }
 
+  @Override
+  public String toString() {
+    return _trait.toString(this.getClass());
+  }
+
   public void onExpand() {
     _trait.onExpand();
   }
@@ -139,3 +144,4 @@ public class ExtendedHGNodeImpl extends HGNodeImpl {
     return _trait.getNodeSource(clazz);
   }
 }
+

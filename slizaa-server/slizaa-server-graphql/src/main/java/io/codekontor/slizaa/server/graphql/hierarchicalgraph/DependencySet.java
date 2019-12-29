@@ -20,6 +20,8 @@ package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.server.service.selection.ISelectionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DependencySet {
+
+    private static Logger logger = LoggerFactory.getLogger(DependencySet.class);
 
     private ISelectionService _selectionService;
 
@@ -64,7 +68,17 @@ public class DependencySet {
             return Collections.emptyList();
         }
 
-        return NodeUtils.toNodes(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
+        if (logger.isDebugEnabled()) {
+            logger.debug("referencedNodes({},{},{})", selectedNodes, selectedNodesType, includedPredecessors);
+        }
+
+        List<Node> result = NodeUtils.toNodes(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("referencedNodes result:{}", result);
+        }
+
+        return result;
     }
 
     public List<String> referencedNodeIds(List<String> selectedNodes, NodeType selectedNodesType, boolean includedPredecessors) {
@@ -73,7 +87,17 @@ public class DependencySet {
             return Collections.emptyList();
         }
 
-        return NodeUtils.toNodeIds(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
+        if (logger.isDebugEnabled()) {
+            logger.debug("referencedNodeIds({},{},{})", selectedNodes, selectedNodesType, includedPredecessors);
+        }
+
+        List<String> result = NodeUtils.toNodeIds(referencedHgNodes(selectedNodes, selectedNodesType, includedPredecessors));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("referencedNodeIds result: {}", result);
+        }
+
+        return result;
     }
 
     public List<Node> filteredChildren(String parentNode, NodeType parentNodeType) {

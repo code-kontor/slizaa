@@ -1,5 +1,5 @@
 /**
- * slizaa-hierarchicalgraph-core-model - Slizaa Static Software Analysis Tools
+ * slizaa-hierarchicalgraph-core-testfwk - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,27 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.hierarchicalgraph.core.model.simple;
+package io.codekontor.slizaa.hierarchicalgraph.core.testfwk;
 
-import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.createNewCoreDependency;
-import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.createNewNode;
-import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.createNewProxyDependency;
-import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.createNewRootNode;
+import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.*;
 
 import java.util.function.Supplier;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IProxyDependencyResolver;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.CustomFactoryStandaloneSupport;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactory;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.IDependencySource;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
+
+import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IProxyDependencyResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -44,6 +37,8 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 public class SimpleTestModelRule implements TestRule {
+
+    private static Logger logger = LoggerFactory.getLogger(SimpleTestModelRule.class);
 
     //
     private HGNode _a1;
@@ -54,8 +49,12 @@ public class SimpleTestModelRule implements TestRule {
     //
     private HGNode _b2;
 
+    private HGNode _a22;
+
     //
     private HGNode _a2;
+
+    private HGNode _b22;
 
     //
     private HGNode _a3;
@@ -79,11 +78,22 @@ public class SimpleTestModelRule implements TestRule {
     private HGCoreDependency _dep_a2_b2_core1;
 
     //
+    private HGCoreDependency _dep_a2_b22_core1;
+
+    //
+    private HGCoreDependency _dep_a22_b22_core1;
+
+    //
     private HGProxyDependency _dep_a3_b3_proxy1;
 
     //
-    private HGRootNode _rootNode;
+    private HGCoreDependency _dep_a4_b4_core1;
 
+    //
+    private HGCoreDependency _dep_a4_b4_core2;
+
+    //
+    private HGRootNode _rootNode;
 
     /**
      * {@inheritDoc}
@@ -123,6 +133,14 @@ public class SimpleTestModelRule implements TestRule {
      */
     public HGNode a1() {
         return this._a1;
+    }
+
+    public HGNode a4() {
+        return _a4;
+    }
+
+    public HGNode b4() {
+        return _b4;
     }
 
     /**
@@ -175,6 +193,14 @@ public class SimpleTestModelRule implements TestRule {
         return this._b3;
     }
 
+    public HGNode a22() {
+        return _a22;
+    }
+
+    public HGNode b22() {
+        return _b22;
+    }
+
     /**
      * <p>
      * </p>
@@ -205,14 +231,30 @@ public class SimpleTestModelRule implements TestRule {
         return this._dep_a2_b2_core1;
     }
 
+    public HGCoreDependency a22_b22_core1() {
+        return _dep_a22_b22_core1;
+    }
+
+    public HGCoreDependency a2_b22_core1() {
+        return _dep_a2_b22_core1;
+    }
+
     /**
      * <p>
      * </p>
      *
      * @return the dep_a3_b3_proxy1
      */
-    public HGProxyDependency dep_a3_b3_proxy1() {
+    public HGProxyDependency a3_b3_proxy1() {
         return this._dep_a3_b3_proxy1;
+    }
+
+    public HGCoreDependency a4_b4_core1() {
+        return _dep_a4_b4_core1;
+    }
+
+    public HGCoreDependency a4_b4_core2() {
+        return _dep_a4_b4_core2;
     }
 
     /**
@@ -225,31 +267,43 @@ public class SimpleTestModelRule implements TestRule {
         CustomFactoryStandaloneSupport.registerCustomHierarchicalgraphFactory();
 
         //
-        Supplier<INodeSource> nodeSourceSupplier = () -> HierarchicalgraphFactory.eINSTANCE.createDefaultNodeSource();
         Supplier<IDependencySource> dependencySourceSupplier = () -> HierarchicalgraphFactory.eINSTANCE
                 .createDefaultDependencySource();
 
-        this._rootNode = createNewRootNode(nodeSourceSupplier);
+        this._rootNode = createNewRootNode(nodeSourceSupplier("root"));
 
-        this._a1 = createNewNode(this._rootNode, this._rootNode, nodeSourceSupplier);
-        this._b1 = createNewNode(this._rootNode, this._rootNode, nodeSourceSupplier);
+        this._a1 = createNewNode(this._rootNode, this._rootNode, nodeSourceSupplier("a1"));
+        this._b1 = createNewNode(this._rootNode, this._rootNode, nodeSourceSupplier("b1"));
 
-        this._a2 = createNewNode(this._rootNode, this._a1, nodeSourceSupplier);
-        this._b2 = createNewNode(this._rootNode, this._b1, nodeSourceSupplier);
+        this._a2 = createNewNode(this._rootNode, this._a1, nodeSourceSupplier("a2"));
+        this._b2 = createNewNode(this._rootNode, this._b1, nodeSourceSupplier("b2"));
 
-        this._a3 = createNewNode(this._rootNode, this._a2, nodeSourceSupplier);
-        this._b3 = createNewNode(this._rootNode, this._b2, nodeSourceSupplier);
+        this._a22 = createNewNode(this._rootNode, this._a1, nodeSourceSupplier("a22"));
+        this._b22 = createNewNode(this._rootNode, this._b1, nodeSourceSupplier("b22"));
 
-        this._a4 = createNewNode(this._rootNode, this._a3, nodeSourceSupplier);
-        this._b4 = createNewNode(this._rootNode, this._b3, nodeSourceSupplier);
+        this._a3 = createNewNode(this._rootNode, this._a2, nodeSourceSupplier("a3"));
+        this._b3 = createNewNode(this._rootNode, this._b2, nodeSourceSupplier("b3"));
+
+        this._a4 = createNewNode(this._rootNode, this._a3, nodeSourceSupplier("a4"));
+        this._b4 = createNewNode(this._rootNode, this._b3, nodeSourceSupplier("b4"));
 
         this._dep_a1_b1_core1 = createNewCoreDependency(this._a1, this._b1, "CORE_DEP", dependencySourceSupplier, false);
         this._dep_a1_b1_core2 = createNewCoreDependency(this._a1, this._b1, "CORE_DEP", dependencySourceSupplier, false);
         this._dep_a2_b2_core1 = createNewCoreDependency(this._a2, this._b2, "CORE_DEP", dependencySourceSupplier, false);
+        this._dep_a2_b22_core1 = createNewCoreDependency(this._a2, this._b22, "CORE_DEP", dependencySourceSupplier, false);
+        this._dep_a22_b22_core1 = createNewCoreDependency(this._a22, this._b22, "CORE_DEP", dependencySourceSupplier, false);
 
         this._dep_a3_b3_proxy1 = createNewProxyDependency(this._a3, this._b3, "PROXY_DEP", dependencySourceSupplier, false);
 
         this._rootNode.registerExtension(IProxyDependencyResolver.class, new TestProxyDependencyResolver());
+    }
+
+    private Supplier<INodeSource> nodeSourceSupplier(String id) {
+        return () -> {
+            DefaultNodeSource defaultNodeSource = HierarchicalgraphFactory.eINSTANCE.createDefaultNodeSource();
+            defaultNodeSource.setIdentifier(id);
+            return defaultNodeSource;
+        };
     }
 
     private class TestProxyDependencyResolver implements IProxyDependencyResolver {
@@ -257,14 +311,16 @@ public class SimpleTestModelRule implements TestRule {
         @Override
         public IProxyDependencyResolverJob resolveProxyDependency(HGProxyDependency dependencyToResolve) {
 
-            HGCoreDependency newDependency_1 = createNewCoreDependency(dependencyToResolve.getFrom(), dependencyToResolve.getTo(),
+            logger.info("Resolving HGProxyDependency: {}", dependencyToResolve);
+
+            _dep_a4_b4_core1 = createNewCoreDependency(_a4, _b4,
                     "NEW_USAGE_1", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
 
-            HGCoreDependency newDependency_2 = createNewCoreDependency(dependencyToResolve.getFrom(), dependencyToResolve.getTo(),
+            _dep_a4_b4_core2 = createNewCoreDependency(_a4, _b4,
                     "NEW_USAGE_2", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
 
-            dependencyToResolve.getAccumulatedCoreDependencies().add(newDependency_1);
-            dependencyToResolve.getAccumulatedCoreDependencies().add(newDependency_2);
+            dependencyToResolve.getAccumulatedCoreDependencies().add(_dep_a4_b4_core1);
+            dependencyToResolve.getAccumulatedCoreDependencies().add(_dep_a4_b4_core2);
 
             // return null as we resolved the dependencies immediately
             return null;

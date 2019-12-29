@@ -23,13 +23,14 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.DependencySet;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IDependencySet;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IReferencedNodes;
 import io.codekontor.slizaa.server.service.selection.IModifiableSelectionService;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class SelectionServiceImpl extends AbstractSelectionService implements IModifiableSelectionService {
@@ -64,9 +65,9 @@ public class SelectionServiceImpl extends AbstractSelectionService implements IM
         checkNotNull(aggregatedDependency);
         checkNotNull(nodeType);
 
-        DependencySet dependencySet = getDependenciesSelection(aggregatedDependency);
-        return nodeType.equals(SourceOrTarget.SOURCE) ? dependencySet.getFilteredSourceNodeChildren(node) :
-                dependencySet.getFilteredTargetNodeChildren(node);
+        IDependencySet dependencySet = getDependenciesSelection(aggregatedDependency);
+        return nodeType.equals(SourceOrTarget.SOURCE) ? dependencySet.getFilteredNodeChildren(node, SourceOrTarget.SOURCE, true) :
+                dependencySet.getFilteredNodeChildren(node, SourceOrTarget.TARGET, true);
     }
 
     private Set<HGNode> getReferencedNodes(HGAggregatedDependency aggregatedDependency, Collection<HGNode> selectedNodes, SourceOrTarget nodeType, boolean includePredecessors) {
@@ -74,8 +75,8 @@ public class SelectionServiceImpl extends AbstractSelectionService implements IM
         checkNotNull(selectedNodes);
         checkNotNull(nodeType);
 
-        DependencySet dependencySet = getDependenciesSelection(aggregatedDependency);
-        DependencySet.ReferencedNodes referencedNodes = dependencySet.computeReferencedNodes(selectedNodes, nodeType);
-        return referencedNodes.getFilteredNodes(includePredecessors);
+        IDependencySet dependencySet = getDependenciesSelection(aggregatedDependency);
+        IReferencedNodes referencedNodes = dependencySet.computeReferencedNodes(selectedNodes, nodeType, true);
+        return referencedNodes.getReferencedNodes(includePredecessors);
     }
 }

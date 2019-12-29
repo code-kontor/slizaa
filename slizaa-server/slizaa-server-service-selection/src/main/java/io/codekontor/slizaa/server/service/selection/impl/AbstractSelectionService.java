@@ -19,20 +19,22 @@ package io.codekontor.slizaa.server.service.selection.impl;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.DependencySet;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IDependencySet;
 import io.codekontor.slizaa.server.service.selection.ISelectionService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstractSelectionService implements ISelectionService {
 
-    private Map<DependenciesSelectionKey, DependencySet> _selectionMap;
+    private Map<DependenciesSelectionKey, IDependencySet> _selectionMap;
 
     private ScheduledExecutorService _scheduledExecutorService;
 
@@ -60,12 +62,12 @@ public abstract class AbstractSelectionService implements ISelectionService {
         }
     }
 
-    protected DependencySet getDependenciesSelection(HGAggregatedDependency aggregatedDependency) {
+    protected IDependencySet getDependenciesSelection(HGAggregatedDependency aggregatedDependency) {
         DependenciesSelectionKey key = new DependenciesSelectionKey(checkNotNull(aggregatedDependency));
         synchronized (_lock) {
-            DependencySet dependencySet = _selectionMap.get(key);
+            IDependencySet dependencySet = _selectionMap.get(key);
             if (dependencySet == null) {
-                dependencySet = new DependencySet(aggregatedDependency.getCoreDependencies());
+                dependencySet = IDependencySet.newDependencySet(aggregatedDependency.getCoreDependencies());
             }
             _selectionMap.put(key, dependencySet);
             return dependencySet;

@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeLabelProvider;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.BasicEMap;
 import org.eclipse.emf.common.util.ECollections;
@@ -624,6 +625,11 @@ public class ExtendedHGNodeTrait {
     }
 
     return Optional.empty();
+  }
+
+  public String toString(Class<?> clazz) {
+    String label = getRootNode().hasExtension(INodeLabelProvider.class) ? getRootNode().getExtension(INodeLabelProvider.class).getText(this._hgNode) : "-";
+    return label != null ? String.format("%s {id=%s, label=%s}", clazz.getSimpleName(), getIdentifier(), label ) : String.format("%s {id=%s}", clazz.getSimpleName(), getIdentifier());
   }
 
   private List<HGCoreDependency> filterResolvedDependenciesOfProxyDependencies(

@@ -69,7 +69,7 @@ public class ProxyDependencyResolve_NotificationTest extends AbstractResolverTes
 
     //
     resolve(() -> {
-      model().dep_a3_b3_proxy1().resolveProxyDependencies();
+      model().dep_a3_b3_proxy1().resolve();
     });
 
     //

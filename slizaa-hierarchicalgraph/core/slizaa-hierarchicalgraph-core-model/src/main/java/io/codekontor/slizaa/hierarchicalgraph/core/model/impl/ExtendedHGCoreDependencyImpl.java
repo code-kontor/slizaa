@@ -35,6 +35,14 @@ public class ExtendedHGCoreDependencyImpl extends HGCoreDependencyImpl {
    * {@inheritDoc}
    */
   @Override
+  public boolean isProxyDependency() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public HGRootNode getRootNode() {
     return getFrom().getRootNode();
   }

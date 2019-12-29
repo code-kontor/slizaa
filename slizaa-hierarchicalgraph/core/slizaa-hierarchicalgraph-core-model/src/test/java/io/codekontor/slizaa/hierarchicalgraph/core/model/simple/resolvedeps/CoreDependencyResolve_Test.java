@@ -55,7 +55,7 @@ public class CoreDependencyResolve_Test extends AbstractResolverTest {
     resolve(() -> {
       for (HGCoreDependency outgoingDependency : new ArrayList<>(model().a1().getAccumulatedOutgoingCoreDependencies())) {
         if (outgoingDependency instanceof HGProxyDependency) {
-          ((HGProxyDependency) outgoingDependency).resolveProxyDependencies();
+          ((HGProxyDependency) outgoingDependency).resolve();
         }
       }
     });

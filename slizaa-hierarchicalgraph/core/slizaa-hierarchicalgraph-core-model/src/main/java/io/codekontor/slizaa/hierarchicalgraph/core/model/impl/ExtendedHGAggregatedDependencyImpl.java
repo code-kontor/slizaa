@@ -40,18 +40,6 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphPackag
  */
 public class ExtendedHGAggregatedDependencyImpl extends HGAggregatedDependencyImpl {
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param keyExtractor
-   * @return
-   */
-  public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
-    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-  }
-
   /** - */
   private boolean                 initialized = false;
 

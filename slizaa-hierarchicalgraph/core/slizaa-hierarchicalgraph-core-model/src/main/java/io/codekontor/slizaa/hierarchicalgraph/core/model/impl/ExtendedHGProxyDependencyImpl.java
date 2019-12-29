@@ -44,6 +44,14 @@ public class ExtendedHGProxyDependencyImpl extends HGProxyDependencyImpl {
    * {@inheritDoc}
    */
   @Override
+  public boolean isProxyDependency() {
+    return true;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public HGRootNode getRootNode() {
     return getFrom().getRootNode();
   }
@@ -74,12 +82,17 @@ public class ExtendedHGProxyDependencyImpl extends HGProxyDependencyImpl {
    * {@inheritDoc}
    */
   @Override
-  public void resolveProxyDependencies() {
+  public synchronized void resolve() {
     if (!resolved) {
       Utilities.resolveProxyDependency(this);
     }
   }
-  
+
+  @Override
+  public synchronized boolean isResolved() {
+    return super.isResolved();
+  }
+
   /**
    * <p>
    * </p>

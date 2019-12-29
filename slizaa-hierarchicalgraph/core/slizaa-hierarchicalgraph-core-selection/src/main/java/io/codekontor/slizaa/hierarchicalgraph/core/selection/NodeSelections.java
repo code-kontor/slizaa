@@ -83,6 +83,11 @@ public class NodeSelections {
                 .collect(Collectors.toSet());
     }
 
+    public static Stream<HGNode> getPredecessorsAsStream(Collection<HGNode> nodes, boolean includeSelf) {
+        return checkNotNull(nodes).stream()
+                .flatMap(node -> includeSelf ? Stream.concat(node.getPredecessors().stream(), Stream.of(node)) : node.getPredecessors().stream());
+    }
+
     /**
      *
      * @param node
