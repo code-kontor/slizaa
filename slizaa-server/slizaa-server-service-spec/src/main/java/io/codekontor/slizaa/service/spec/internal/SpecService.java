@@ -28,8 +28,7 @@ import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import io.codekontor.slizaa.service.spec.ISpecService;
 
@@ -52,8 +51,7 @@ public class SpecService implements ISpecService {
   public SlizaaServerSpec fetchSpec() {
 
     // server extensions
-    List<ServerExtensionSpec> serverExtensionSpecs =
-            _slizaaService.getExtensionService().getExtensions().stream().map(toServerExtensionsSpec()).collect(Collectors.toList());
+    List<ServerExtensionSpec> serverExtensionSpecs =new ArrayList<>();
 
     List<GraphDatabaseSpec> graphDatabaseSpecs = new ArrayList<>();
 

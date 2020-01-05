@@ -20,12 +20,7 @@ package io.codekontor.slizaa.server.service.backend.impl;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -34,21 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import com.google.common.io.ByteStreams;
-
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
-import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
-import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
-import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
-import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
-import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
 import io.codekontor.slizaa.server.service.backend.impl.dao.ISlizaaServerBackendDao;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 
 /**
  * <p>

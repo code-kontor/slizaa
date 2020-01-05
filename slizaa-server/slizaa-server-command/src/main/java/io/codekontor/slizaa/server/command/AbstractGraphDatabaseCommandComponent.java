@@ -17,16 +17,11 @@
  */
 package io.codekontor.slizaa.server.command;
 
-import io.codekontor.slizaa.server.descr.ContentDefinition;
-import io.codekontor.slizaa.server.descr.GraphDatabase;
-import io.codekontor.slizaa.server.descr.HierarchicalGraph;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.extensions.IExtensionService;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
-import io.codekontor.slizaa.server.spec.HierarchicalGraphSpec;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.table.*;
@@ -46,9 +41,6 @@ public abstract class AbstractGraphDatabaseCommandComponent {
   @Autowired
   private IBackendService           _backendService;
 
-  @Autowired
-  private IExtensionService         _extensionService;
-
   protected ISlizaaService slizaaService() {
     return _slizaaService;
   }
@@ -63,10 +55,6 @@ public abstract class AbstractGraphDatabaseCommandComponent {
 
   protected IBackendService backendService() {
     return _backendService;
-  }
-
-  protected IExtensionService extensionService() {
-    return _extensionService;
   }
 
   @NotNull
@@ -130,14 +118,7 @@ public abstract class AbstractGraphDatabaseCommandComponent {
    */
   protected String checkBackendConfigured() {
     if (!_slizaaService.getBackendService().hasInstalledExtensions()) {
-      StringBuilder message = new StringBuilder();
-      message
-          .append("The Slizaa Server has not been configured properly: There are not installed backend extensions.\n");
-      message.append(dumpAvailableExtensions());
-      if (_modifiableBackendService != null) {
-        message.append("You can install backend extensions using the command 'installExtensions'.");
-      }
-      return cannotExecuteCommand(message.toString());
+      return cannotExecuteCommand("The Slizaa Server has not been configured properly: There are no installed backend extensions.\n");
     }
     return null;
   }
@@ -162,15 +143,6 @@ public abstract class AbstractGraphDatabaseCommandComponent {
     StringBuffer stringBuffer = new StringBuffer();
     stringBuffer.append("Can not execute command.\n");
     stringBuffer.append(msg + "\n");
-    return stringBuffer.toString();
-  }
-
-  protected String dumpAvailableExtensions() {
-    StringBuffer stringBuffer = new StringBuffer();
-    stringBuffer.append("Available Backend Extensions:\n");
-    extensionService().getExtensions().forEach(extension -> {
-      stringBuffer.append(formatExtension(extension));
-    });
     return stringBuffer.toString();
   }
 

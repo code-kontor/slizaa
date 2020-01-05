@@ -17,7 +17,7 @@
  */
 package io.codekontor.slizaa.server.service.backend.impl.dao;
 
-import io.codekontor.slizaa.server.service.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 
 import java.util.List;
 

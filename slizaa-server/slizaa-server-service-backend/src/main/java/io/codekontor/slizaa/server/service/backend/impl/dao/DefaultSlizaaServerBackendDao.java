@@ -18,7 +18,7 @@
 package io.codekontor.slizaa.server.service.backend.impl.dao;
 
 import io.codekontor.slizaa.server.service.configuration.IConfigurationService;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-extensions - Slizaa Static Software Analysis Tools
+ * slizaa-server-service-backend - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.extensions.directory;
+package io.codekontor.slizaa.server.service.backend.extensions.directory;
 
 import com.google.common.base.Preconditions;
-import io.codekontor.slizaa.server.service.extensions.ExtensionIdentifier;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.extensions.Version;
+import io.codekontor.slizaa.server.service.backend.extensions.ExtensionIdentifier;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

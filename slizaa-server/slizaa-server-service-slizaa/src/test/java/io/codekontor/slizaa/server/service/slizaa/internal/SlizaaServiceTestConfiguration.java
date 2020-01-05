@@ -17,25 +17,20 @@
  */
 package io.codekontor.slizaa.server.service.slizaa.internal;
 
+import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
+import io.codekontor.slizaa.server.service.backend.impl.DummyBackendService;
+import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
 import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModule;
+import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
+import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.IGraphDatabaseStateMachineContextFactory;
+import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.factory.DummyGraphDatabaseStateMachineContextFactory;
+import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import io.codekontor.slizaa.server.service.backend.IBackendService;
-import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
-import io.codekontor.slizaa.server.service.backend.impl.DummyBackendService;
-import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
-import io.codekontor.slizaa.server.service.extensions.EnableExtensionsModule;
-import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
-import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.IGraphDatabaseStateMachineContextFactory;
-import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.factory.DummyGraphDatabaseStateMachineContextFactory;
-import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
-
 @Configuration
-// @EnableBackendServiceModule
-@EnableExtensionsModule
 @EnableConfigurationModule
 @EnableSlizaaServiceModule
 @EnableSvgServiceModule

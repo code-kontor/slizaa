@@ -37,7 +37,6 @@
 
 	<modules>
 		<module>slizaa-server-service-configuration</module>
-		<module>slizaa-server-service-extensions</module>
 		<module>slizaa-server-service-backend</module>
 		<module>slizaa-server-service-svg</module>
 		<module>slizaa-server-service-slizaa</module>

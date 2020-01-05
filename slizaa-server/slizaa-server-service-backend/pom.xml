@@ -35,11 +35,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
-			<artifactId>slizaa-server-service-extensions</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-server-service-configuration</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -74,7 +69,11 @@
 			<groupId>io.github.classgraph</groupId>
 			<artifactId>classgraph</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>io.codekontor.mvnresolver</groupId>
+			<artifactId>mvnresolver-uber</artifactId>
+			<version>${version-mvnresolver-uber}</version>
+		</dependency>
 
 		<!-- TEST -->
 		<dependency>

@@ -31,13 +31,4 @@ extend type Query {
 
     # Returns the server configuration
     serverConfiguration: ServerConfiguration!
-
-    # Returns the available server extensions
-    availableServerExtensions: [ServerExtension]!
-}
-
-extend type Mutation {
-
-    # Installs the specified server extensions.
-    installServerExtensions(extensions: [ServerExtensionIdentifier]): [ServerExtension]!
 }

@@ -19,8 +19,8 @@ package io.codekontor.slizaa.server.service.backend.impl;
 
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.extensions.directory.DirectoryBasedExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.directory.DirectoryBasedExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;

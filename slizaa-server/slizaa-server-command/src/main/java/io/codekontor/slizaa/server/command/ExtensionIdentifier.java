@@ -18,8 +18,8 @@
 package io.codekontor.slizaa.server.command;
 
 import com.google.common.base.Preconditions;
-import io.codekontor.slizaa.server.service.extensions.IExtensionIdentifier;
-import io.codekontor.slizaa.server.service.extensions.Version;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtensionIdentifier;
+import io.codekontor.slizaa.server.service.backend.extensions.Version;
 
 public class ExtensionIdentifier implements IExtensionIdentifier {
 

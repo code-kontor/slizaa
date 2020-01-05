@@ -26,15 +26,15 @@ import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 
 import io.codekontor.slizaa.server.service.backend.impl.SlizaaServerBackendImpl;
-import io.codekontor.slizaa.server.service.extensions.Version;
-import io.codekontor.slizaa.server.service.extensions.mvn.MvnBasedExtension;
-import io.codekontor.slizaa.server.service.extensions.mvn.MvnDependency;
+import io.codekontor.slizaa.server.service.backend.extensions.Version;
+import io.codekontor.slizaa.server.service.backend.extensions.mvn.MvnBasedExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.mvn.MvnDependency;
 
 public class ServerBackend_InstallExtensionsTest extends AbstractServerBackendTest {
 
   //
   private static MvnBasedExtension testExtension    = new MvnBasedExtension("Test", new Version(1, 0, 0))
-      .withDependency(new MvnDependency("io.codekontor.slizaa:slizaa-core-progressmonitor:1.0.0-SNAPSHOT"));
+      .withDependency(new MvnDependency("io.codekontor.slizaa:slizaa-core-progressmonitor:1.0.0.M3"));
 
   //
   private static MvnBasedExtension invalidExtension = new MvnBasedExtension("Missing", new Version(1, 0, 0))

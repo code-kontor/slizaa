@@ -17,8 +17,8 @@
  */
 package io.codekontor.slizaa.server.command;
 
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.extensions.IExtensionIdentifier;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtensionIdentifier;
 import org.springframework.shell.Availability;
 import org.springframework.shell.standard.*;
 
@@ -28,19 +28,6 @@ import java.util.List;
 @ShellComponent
 @ShellCommandGroup("Slizaa Backend Commands")
 public class SlizaaBackendCommands extends AbstractGraphDatabaseCommandComponent{
-
-    @ShellMethod(value = "List all available backend extensions.", key="listAvailableExtensions")
-    @ShellMethodAvailability("availabilityCheck")
-    public String listAvailableExtensions() {
-
-        //
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Available Backend Extensions:\n");
-        extensionService().getExtensions().forEach(extension -> {
-            stringBuffer.append(formatExtension(extension));
-        });
-        return stringBuffer.toString();
-    }
 
      @ShellMethod(value = "List installed extensions.", key="listInstalledExtensions")
     public String listInstalledExtensions() {
@@ -53,46 +40,5 @@ public class SlizaaBackendCommands extends AbstractGraphDatabaseCommandComponent
 
 
         return stringBuffer.toString();
-    }
-
-    @ShellMethod(value = "Install backend extensions.", key="installExtensions")
-    @ShellMethodAvailability("availabilityCheck")
-    public String installExtensions(String[] extensions) {
-
-        // fail fast
-        if (!hasModifiableBackendService()) {
-            return cannotExecuteCommand("Backend is not modifiable.");
-        }
-
-        //
-        List<IExtensionIdentifier> extensionIdList = new ArrayList<>();
-
-        for (int i = 0; i < extensions.length; i++) {
-            String extension = extensions[i];
-            String[] split = extension.split("_");
-            if (split.length != 2) {
-                return cannotExecuteCommand(String.format("Invalid parameter value '%s'.", extension));
-            }
-            extensionIdList.add(new ExtensionIdentifier(split[0], split[1]));
-        }
-
-       //
-       List<IExtension> extensionsToInstall = extensionService().getExtensions(extensionIdList);
-       modifiableBackendService().installExtensions(extensionsToInstall);
-
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Installed Backend Extensions:\n");
-        modifiableBackendService().getInstalledExtensions().forEach(extension -> {
-            stringBuffer.append(formatExtension(extension));
-        });
-
-
-        return stringBuffer.toString();
-    }
-
-    public Availability availabilityCheck() {
-        return modifiableBackendService() != null
-                ? Availability.available()
-                : Availability.unavailable("an offline backend is not modifiable.");
     }
 }

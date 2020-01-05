@@ -19,7 +19,7 @@ package io.codekontor.slizaa.server.service.backend;
 
 import java.util.List;
 
-import io.codekontor.slizaa.server.service.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 
 public interface IBackendServiceCallback {
 

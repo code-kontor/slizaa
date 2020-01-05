@@ -46,8 +46,7 @@ import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
 import io.codekontor.slizaa.server.service.configuration.IConfigurationService;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.extensions.IExtensionService;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import io.codekontor.slizaa.server.service.slizaa.internal.configuration.GraphDatabaseConfiguration;
@@ -90,9 +89,6 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
   @Autowired
   private IBackendServiceInstanceProvider           _backendService;
-
-  @Autowired
-  private IExtensionService                         _extensionService;
 
   @Autowired
   private IConfigurationService                     _configurationService;
@@ -197,11 +193,6 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   @Override
   public Collection<IContentDefinitionProviderFactory<?>> getContentDefinitionProviderFactories() {
     return _contentDefinitionProviderFactoryService.getContentDefinitionProviderFactories();
-  }
-
-  @Override
-  public IExtensionService getExtensionService() {
-    return _extensionService;
   }
 
   @Override

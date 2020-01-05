@@ -33,9 +33,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import io.codekontor.slizaa.server.service.configuration.IConfigurationService;
 import io.codekontor.slizaa.server.service.configuration.impl.NullConfigurationService;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
-import io.codekontor.slizaa.server.service.extensions.IExtensionIdentifier;
-import io.codekontor.slizaa.server.service.extensions.IExtensionService;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtensionIdentifier;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = AbstractServerBackendTest.class)
@@ -50,45 +49,5 @@ public abstract class AbstractServerBackendTest {
 
   @Autowired
   protected ApplicationContext applicationContext;
-
-  @Autowired
-  protected DummyExtensionService extensionService;
-
-  /**
-   *
-   */
-  @Component
-  public static class DummyExtensionService implements IExtensionService {
-
-    //
-    private List<IExtension> _extensions = Collections.emptyList();
-
-    /**
-     *
-     * @return
-     */
-    @Override
-    public List<IExtension> getExtensions() {
-      return _extensions;
-    }
-
-    /**
-     *
-     * @param extensionIdentifiers
-     * @return
-     */
-    @Override
-    public List<IExtension> getExtensions(List<? extends IExtensionIdentifier> extensionIdentifiers) {
-      return getExtensions().stream().filter(extensionIdentifiers::contains).collect(Collectors.toList());
-    }
-
-    /**
-     *
-     * @param _extensions
-     */
-    public void setExtensions(List<IExtension> _extensions) {
-      this._extensions = _extensions;
-    }
-  }
 }
 

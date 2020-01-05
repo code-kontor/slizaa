@@ -50,10 +50,4 @@ public class ServerConfigQuery implements GraphQLQueryResolver {
     //
     return new ServerConfiguration(installedServerExtensions);
   }
-
-  public List<ServerExtension> availableServerExtensions() {
-    return slizaaService.getExtensionService().getExtensions().stream()
-        .map(ext -> new ServerExtension(ext.getSymbolicName(), ext.getVersion().toString()))
-        .collect(Collectors.toList());
-  }
 }

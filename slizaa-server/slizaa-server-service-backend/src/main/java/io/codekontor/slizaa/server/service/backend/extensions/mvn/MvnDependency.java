@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-extensions - Slizaa Static Software Analysis Tools
+ * slizaa-server-service-backend - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.extensions.mvn;
+package io.codekontor.slizaa.server.service.backend.extensions.mvn;
 
 import java.util.Arrays;
 import java.util.List;

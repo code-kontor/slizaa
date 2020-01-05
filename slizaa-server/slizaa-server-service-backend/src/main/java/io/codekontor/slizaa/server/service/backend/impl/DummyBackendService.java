@@ -32,9 +32,8 @@ import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
 import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
-import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
-import io.codekontor.slizaa.server.service.extensions.IExtension;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 
 public class DummyBackendService implements IModifiableBackendService, IBackendServiceInstanceProvider {
 

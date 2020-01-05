@@ -21,7 +21,6 @@ import io.codekontor.slizaa.server.command.EnableSlizaaServerCommandModule;
 import io.codekontor.slizaa.server.graphql.EnableGraphqlModule;
 import io.codekontor.slizaa.server.service.backend.EnableBackendServiceModule;
 import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
-import io.codekontor.slizaa.server.service.extensions.EnableExtensionsModule;
 import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModule;
 import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
 import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
@@ -33,7 +32,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 @SpringBootApplication
-@EnableExtensionsModule
 @EnableBackendServiceModule
 @EnableSlizaaServiceModule
 @EnableGraphqlModule
