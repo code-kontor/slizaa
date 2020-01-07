@@ -52,6 +52,9 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
     public render() {
 
+        // tslint:disable-next-line:no-console
+        console.log("render")
+
         const selectedSourceNodeIds = this.state.selectedNodesType === NodeType.SOURCE ? this.state.selectedNodeIds : [];
         const selectedTargetNodeIds = this.state.selectedNodesType === NodeType.TARGET ? this.state.selectedNodeIds : [];
 
@@ -59,25 +62,32 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
             databaseId: this.props.databaseId,
             dependencySourceNodeId: this.props.sourceNodeId,
             dependencyTargetNodeId: this.props.targetNodeId,
+            expandedNodes: this.state.expandedSourceNodeIds,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
             selectedNodeIds: this.state.selectedNodeIds,
-            selectedNodesType: this.state.selectedNodesType
+            selectedNodesType: this.state.selectedNodesType,
         }
 
         return <Query<ReferencedNodesForAggregatedDependencies, ReferencedNodesForAggregatedDependenciesVariables>
             query={GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY}
             fetchPolicy={"no-cache"}
+            pollInterval={1000}
             variables={variables}>
 
-            {({loading, data, error}) => {
+            {({loading, data, error, refetch}) => {
 
                 if (error) {
                     return <h1>{error.message}</h1>
                 }
 
-
                 const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
                 const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
+
+                // tslint:disable-next-line:no-console
+                console.log(markedSourceNodeIds)
+
+                // tslint:disable-next-line:no-console
+                console.log(refetch)
 
                 // TODO: merge with expanded IDs
                 const sourcePredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.sourcePredecessors == null ? [] : data.hierarchicalGraph.sourcePredecessors.predecessors.map((p) => p.id);
@@ -153,6 +163,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
     }
 
     private onSourceExpand = (expandedItems: string[]): void => {
+        // tslint:disable-next-line:no-console
+        console.log("expand: " + expandedItems)
         this.setState({
             expandedSourceNodeIds: expandedItems,
         })
@@ -166,6 +178,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
     }
 
     private onTargetExpand = (expandedItems: string[]): void => {
+        // tslint:disable-next-line:no-console
+        console.log("expand: " + expandedItems)
         this.setState({
             expandedTargetNodeIds: expandedItems,
         })

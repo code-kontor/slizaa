@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import {IDsmProps} from "../../../components/dsm/IDsmProps";
-import {IDependencySelection} from "../internal/IDependenciesViewState";
+import {IDependencySelection} from "../IDependenciesViewState";
 
 export interface IDependencyOverviewPartProps extends IDsmProps {
     dependencySelection?: IDependencySelection

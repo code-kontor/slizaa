@@ -21,7 +21,7 @@ import {ApolloConsumer} from "react-apollo";
 import {DSM} from "../../../components/dsm";
 import {IDsmLabel, IDsmSelection} from "../../../components/dsm/IDsmProps";
 import {fetchSvg} from "../../../components/slizaaicon";
-import {IDependencySelection} from "../internal/IDependenciesViewState";
+import {IDependencySelection} from "../IDependenciesViewState";
 import './DependencyOverviewPart.css';
 import {IDependencyOverviewPartProps} from "./IDependencyOverviewPartProps";
 import {IDependencyOverviewPartState} from "./IDependencyOverviewPartState";
@@ -105,6 +105,5 @@ export class DependencyOverviewPart extends React.Component<IDependencyOverviewP
 
     private iconProvider = (client: ApolloClient<any>): ((label: IDsmLabel) => Promise<string>) => {
         return (label) => fetchSvg(client, label.iconIdentifier);
-        // return '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"><rect width="18" height="18" style="fill:green;" /><text x="0" y="0" style="font-size:14px;fill:white;">Hello</text></svg>';
     }
 }

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IDsmLabel} from "../../../components/dsm/IDsmProps";
-import {NodeType} from "../../../model/NodeType";
+import {IDsmLabel} from "../../components/dsm/IDsmProps";
+import {NodeType} from "../../model/NodeType";
 
 export interface IDependenciesViewState {
     databaseId: string
@@ -46,8 +46,8 @@ export interface IDependencySelection {
 
 export interface IIDependenciesViewLayout {
     treeWidth: number
-    upperHeight: number
-    lowerHeight: number
+    horizontalRatio: number
+    height: number
     dsmSetting: IDsmSettings
 }
 

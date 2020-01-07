@@ -22,16 +22,16 @@ import {ApolloConsumer, Query} from 'react-apollo';
 import {connect} from 'react-redux';
 import {Card} from 'src/components/card';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
-import {HorizontalSplitLayout, ResizableBox} from 'src/components/layout';
+import {HorizontalSplitLayout, VerticalSplitLayout} from 'src/components/layout';
 import {IAppState} from 'src/redux/IAppState';
-import {IDsmSelection} from "../../../components/dsm/IDsmProps";
-import {SlizaaDependencyTree} from "../../../components/slizaadependencytree";
-import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../../gqlqueries/__generated__/DsmForNodeChildren";
-import {GQ_DSM_FOR_NODE_CHILDREN} from "../../../gqlqueries/GqlQueries";
-import {ISlizaaNode} from "../../../model/ISlizaaNode";
-import {NodeType} from "../../../model/NodeType";
-import {DependencyOverviewPart} from "../dsmPart/DependencyOverviewPart";
+import {IDsmSelection} from "../../components/dsm/IDsmProps";
+import {SlizaaDependencyTree} from "../../components/slizaadependencytree";
+import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../gqlqueries/__generated__/DsmForNodeChildren";
+import {GQ_DSM_FOR_NODE_CHILDREN} from "../../gqlqueries/GqlQueries";
+import {ISlizaaNode} from "../../model/ISlizaaNode";
+import {NodeType} from "../../model/NodeType";
 import './DependenciesView.css';
+import {DependencyOverviewPart} from "./dsmPart/DependencyOverviewPart";
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
 import {IDependenciesViewState} from "./IDependenciesViewState";
 
@@ -64,15 +64,24 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     horizontalSideMarkerHeight: 10,
                     verticalSideMarkerWidth: 150
                 },
-                lowerHeight: 371,
+                height: 600,
+                horizontalRatio: 500,
                 treeWidth: 400,
-                upperHeight: 600,
             },
             mainTreeNodeSelection: {
                 expandedNodeIds: ["-1"],
                 selectedNodeIds: [],
             },
         }
+    }
+
+    public componentDidMount(): void {
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+    }
+
+    public componentWillUnmount(): void {
+        window.removeEventListener('resize', this.updateWindowDimensions);
     }
 
     public render() {
@@ -84,34 +93,36 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         return (
             <ApolloConsumer>
                 {cl =>
-                    <div>
-                        <ResizableBox id="upperResizableBox"
-                                      intitalHeight={this.state.layout.upperHeight}
-                                      onHeightChanged={this.onHeightChanged}>
-                            <HorizontalSplitLayout id="upper"
-                                                   initialWidth={this.state.layout.treeWidth}
-                                                   onWidthChanged={this.onSplitLayoutWidthChanged}
-                                                   left={
-                                                       <Card title="Hierarchical Graph">
-                                                           {this.hierarchicalGraph(cl)}
-                                                       </Card>
-                                                   }
-                                                   right={
-                                                       <Card title="Dependencies Overview"
-                                                             allowOverflow={false}>
-                                                           {this.dependenciesOverview(cl)}
-                                                       </Card>
-                                                   }
+                    <VerticalSplitLayout
+                        id="dependencyViewMain"
+                        height={this.state.layout.height}
+                        gutter={8}
+                        initialRatio={this.state.layout.horizontalRatio}
+                        onRatioChanged={this.onHorizontalRatioChanged}
+                        top={
+                            <HorizontalSplitLayout
+                                id="upper"
+                                gutter={8}
+                                initialWidth={this.state.layout.treeWidth}
+                                onWidthChanged={this.onSplitLayoutWidthChanged}
+                                left={
+                                    <Card title="Hierarchical Graph">
+                                        {this.hierarchicalGraph(cl)}
+                                    </Card>
+                                }
+                                right={
+                                    <Card title="Dependencies Overview"
+                                          allowOverflow={false}>
+                                        {this.dependenciesOverview(cl)}
+                                    </Card>
+                                }
                             />
-                        </ResizableBox>
-                        <ResizableBox id="lowerResizableBox"
-                                      intitalHeight={this.state.layout.lowerHeight}
-                                      onHeightChanged={this.onHeightChanged}>
+                        }
+                        bottom={
                             <Card title="Dependencies Details" allowOverflow={false}>
                                 {this.dependenciesDetails(cl)}
                             </Card>
-                        </ResizableBox>
-                    </div>
+                        }/>
                 }
             </ApolloConsumer>
         );
@@ -127,7 +138,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             onExpand={this.onMainTreeExpand}
             expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
             checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
-
     }
 
     /**
@@ -164,17 +174,17 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     const {orderedNodes, cells, stronglyConnectedComponents} = data.hierarchicalGraph.node.children.dependencyMatrix
 
                     return <DependencyOverviewPart
-                                 labels={orderedNodes}
-                                 cells={cells}
-                                 stronglyConnectedComponents={stronglyConnectedComponents}
-                                 horizontalBoxSize={35}
-                                 verticalBoxSize={35}
-                                 horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
-                                 verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
-                                 onSideMarkerResize={this.onSideMarkerResize}
-                                 onSelect={this.onSelectDependency}
-                                 dependencySelection={this.state.mainDependencySelection}
-                            />
+                        labels={orderedNodes}
+                        cells={cells}
+                        stronglyConnectedComponents={stronglyConnectedComponents}
+                        horizontalBoxSize={35}
+                        verticalBoxSize={35}
+                        horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
+                        verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
+                        onSideMarkerResize={this.onSideMarkerResize}
+                        onSelect={this.onSelectDependency}
+                        dependencySelection={this.state.mainDependencySelection}
+                    />
                 }}
             </Query>
 
@@ -291,7 +301,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
     }
 
 
-
     private onSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
         this.setState({
             layout: {
@@ -301,24 +310,29 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         });
     }
 
-    private onHeightChanged = (id: string, newHeight: number): void => {
-        if (id === "upperResizableBox") {
-            this.setState(
-                {
-                    layout: {
-                        ...this.state.layout,
-                        upperHeight: newHeight,
-                    }
-                });
-        } else if (id === "lowerResizableBox") {
-            this.setState(
-                {
-                    layout: {
-                        ...this.state.layout,
-                        lowerHeight: newHeight,
-                    }
-                });
-        }
+    private updateWindowDimensions = (): void => {
+
+        const HEADER_SIZE_WITH_MARGIN = 80;
+
+        const newHeight = window.innerHeight - HEADER_SIZE_WITH_MARGIN;
+
+        this.setState(
+            {
+                layout: {
+                    ...this.state.layout,
+                    height: newHeight,
+                }
+            });
+    }
+
+    private onHorizontalRatioChanged = (id: string, newRation: number): void => {
+        this.setState(
+            {
+                layout: {
+                    ...this.state.layout,
+                    horizontalRatio: newRation,
+                }
+            })
     }
 
     private onMainTreeExpand = (aExpandedNodeIds: string[]): void => {

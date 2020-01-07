@@ -23,7 +23,7 @@ import { Dispatch } from 'redux';
 import { SlizaaHgChooser } from 'src/components/slizaahgchooser';
 import { actionSelectDatabase, actionSelectHierarchicalGraph } from 'src/redux/Actions';
 import { IAppState } from 'src/redux/IAppState';
-import DependenciesView from 'src/views/dependenciesview/internal/DependenciesView';
+import DependenciesView from 'src/views/dependenciesview/DependenciesView';
 
 import { SelectParam } from 'antd/lib/menu';
 import './MainView.css';
