@@ -178,15 +178,15 @@ public class GraphFactoryFunctions {
             if (element instanceof IProxyDependencyDefinition) {
 
                 //
-                IProxyDependencyDefinition proxyDependency = (IProxyDependencyDefinition) element;
+                IProxyDependencyDefinition proxyDependencyDefinition = (IProxyDependencyDefinition) element;
 
                 //
                 Function<HGProxyDependency, List<Future<List<IDependencyDefinition>>>> resolveFunction = checkNotNull(
-                        proxyDependency.getResolveFunction());
+                        proxyDependencyDefinition.getResolveFunction());
 
                 //
-                HGCoreDependency slizaaProxyDependency = createDependency(proxyDependency.getIdStart(),
-                        proxyDependency.getIdTarget(), proxyDependency.getIdRel(), proxyDependency.getType(), rootElement,
+                HGCoreDependency slizaaProxyDependency = createDependency(proxyDependencyDefinition.getIdStart(),
+                        proxyDependencyDefinition.getIdTarget(), proxyDependencyDefinition.getIdRel(), proxyDependencyDefinition.getType(), rootElement,
                         dependencySourceCreator, resolveFunction, reinitializeCaches);
 
                 //
@@ -194,7 +194,7 @@ public class GraphFactoryFunctions {
 
                     // TODO: Should we really use the user object here?
                     ((GraphDbDependencySource) slizaaProxyDependency.getDependencySource())
-                            .setUserObject(proxyDependency.getResolveFunction());
+                            .setUserObject(proxyDependencyDefinition.getResolveFunction());
 
                     //
                     result.add(slizaaProxyDependency);
@@ -207,16 +207,17 @@ public class GraphFactoryFunctions {
 
                     //
                     IBoltClient boltClient = rootElement.getExtension(IBoltClient.class);
-                    Node startNode = boltClient.getNode(proxyDependency.getIdStart());
-                    Node targetNode = boltClient.getNode(proxyDependency.getIdTarget());
+                    Node startNode = boltClient.getNode(proxyDependencyDefinition.getIdStart());
+                    Node targetNode = boltClient.getNode(proxyDependencyDefinition.getIdTarget());
 
                     // TODO!
-                    System.out.println(
-                            "Missing start node for " + proxyDependency.getIdStart() + " : " + proxyDependency.getIdTarget());
-                    System.out.println("StartNode: " + rootElement.lookupNode(proxyDependency.getIdStart()));
-                    System.out.println("EndNode: " + rootElement.lookupNode(proxyDependency.getIdTarget()));
-                    System.out.println(startNode.labels() + " : " + startNode.asMap());
-                    System.out.println(targetNode.labels() + " : " + targetNode.asMap());
+
+                    System.out.println(String.format(
+                            "Could not create proxy Dependency (%s -[%s]-> %s)): ", proxyDependencyDefinition.getIdStart(), proxyDependencyDefinition.getType(), proxyDependencyDefinition.getIdTarget()));
+                    System.out.println("- Start HGNode: " + rootElement.lookupNode(proxyDependencyDefinition.getIdStart()));
+                    System.out.println("- Target HGNode: " + rootElement.lookupNode(proxyDependencyDefinition.getIdTarget()));
+                    System.out.println("- Start DBNode:" + startNode.labels() + " : " + startNode.asMap());
+                    System.out.println("- Target DBNode:" + targetNode.labels() + " : " + targetNode.asMap());
                 }
 
             }

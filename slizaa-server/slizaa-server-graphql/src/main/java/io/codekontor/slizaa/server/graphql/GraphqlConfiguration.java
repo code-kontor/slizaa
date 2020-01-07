@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import graphql.kickstart.execution.error.GraphQLErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,29 +30,13 @@ import graphql.ErrorClassification;
 import graphql.ExceptionWhileDataFetching;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
-import graphql.servlet.GraphQLErrorHandler;
+
 
 @Configuration
 @ComponentScan(basePackageClasses = { GraphqlConfiguration.class })
 public class GraphqlConfiguration {
 
-//  @Bean
-//  public ExecutionStrategy executionStrategy() {
-//    return new AsyncExecutionStrategy(new DataFetcherExceptionHandler() {
-//
-//      @Override
-//      public void onException(DataFetcherExceptionHandlerParameters handlerParameters) {
-//        Throwable exception = handlerParameters.getException();
-//        SourceLocation sourceLocation = handlerParameters.getField().getSourceLocation();
-//        ExecutionPath path = handlerParameters.getPath();
-//
-//        ExceptionWhileDataFetching error = new ExceptionWhileDataFetching(path, exception, sourceLocation);
-//        handlerParameters.getExecutionContext().addError(error);
-//      }
-//    });
-//  }
-
-  @Bean
+ @Bean
   public GraphQLErrorHandler errorHandler() {
     return new GraphQLErrorHandler() {
 
@@ -61,7 +46,7 @@ public class GraphqlConfiguration {
             .collect(Collectors.toList());
       }
     };
-  }
+}
 
   private class GraphQLErrorAdapter implements GraphQLError {
 

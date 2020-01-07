@@ -3,9 +3,10 @@ target/
 /.idea/workspace.xml
 /.project
 /.settings/
-/backend-extensions
 .idea/
 *.iml
 application-dev.properties
 spring-shell.log
-slizaa-work/
+/backend-extensions/
+/slizaa-work/
+/config/
