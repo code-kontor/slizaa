@@ -97,16 +97,29 @@ type StronglyConnectedComponent {
 	nodePositions: [Int!]!
 }
 
+type DependencyPage {
+    pageNumber: Int!
+    maxPages: Int!
+    pageSize: Int!
+    totalCount: Int!
+}
+
 type DependencySet{
 
     dependencies: [Dependency!]!
 
     size: Int!
 
+    # Returns a dependency page with with the specified size
+    dependencies(pageNumber: Int!, pageSize: Int!): DependencyPage
+
+    #
     referencedNodes(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [Node!]!
 
+    #
     referencedNodeIds(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [String!]!
 
+    #
     filteredDependencies(selectedNodes: [ID!]!, selectedNodesType: NodeType!): DependencySet!
 
     # Returns a set of nodes filtered by the specified node type.

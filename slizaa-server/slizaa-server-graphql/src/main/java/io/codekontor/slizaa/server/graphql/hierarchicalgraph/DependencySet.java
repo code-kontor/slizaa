@@ -53,6 +53,15 @@ public class DependencySet {
                 .map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getWeight())).collect(Collectors.toList());
     }
 
+    public DependencyPage dependencies(int pageNumber, int pageSize) {
+
+        // TODO : _aggregatedDependency == null
+        List<Dependency> dependencies = Collections.emptyList();
+        PageInfo pageInfo = new PageInfo(pageNumber,0, pageSize,  _aggregatedDependency == null ? 0 : _aggregatedDependency.getCoreDependencies().size());
+
+        return new DependencyPage(pageInfo, dependencies);
+    }
+
     public int size() {
 
         if (_aggregatedDependency == null) {
