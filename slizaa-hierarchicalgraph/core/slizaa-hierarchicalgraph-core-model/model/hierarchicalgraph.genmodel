@@ -126,6 +126,7 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//AbstractHGDependency/from"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//AbstractHGDependency/to"/>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//AbstractHGDependency/getRootNode"/>
+      <genOperations ecoreOperation="hierarchicalgraph.ecore#//AbstractHGDependency/getIdentifier"/>
     </genClasses>
     <genClasses ecoreClass="hierarchicalgraph.ecore#//HGAggregatedDependency">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//HGAggregatedDependency/coreDependencies"/>

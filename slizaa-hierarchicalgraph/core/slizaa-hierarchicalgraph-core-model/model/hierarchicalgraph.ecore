@@ -158,6 +158,11 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractHGDependency" abstract="true">
     <eOperations name="getRootNode" eType="#//HGRootNode"/>
+    <eOperations name="getIdentifier" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Returns the unique identifier of this dependency."/>
+      </eAnnotations>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EReference" name="from" lowerBound="1" eType="#//HGNode"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="to" lowerBound="1" eType="#//HGNode"/>
   </eClassifiers>
