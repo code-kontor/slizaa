@@ -17,32 +17,41 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
+import com.google.common.base.Preconditions;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.AbstractHGDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+
 /**
  *
  */
 public class Dependency {
 
-  private Node sourceNode;
+    public static final String AGGREGATED_DEPENDENCY_TYPE = "DEPENDS ON";
 
-  private Node targetNode;
+    private AbstractHGDependency _hgDependency;
 
-  private int weight;
+    public Dependency(AbstractHGDependency hgDependency) {
+        _hgDependency = Preconditions.checkNotNull(hgDependency);
+    }
 
-  public Dependency(Node sourceNode, Node targetNode, int weight) {
-    this.sourceNode = sourceNode;
-    this.targetNode = targetNode;
-    this.weight = weight;
-  }
+    public Node getSourceNode() {
+        return new Node(_hgDependency.getFrom());
+    }
 
-  public Node getSourceNode() {
-    return sourceNode;
-  }
+    public Node getTargetNode() {
+        return new Node(_hgDependency.getTo());
+    }
 
-  public Node getTargetNode() {
-    return targetNode;
-  }
+    public int getWeight() {
+        return _hgDependency instanceof HGCoreDependency ?
+                ((HGCoreDependency) _hgDependency).getWeight() :
+                ((HGAggregatedDependency) _hgDependency).getAggregatedWeight();
+    }
 
-  public int getWeight() {
-    return weight;
-  }
+    public String getType() {
+        return _hgDependency instanceof HGCoreDependency ?
+                ((HGCoreDependency) _hgDependency).getType() :
+                AGGREGATED_DEPENDENCY_TYPE;
+    }
 }

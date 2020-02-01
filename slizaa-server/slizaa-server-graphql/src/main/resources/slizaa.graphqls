@@ -1,7 +1,3 @@
-type MapEntry { key: String!, value: String }
-
-type PageInfo { }
-
 # The Query type
 type Query {
 

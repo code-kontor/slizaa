@@ -71,6 +71,7 @@ type Node {
 type Dependency {
     sourceNode: Node!
     targetNode: Node!
+    type: String!
     weight: Int
 }
 
@@ -97,11 +98,16 @@ type StronglyConnectedComponent {
 	nodePositions: [Int!]!
 }
 
-type DependencyPage {
+type PageInfo {
     pageNumber: Int!
     maxPages: Int!
     pageSize: Int!
     totalCount: Int!
+}
+
+type DependencyPage {
+    pageInfo: PageInfo
+    dependencies: [Dependency!]!
 }
 
 type DependencySet{
@@ -111,7 +117,7 @@ type DependencySet{
     size: Int!
 
     # Returns a dependency page with with the specified size
-    dependencies(pageNumber: Int!, pageSize: Int!): DependencyPage
+    dependencyPage(pageNumber: Int!, pageSize: Int!): DependencyPage
 
     #
     referencedNodes(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [Node!]!
@@ -128,6 +134,8 @@ type DependencySet{
     #
     filteredChildrenIds(parentNode: ID!, parentNodeType: NodeType!): [String!]!
 }
+
+type MapEntry { key: String!, value: String }
 
 # The Query type
 extend type Query {

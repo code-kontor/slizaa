@@ -17,12 +17,15 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
+import com.google.common.math.IntMath;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.server.service.selection.ISelectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -50,16 +53,36 @@ public class DependencySet {
         }
 
         return _aggregatedDependency.getCoreDependencies().stream()
-                .map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getWeight())).collect(Collectors.toList());
+                .map(dep -> new Dependency(dep)).collect(Collectors.toList());
     }
 
-    public DependencyPage dependencies(int pageNumber, int pageSize) {
+    /*
+     * page is starting with 1 !!
+     */
+    public DependencyPage dependencyPage(int pageNumber, int pageSize) {
 
-        // TODO : _aggregatedDependency == null
-        List<Dependency> dependencies = Collections.emptyList();
-        PageInfo pageInfo = new PageInfo(pageNumber,0, pageSize,  _aggregatedDependency == null ? 0 : _aggregatedDependency.getCoreDependencies().size());
+        if (pageNumber < 1) {
+            throw new IndexOutOfBoundsException("Invalid");
+        }
 
-        return new DependencyPage(pageInfo, dependencies);
+        List<HGCoreDependency> coreDependencies = _aggregatedDependency.getCoreDependencies();
+
+        int startIndex = (pageNumber - 1) * pageSize;
+        int endIndex = pageNumber * pageSize;
+
+        int end = Math.min(startIndex + pageSize, coreDependencies.size());
+
+        // TODO : partial list
+        List<HGCoreDependency> partialList =
+                startIndex > coreDependencies.size() ?
+                        Collections.emptyList() :
+                        coreDependencies.subList(startIndex, endIndex);
+
+        List<Dependency> partialResultList = convert(partialList);
+        int maxPages = IntMath.divide(coreDependencies.size(), pageSize, RoundingMode.CEILING);
+        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, coreDependencies.size());
+
+        return new DependencyPage(pageInfo, partialResultList);
     }
 
     public int size() {
@@ -156,5 +179,15 @@ public class DependencySet {
         return checkNotNull(parentNodeType).equals(NodeType.SOURCE) ?
                 _selectionService.getChildrenFilteredByDependencySources(_aggregatedDependency, hgNode) :
                 _selectionService.getChildrenFilteredByDependencyTargets(_aggregatedDependency, hgNode);
+    }
+
+    private List<Dependency> convert(List<HGCoreDependency> coreDependencies) {
+
+        if (coreDependencies == null) {
+            return Collections.emptyList();
+        }
+
+        return coreDependencies.stream()
+                .map(dep -> new Dependency(dep)).collect(Collectors.toList());
     }
 }
