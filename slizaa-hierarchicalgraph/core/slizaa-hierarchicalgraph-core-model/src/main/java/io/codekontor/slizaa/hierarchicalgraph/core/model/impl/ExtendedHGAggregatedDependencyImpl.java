@@ -115,12 +115,6 @@ public class ExtendedHGAggregatedDependencyImpl extends HGAggregatedDependencyIm
     return getFrom().getRootNode();
   }
 
-  @Override
-  public Object getIdentifier() {
-    // TODO!
-    return super.getIdentifier();
-  }
-
   /**
    * {@inheritDoc}
    */
