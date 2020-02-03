@@ -90,28 +90,103 @@ export const GQ_GRAPH_DATABASES_WITH_HIERARCHICAL_GRAPHS = gql`query GraphDataba
     }
 }`
 
-export const GQ_HAS_INSTALLED_EXTENSIONS = gql`
-    query HasInstalledExtensions {
-        serverConfiguration {
-            hasInstalledExtensions
-        }
-    }
-`;
-
-export const GQ_AVAILABLE_SERVER_EXTENSIONS = gql`
-    query AvailableServerExtensions {
-        availableServerExtensions {
-            symbolicName
-            version
-        }
-    }`;
-
 export const GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY = gql`
     query ReferencedNodesForAggregatedDependencies($databaseId: ID!, $hierarchicalGraphId: ID!, $dependencySourceNodeId: ID!, $dependencyTargetNodeId: ID!, $selectedNodeIds: [ID!]!,  $selectedNodesType: NodeType!) {
         hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
             dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
                 size
                 referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
+            }
+            sourcePredecessors: node(id: $dependencySourceNodeId) {
+                id
+                predecessors {
+                    id
+                }
+            }
+            targetPredecessors: node(id: $dependencyTargetNodeId) {
+                id
+                predecessors {
+                    id
+                }
+            }
+        }
+    }`
+
+export const GQ_CORE_DEPENDENCIES_FOR_AGGREGATED_DEPENDENCY = gql`
+    query ReferencedNodesForAggregatedDependencies(
+        $databaseId: ID!, 
+        $hierarchicalGraphId: ID!, 
+        $dependencySourceNodeId: ID!, 
+        $dependencyTargetNodeId: ID!,
+        $pageSize: Int!,
+        $pageNumber: Int!,
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
+                size
+                dependencyPage(pageNumber: $pageSize, pageSize: $pageNumber) {
+                    pageInfo {
+                        pageNumber
+                        maxPages
+                        pageSize
+                        totalCount
+                    }
+                    dependencies {
+                        type
+                        weight
+                        sourceNode {
+                            id
+                            text
+                            iconIdentifier
+                        }
+                        targetNode {
+                            id
+                            text
+                            iconIdentifier
+                        }
+                    }
+                }
+            }
+        }
+    }`
+
+export const GQ_AGGREGATED_DEPENDENCY_DETAILS = gql`
+    query DependenciesForAggregatedDependencies(
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $dependencySourceNodeId: ID!,
+        $dependencyTargetNodeId: ID!,
+        $selectedNodeIds: [ID!]!,
+        $selectedNodesType: NodeType!
+        $pageSize: Int!,
+        $pageNumber: Int!,
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
+                size
+                referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
+                dependencyPage(pageNumber: $pageNumber, pageSize: $pageSize) {
+                    pageInfo {
+                        pageNumber
+                        maxPages
+                        pageSize
+                        totalCount
+                    }
+                    dependencies {
+                        type
+                        weight
+                        sourceNode {
+                            id
+                            text
+                            iconIdentifier
+                        }
+                        targetNode {
+                            id
+                            text
+                            iconIdentifier
+                        }
+                    }
+                }
             }
             sourcePredecessors: node(id: $dependencySourceNodeId) {
                 id

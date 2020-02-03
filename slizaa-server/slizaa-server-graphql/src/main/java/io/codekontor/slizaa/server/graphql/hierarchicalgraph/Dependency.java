@@ -21,6 +21,7 @@ import com.google.common.base.Preconditions;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.AbstractHGDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
 
 /**
  *
@@ -53,5 +54,9 @@ public class Dependency {
         return _hgDependency instanceof HGCoreDependency ?
                 ((HGCoreDependency) _hgDependency).getType() :
                 AGGREGATED_DEPENDENCY_TYPE;
+    }
+
+    public boolean isProxyDependency() {
+        return _hgDependency instanceof HGProxyDependency;
     }
 }

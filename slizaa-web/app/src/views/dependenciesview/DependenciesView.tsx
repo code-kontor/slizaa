@@ -25,6 +25,7 @@ import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, VerticalSplitLayout} from 'src/components/layout';
 import {IAppState} from 'src/redux/IAppState';
 import {IDsmSelection} from "../../components/dsm/IDsmProps";
+import {SlizaaDependencyList} from "../../components/slizaadependencylist/SlizaaDependencyList";
 import {SlizaaDependencyTree} from "../../components/slizaadependencytree";
 import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../gqlqueries/__generated__/DsmForNodeChildren";
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../gqlqueries/GqlQueries";
@@ -66,7 +67,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                 },
                 height: 600,
                 horizontalRatio: 500,
-                treeWidth: 400,
+                lowerDividerPosition: 400,
+                upperDividerPosition: 400,
             },
             mainTreeNodeSelection: {
                 expandedNodeIds: ["-1"],
@@ -103,8 +105,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                             <HorizontalSplitLayout
                                 id="upper"
                                 gutter={8}
-                                initialWidth={this.state.layout.treeWidth}
-                                onWidthChanged={this.onSplitLayoutWidthChanged}
+                                initialWidth={this.state.layout.upperDividerPosition}
+                                onWidthChanged={this.onUpperSplitLayoutWidthChanged}
                                 left={
                                     <Card title="Hierarchical Graph">
                                         {this.hierarchicalGraph(cl)}
@@ -119,9 +121,22 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                             />
                         }
                         bottom={
-                            <Card title="Dependencies Details" allowOverflow={false}>
-                                {this.dependenciesDetails(cl)}
-                            </Card>
+                            <HorizontalSplitLayout
+                                id="upper"
+                                gutter={8}
+                                initialWidth={this.state.layout.lowerDividerPosition}
+                                onWidthChanged={this.onLowerSplitLayoutWidthChanged}
+                                left={
+                                    <Card title="Dependencies List">
+                                        {this.dependenciesList(cl)}
+                                    </Card>
+                                }
+                                right={
+                                    <Card title="Dependencies Tree" allowOverflow={false}>
+                                        {this.dependenciesTree(cl)}
+                                    </Card>
+                                }
+                            />
                         }/>
                 }
             </ApolloConsumer>
@@ -192,7 +207,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         return null;
     }
 
-    private dependenciesDetails(client: ApolloClient<any>): React.ReactNode {
+    private dependenciesTree(client: ApolloClient<any>): React.ReactNode {
 
         // return empty div if selected dependency is undefined
         if (this.state.mainDependencySelection === undefined) {
@@ -222,6 +237,25 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             onNodesSelected={this.onDependencyTreeNodesSelected}
         />
     }
+
+    private dependenciesList(client: ApolloClient<any>): React.ReactNode {
+
+        // return empty div if selected dependency is undefined
+        if (this.state.mainDependencySelection === undefined) {
+            return <div/>;
+        }
+
+        //
+        return <SlizaaDependencyList
+            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeLabel.id + "-" + this.state.mainDependencySelection.targetNodeLabel.id}
+            client={client}
+            databaseId={this.props.databaseId}
+            hierarchicalGraphId={this.props.hierarchicalGraphId}
+            sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
+            targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
+        />
+    }
+
 
     private onDependencyTreeNodesSelected = (aSelectedNodeIds: string[], aSelectedNodesType: NodeType): void => {
 
@@ -301,14 +335,24 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
     }
 
 
-    private onSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
+    private onUpperSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
         this.setState({
             layout: {
                 ...this.state.layout,
-                treeWidth: newWidth,
+                upperDividerPosition: newWidth,
             }
         });
     }
+
+    private onLowerSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
+        this.setState({
+            layout: {
+                ...this.state.layout,
+                lowerDividerPosition: newWidth,
+            }
+        });
+    }
+
 
     private updateWindowDimensions = (): void => {
 

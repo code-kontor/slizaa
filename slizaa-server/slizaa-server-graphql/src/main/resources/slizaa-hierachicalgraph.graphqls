@@ -72,7 +72,8 @@ type Dependency {
     sourceNode: Node!
     targetNode: Node!
     type: String!
-    weight: Int
+    weight: Int!
+    isProxyDependency: Boolean!
 }
 
 type DependencyMatrix {
