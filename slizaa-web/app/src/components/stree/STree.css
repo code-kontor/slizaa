@@ -17,6 +17,7 @@
  */
 .slizaa-tree {
   font-size: 12px;
+  height: 100%;
 }
 
 .ant-tree-child-tree > li:first-child {

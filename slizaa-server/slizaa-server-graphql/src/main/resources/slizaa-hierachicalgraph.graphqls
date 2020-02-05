@@ -15,6 +15,9 @@ extend type HierarchicalGraph {
     # Returns the nodes with the given ids
     nodes(ids: [ID]!): NodeSet!
 
+    # Returns the node with the given id
+    dependency(id: ID!): Dependency
+
     # Returns a dependency set based on an aggregated dependency
     dependencySetForAggregatedDependency(sourceNodeId: ID!, targetNodeId: ID!): DependencySet
 }
@@ -69,11 +72,13 @@ type Node {
 }
 
 type Dependency {
+    id: ID!
     sourceNode: Node!
     targetNode: Node!
     type: String!
     weight: Int!
     isProxyDependency: Boolean!
+    resolvedDependencies: [Dependency!]!
 }
 
 type DependencyMatrix {

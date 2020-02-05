@@ -15,19 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* tslint:disable */
-/* eslint-disable */
-// This file was automatically generated and should not be edited.
 
-//==============================================================
-// START Enums and Input Objects
-//==============================================================
+import ApolloClient from "apollo-client";
+import {NodeType} from "../../model/NodeType";
 
-export enum NodeType {
-  SOURCE = "SOURCE",
-  TARGET = "TARGET",
+export interface ISlizaaDependencyViewerProps {
+    client: ApolloClient<any>,
+    databaseId: string,
+    hierarchicalGraphId: string,
+    sourceNodeId: string,
+    targetNodeId: string,
+    height: number,
+    selectedNodeIds: string[],
+    selectedNodesType: NodeType,
 }
-
-//==============================================================
-// END Enums and Input Objects
-//==============================================================

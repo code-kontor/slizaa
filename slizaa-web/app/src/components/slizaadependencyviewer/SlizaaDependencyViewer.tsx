@@ -15,38 +15,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import ApolloClient from 'apollo-client';
-import * as React from "react";
-import {CSSProperties} from "react";
-import {Query} from "react-apollo";
-import {SlizaaIcon} from 'src/components/slizaaicon';
-import {ISlizaaNode} from "../../model/ISlizaaNode";
-import {NodeType} from "../../model/NodeType";
-import {SlizaaNode} from "../../model/SlizaaNode";
-import {fetchChildrenFilterByDependencySet} from "../../model/SlizaaNodeChildrenResolver";
-import STree from "../stree/STree";
-import {ISlizaaDependencyTreeProps} from "./ISlizaaDependencyTreeProps";
-import {ISlizaaDependencyTreeState} from "./ISlizaaDependencyTreeState";
 
+import ApolloClient from "apollo-client";
+import {CSSProperties} from 'react';
+import * as React from 'react';
+import {Query} from "react-apollo";
 import {
     ReferencedNodesForAggregatedDependencies,
     ReferencedNodesForAggregatedDependenciesVariables
 } from "../../gqlqueries/__generated__/ReferencedNodesForAggregatedDependencies";
 import {GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY} from "../../gqlqueries/GqlQueries";
-import './SlizaaDependencyTree.css';
+import {ISlizaaNode} from "../../model/ISlizaaNode";
+import {NodeType} from "../../model/NodeType";
+import {SlizaaNode} from "../../model/SlizaaNode";
+import {fetchChildrenFilterByDependencySet} from "../../model/SlizaaNodeChildrenResolver";
+import {SlizaaIcon} from "../slizaaicon";
+import STree from "../stree/STree";
+import {DependencyList} from "./dependencylist/DependencyList";
+import {ISlizaaDependencyViewerProps} from "./ISlizaaDependencyViewerProps";
+import {ISlizaaDependencyViewerState} from "./ISlizaaDependencyViewerState";
+import './SlizaaDependencyViewer.css';
 
-export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeProps, ISlizaaDependencyTreeState> {
+export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyViewerProps, ISlizaaDependencyViewerState> {
 
-    constructor(props: ISlizaaDependencyTreeProps) {
+    private sourceNode: ISlizaaNode;
+    private targetNode: ISlizaaNode;
+
+    constructor(props: any) {
         super(props);
+
+        this.sourceNode = SlizaaNode.createRoot("Root", "default");
+        this.targetNode = SlizaaNode.createRoot("Root", "default");
 
         this.state = {
             expandedSourceNodeIds: [],
             expandedTargetNodeIds: [],
-            selectedNodeIds: props.selectedNodeIds,
-            selectedNodesType: props.selectedNodesType,
-            sourceNode: SlizaaNode.createRoot("Root", "default"),
-            targetNode: SlizaaNode.createRoot("Root", "default"),
+            selectedNodeIds: [],
+            selectedNodesType: NodeType.SOURCE,
         };
     }
 
@@ -55,25 +60,29 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         const selectedSourceNodeIds = this.state.selectedNodesType === NodeType.SOURCE ? this.state.selectedNodeIds : [];
         const selectedTargetNodeIds = this.state.selectedNodesType === NodeType.TARGET ? this.state.selectedNodeIds : [];
 
-        const variables : ReferencedNodesForAggregatedDependenciesVariables = {
+        const variables: ReferencedNodesForAggregatedDependenciesVariables = {
             databaseId: this.props.databaseId,
             dependencySourceNodeId: this.props.sourceNodeId,
             dependencyTargetNodeId: this.props.targetNodeId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
-            selectedNodeIds: this.state.selectedNodeIds,
-            selectedNodesType: this.state.selectedNodesType,
+            selectedNodeIds: [],
+            selectedNodesType: NodeType.SOURCE,
         }
 
         return <Query<ReferencedNodesForAggregatedDependencies, ReferencedNodesForAggregatedDependenciesVariables>
             query={GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY}
             fetchPolicy={"no-cache"}
-            pollInterval={1000}
+            // pollInterval={1000}
             variables={variables}>
 
             {({loading, data, error, refetch}) => {
 
                 if (error) {
                     return <h1>{error.message}</h1>
+                }
+
+                if (loading) {
+                    return <div/>
                 }
 
                 const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
@@ -97,7 +106,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
                 const elementLeft = hasDependencies ?
                     <STree
-                        rootNode={this.state.sourceNode}
+                        rootNode={this.sourceNode}
                         onExpand={this.onSourceExpand}
                         onSelect={this.onSourceSelect}
                         expandedKeys={combinedExpandedSourceNodeIds}
@@ -108,9 +117,19 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                     /> :
                     <div/>
 
+                const elementCentered = hasDependencies ?
+                    <DependencyList
+                        databaseId={this.props.databaseId}
+                        hierarchicalGraphId={this.props.hierarchicalGraphId}
+                        dependencySourceNodeId={this.props.sourceNodeId}
+                        dependencyTargetNodeId={this.props.targetNodeId}
+                        height={this.props.height}
+                    /> :
+                    <div/>
+
                 const elementRight = hasDependencies ?
                     <STree
-                        rootNode={this.state.targetNode}
+                        rootNode={this.targetNode}
                         onExpand={this.onTargetExpand}
                         onSelect={this.onTargetSelect}
                         expandedKeys={combinedExpandedTargetNodeIds}
@@ -121,11 +140,14 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                     /> :
                     <div/>
 
-                return <div className="slizaa-dependency-tree" style={stylesCursorWait}>
-                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents}>
+                return <div className="dependencyViewerContainer" style={stylesCursorWait}>
+                    <div className="dependencyViewerContainer-Left" style={stylesNoEvents}>
                         {elementLeft}
                     </div>
-                    <div className="slizaa-dependency-tree-container" style={stylesNoEvents}>
+                    <div className="dependencyViewerContainer-Center" style={stylesNoEvents}>
+                        {elementCentered}
+                    </div>
+                    <div className="dependencyViewerContainer-Right" style={stylesNoEvents}>
                         {elementRight}
                     </div>
                 </div>

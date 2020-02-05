@@ -88,6 +88,9 @@
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/lookupNode">
         <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/lookupNode/identifier"/>
       </genOperations>
+      <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/lookupCoreDependency">
+        <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/lookupCoreDependency/identifier"/>
+      </genOperations>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/getExtension">
         <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/getExtension/clazz"/>
         <genTypeParameters ecoreTypeParameter="hierarchicalgraph.ecore#//HGRootNode/getExtension/T"/>

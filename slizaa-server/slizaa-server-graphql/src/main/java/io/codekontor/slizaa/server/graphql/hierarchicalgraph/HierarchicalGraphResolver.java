@@ -22,6 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.server.service.selection.ISelectionService;
@@ -47,6 +48,13 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
      */
     public Node rootNode(HierarchicalGraph hierarchicalGraph) {
         return nullSafe(hierarchicalGraph, hgRootNode -> new Node(hgRootNode));
+    }
+
+    public Dependency dependency(HierarchicalGraph hierarchicalGraph, String id) {
+        return nullSafe(hierarchicalGraph, hgRootNode -> {
+            HGCoreDependency coreDependency = hgRootNode.lookupCoreDependency(Long.parseLong(id));
+            return coreDependency != null ? new Dependency(coreDependency) : null;
+        });
     }
 
     /**

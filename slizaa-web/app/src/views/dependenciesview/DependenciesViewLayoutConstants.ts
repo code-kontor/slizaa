@@ -15,19 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* tslint:disable */
-/* eslint-disable */
-// This file was automatically generated and should not be edited.
 
-//==============================================================
-// START Enums and Input Objects
-//==============================================================
+export class DependenciesViewProps {
 
-export enum NodeType {
-  SOURCE = "SOURCE",
-  TARGET = "TARGET",
+    public static GUTTER_SIZE = 8;
 }
-
-//==============================================================
-// END Enums and Input Objects
-//==============================================================

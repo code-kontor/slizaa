@@ -56,6 +56,11 @@ public class ExtendedHGProxyDependencyImpl extends HGProxyDependencyImpl {
     return getFrom().getRootNode();
   }
 
+  @Override
+  public Object getIdentifier() {
+    return dependencySource.getIdentifier();
+  }
+
   /**
    * {@inheritDoc}
    */

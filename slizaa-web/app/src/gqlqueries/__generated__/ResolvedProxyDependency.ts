@@ -20,10 +20,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: NodeChildren
+// GraphQL query operation: ResolvedProxyDependency
 // ====================================================
 
-export interface NodeChildren_hierarchicalGraph_node_children_nodes {
+export interface ResolvedProxyDependency_hierarchicalGraph_dependency_resolvedDependencies_sourceNode {
   __typename: "Node";
   /**
    * The symbolicName for this node
@@ -34,43 +34,50 @@ export interface NodeChildren_hierarchicalGraph_node_children_nodes {
    */
   text: string;
   iconIdentifier: string;
-  hasChildren: boolean;
 }
 
-export interface NodeChildren_hierarchicalGraph_node_children {
-  __typename: "NodeSet";
-  /**
-   * contained nodes as node array
-   */
-  nodes: NodeChildren_hierarchicalGraph_node_children_nodes[];
-}
-
-export interface NodeChildren_hierarchicalGraph_node {
+export interface ResolvedProxyDependency_hierarchicalGraph_dependency_resolvedDependencies_targetNode {
   __typename: "Node";
   /**
    * The symbolicName for this node
    */
   id: string;
   /**
-   * The children
+   * The text label
    */
-  children: NodeChildren_hierarchicalGraph_node_children;
+  text: string;
+  iconIdentifier: string;
 }
 
-export interface NodeChildren_hierarchicalGraph {
+export interface ResolvedProxyDependency_hierarchicalGraph_dependency_resolvedDependencies {
+  __typename: "Dependency";
+  id: string;
+  type: string;
+  weight: number;
+  sourceNode: ResolvedProxyDependency_hierarchicalGraph_dependency_resolvedDependencies_sourceNode;
+  targetNode: ResolvedProxyDependency_hierarchicalGraph_dependency_resolvedDependencies_targetNode;
+}
+
+export interface ResolvedProxyDependency_hierarchicalGraph_dependency {
+  __typename: "Dependency";
+  id: string;
+  resolvedDependencies: ResolvedProxyDependency_hierarchicalGraph_dependency_resolvedDependencies[];
+}
+
+export interface ResolvedProxyDependency_hierarchicalGraph {
   __typename: "HierarchicalGraph";
   /**
    * Returns the node with the given id
    */
-  node: NodeChildren_hierarchicalGraph_node | null;
+  dependency: ResolvedProxyDependency_hierarchicalGraph_dependency | null;
 }
 
-export interface NodeChildren {
-  hierarchicalGraph: NodeChildren_hierarchicalGraph | null;
+export interface ResolvedProxyDependency {
+  hierarchicalGraph: ResolvedProxyDependency_hierarchicalGraph | null;
 }
 
-export interface NodeChildrenVariables {
+export interface ResolvedProxyDependencyVariables {
   databaseId: string;
   hierarchicalGraphId: string;
-  nodeId: string;
+  proxyDependencyId: string;
 }

@@ -1,4 +1,4 @@
-/*
+/**
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,19 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* tslint:disable */
-/* eslint-disable */
-// This file was automatically generated and should not be edited.
-
-//==============================================================
-// START Enums and Input Objects
-//==============================================================
-
-export enum NodeType {
-  SOURCE = "SOURCE",
-  TARGET = "TARGET",
+.dependencyViewerContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
-//==============================================================
-// END Enums and Input Objects
-//==============================================================
+.dependencyViewerContainer-Left {
+    flex: 0 1 auto;
+    width: 20%;
+}
+
+.dependencyViewerContainer-Center {
+    flex: 0 1 auto;
+    width: 60%;
+    height: 100%;
+}
+
+.dependencyViewerContainer-Right {
+    flex: 0 1 auto;
+    width: 20%;
+}

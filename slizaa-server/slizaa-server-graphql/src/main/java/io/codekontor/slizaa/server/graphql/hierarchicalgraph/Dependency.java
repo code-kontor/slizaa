@@ -23,6 +23,10 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  *
  */
@@ -34,6 +38,15 @@ public class Dependency {
 
     public Dependency(AbstractHGDependency hgDependency) {
         _hgDependency = Preconditions.checkNotNull(hgDependency);
+    }
+
+    public String getId() {
+        if (_hgDependency instanceof HGCoreDependency) {
+            return ((HGCoreDependency) _hgDependency).getIdentifier().toString();
+        }
+        return String.format("%s-%s",
+                _hgDependency.getFrom().getIdentifier(),
+                _hgDependency.getTo().getIdentifier());
     }
 
     public Node getSourceNode() {
@@ -58,5 +71,17 @@ public class Dependency {
 
     public boolean isProxyDependency() {
         return _hgDependency instanceof HGProxyDependency;
+    }
+
+    public List<Dependency> resolvedDependencies() {
+        if (_hgDependency instanceof HGProxyDependency) {
+            HGProxyDependency proxyDependency = (HGProxyDependency)_hgDependency;
+            if (!proxyDependency.isResolved()) {
+                proxyDependency.resolve();
+            }
+            List<HGCoreDependency> coreDependencies = ((HGProxyDependency)_hgDependency).getAccumulatedCoreDependencies();
+            return coreDependencies.stream().map(coreDep -> new Dependency(coreDep)).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 }

@@ -21,14 +21,13 @@ import com.google.common.math.IntMath;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.server.service.selection.ISelectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -41,9 +40,14 @@ public class DependencySet {
 
     private HGAggregatedDependency _aggregatedDependency;
 
+    private transient ILabelDefinitionProvider labelDefinitionProvider;
+
     public DependencySet(ISelectionService selectionService, HGAggregatedDependency aggregatedDependency) {
         _selectionService = checkNotNull(selectionService);
         _aggregatedDependency = aggregatedDependency;
+
+        //
+        labelDefinitionProvider = Utils.getLabelDefinitionProvider(aggregatedDependency.getFrom());
     }
 
     public List<Dependency> dependencies() {
@@ -53,6 +57,7 @@ public class DependencySet {
         }
 
         return _aggregatedDependency.getCoreDependencies().stream()
+                .sorted(Comparator.comparing(dep -> labelDefinitionProvider.getLabelDefinition(dep.getFrom()).getText()))
                 .map(dep -> new Dependency(dep)).collect(Collectors.toList());
     }
 
@@ -65,12 +70,15 @@ public class DependencySet {
             throw new IndexOutOfBoundsException("Invalid");
         }
 
-        List<HGCoreDependency> coreDependencies = _aggregatedDependency.getCoreDependencies();
+        if (_aggregatedDependency == null) {
+            return new DependencyPage(new PageInfo(1,0,0,0), Collections.emptyList());
+        }
+
+        List<HGCoreDependency> coreDependencies = new LinkedList<>(_aggregatedDependency.getCoreDependencies());
+        coreDependencies.sort(Comparator.comparing(dep -> labelDefinitionProvider.getLabelDefinition(dep.getFrom()).getText()));
 
         int startIndex = (pageNumber - 1) * pageSize;
-        int endIndex = pageNumber * pageSize;
-
-        int end = Math.min(startIndex + pageSize, coreDependencies.size());
+        int endIndex = Math.min(startIndex + pageSize, coreDependencies.size());
 
         // TODO : partial list
         List<HGCoreDependency> partialList =

@@ -46,7 +46,6 @@ export interface IDependencySelection {
 
 export interface IIDependenciesViewLayout {
     upperDividerPosition: number
-    lowerDividerPosition: number
     horizontalRatio: number
     height: number
     dsmSetting: IDsmSettings

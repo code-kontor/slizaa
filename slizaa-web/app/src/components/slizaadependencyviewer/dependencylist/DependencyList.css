@@ -1,4 +1,4 @@
-/*
+/**
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,19 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* tslint:disable */
-/* eslint-disable */
-// This file was automatically generated and should not be edited.
-
-//==============================================================
-// START Enums and Input Objects
-//==============================================================
-
-export enum NodeType {
-  SOURCE = "SOURCE",
-  TARGET = "TARGET",
+.fixedWidthTable table {
+    table-layout: fixed;
+    font-size: 12px;
 }
 
-//==============================================================
-// END Enums and Input Objects
-//==============================================================
+.fixedWidthTable .ant-table-tbody > tr > td {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.ant-pagination {
+    font-size: 12px;
+}
+
+.ant-pagination-item-active a {
+    color: #2f353a;
+}
+
+.ant-pagination-item-active {
+    font-weight: 700;
+    border-color: #2f353a;
+}
+
+.ant-table-pagination.ant-pagination {
+    float: left;
+}
+
+.ant-table-column-title {
+    font-weight: bold;
+}
