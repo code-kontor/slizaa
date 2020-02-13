@@ -19,17 +19,29 @@ package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import java.util.List;
 
-public interface DependencySet {
+public class NodeSelection {
 
-    int getSize();
+    private List<String> _selectedNodeIds;
 
-    List<Dependency> getDependencies();
+    private NodeType _selectedNodesType;
 
-    DependencyPage getDependencyPage(int pageNumber, int pageSize);
+    public NodeSelection() {
+        // default constructor for graphql
+    }
 
-    List<Node> filteredChildren(String parentNode, NodeType parentNodeType);
+    public List<String> getSelectedNodeIds() {
+        return _selectedNodeIds;
+    }
 
-    List<String> filteredChildrenIds(String parentNode, NodeType parentNodeType);
+    public NodeType getSelectedNodesType() {
+        return _selectedNodesType;
+    }
 
-    FilteredDependencies filteredDependencies(List<NodeSelection> nodeSelection);
+    public void setSelectedNodeIds(List<String> _selectedNodeIds) {
+        this._selectedNodeIds = _selectedNodeIds;
+    }
+
+    public void setSelectedNodesType(NodeType _selectedNodesType) {
+        this._selectedNodesType = _selectedNodesType;
+    }
 }

@@ -19,7 +19,7 @@ package io.codekontor.slizaa.server.service.selection;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 
-public interface IModifiableSelectionService extends ISelectionService {
+public interface IModifiableAggregatedDependencySelectionService extends IAggregatedDependencySelectionService {
 
     void dropSelections(HGRootNode rootNode);
 }

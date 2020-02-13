@@ -34,7 +34,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
-import io.codekontor.slizaa.server.service.selection.IModifiableSelectionService;
+import io.codekontor.slizaa.server.service.selection.IModifiableAggregatedDependencySelectionService;
 import io.codekontor.slizaa.server.service.slizaa.internal.graphdatabase.IGraphDatabaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
       .getLogger(SlizaaServiceImpl.class);
 
   @Autowired
-  private IModifiableSelectionService               _selectionService;
+  private IModifiableAggregatedDependencySelectionService _selectionService;
 
   @Autowired
   private SlizaaServiceDatabaseProperties           _serviceProperties;
@@ -206,7 +206,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
   }
 
   @Override
-  public IModifiableSelectionService getSelectionService() {
+  public IModifiableAggregatedDependencySelectionService getSelectionService() {
     return _selectionService;
   }
 

@@ -20,7 +20,8 @@ package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.IReferencedNodes;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -33,7 +34,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedTargetNodes_a1() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a1()), SourceOrTarget.SOURCE, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a1(), SourceOrTarget.SOURCE), false);
 
         // assertions
         assertReferencedNodes(
@@ -50,7 +51,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedTargetNodes_a2() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a2()), SourceOrTarget.SOURCE, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a2(), SourceOrTarget.SOURCE), false);
 
         // assertions
         assertReferencedNodes(
@@ -67,7 +68,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedTargetNodes_a22() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a22()), SourceOrTarget.SOURCE, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a22(), SourceOrTarget.SOURCE), false);
 
         // assertions
         assertReferencedNodes(
@@ -84,7 +85,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedTargetNodes_a3() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a3()), SourceOrTarget.SOURCE, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a3(), SourceOrTarget.SOURCE), false);
 
         // assertions
         assertReferencedNodes(
@@ -103,7 +104,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
         this.proxyDependency().resolve();
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a4()), SourceOrTarget.SOURCE, true);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a4(), SourceOrTarget.SOURCE), true);
 
         // assertions
         assertReferencedNodes(
@@ -120,7 +121,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedTargetNodes_a4_unresolved() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a4()), SourceOrTarget.SOURCE, true);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a4(), SourceOrTarget.SOURCE), true);
 
         // assertions
         assertReferencedNodes(
@@ -139,7 +140,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
         this.proxyDependency().resolve();
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a4()), SourceOrTarget.SOURCE, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a4(), SourceOrTarget.SOURCE), false);
 
         // assertions
         assertReferencedNodes(
@@ -155,12 +156,11 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     @Test
     public void testComputeReferencedTargetNodes2() {
 
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.a3()), SourceOrTarget.SOURCE, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.a3(), SourceOrTarget.SOURCE), false);
 
-        assertThat(referencedNodes.getSelectedNodesType()).isEqualTo(SourceOrTarget.SOURCE);
-        assertThat(referencedNodes.getReferencedNodes(false))
+        assertThat(referencedNodes.getNodes(SourceOrTarget.TARGET, false))
                 .containsExactlyInAnyOrder(testGraph.b3());
-        assertThat(referencedNodes.getReferencedNodes(true))
+        assertThat(referencedNodes.getNodes(SourceOrTarget.TARGET, true))
                 .containsExactlyInAnyOrder(testGraph.root(), testGraph.b1(), testGraph.b2(), testGraph.b3());
     }
 
@@ -168,11 +168,11 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedSourceNodes_b1() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.b1()), SourceOrTarget.TARGET, false);
+        IFilteredDependencies filteredDependencies = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.b1(), SourceOrTarget.TARGET), false);
 
         // assertions
         assertReferencedNodes(
-                referencedNodes,
+                filteredDependencies,
                 new HGNode[]{testGraph.b1()},
                 SourceOrTarget.TARGET,
                 new HGCoreDependency[]{testGraph.a1_b1_core1(), testGraph.a1_b1_core2(), testGraph.a2_b2_core1(), testGraph.a2_b22_core1(), testGraph.a22_b22_core1(), testGraph.a3_b3_proxy1()},
@@ -185,7 +185,7 @@ public class ReferencedNodesDefaultDependencySetTest extends AbstractDefaultDepe
     public void referencedSourceNodes_b3() {
 
         // compute the referenced nodes
-        IReferencedNodes referencedNodes = dependencySet().computeReferencedNodes(Collections.singleton(testGraph.b3()), SourceOrTarget.TARGET, false);
+        IFilteredDependencies referencedNodes = dependencySet().getFilteredDependencies(INodeSelection.create(testGraph.b3(), SourceOrTarget.TARGET), false);
 
         // assertions
         assertReferencedNodes(

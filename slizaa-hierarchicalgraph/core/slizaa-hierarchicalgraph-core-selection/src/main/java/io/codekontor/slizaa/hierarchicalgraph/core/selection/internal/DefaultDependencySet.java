@@ -20,7 +20,8 @@ package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.Utilities;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.IDependencySet;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.IReferencedNodes;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.NodeSelections;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -65,50 +66,66 @@ public class DefaultDependencySet implements IDependencySet {
     private ProxyDependencyAdapter proxyDependencyAdapter;
 
     public DefaultDependencySet(Collection<HGCoreDependency> dependencies) {
-
-        //
         _unfilteredCoreDependencies = Collections.unmodifiableCollection(checkNotNull(dependencies));
-
         initialize();
     }
 
     @Override
-    public IReferencedNodes computeReferencedNodes(Collection<HGNode> selectedNodes, SourceOrTarget selectedNodesType, boolean includeResolvedProxyDependencies) {
-        checkNotNull(selectedNodesType);
-        checkNotNull(selectedNodes);
+    public IFilteredDependencies getFilteredDependencies(INodeSelection nodeSelection, boolean includeResolvedProxyDependencies) {
+        checkNotNull(nodeSelection);
+        return getFilteredDependencies(Collections.singletonList(nodeSelection), includeResolvedProxyDependencies);
+    }
 
-        // fetch the appropriate dependencies map
-        Map<HGNode, Set<HGCoreDependency>> dependenciesMap = selectedNodesType == SourceOrTarget.SOURCE
-                ? _sourceNode2CoreDependenciesMap
-                : _targetNode2CoreDependenciesMap;
+    @Override
+    public IFilteredDependencies getFilteredDependencies(List<INodeSelection> nodeSelections, boolean includeResolvedProxyDependencies) {
+        checkNotNull(nodeSelections);
 
-        Set<HGNode> unfilteredDependencyNodes = selectedNodesType == SourceOrTarget.SOURCE ?
-                getUnfilteredSourceNodes(true, includeResolvedProxyDependencies) :
-                getUnfilteredTargetNodes(true, includeResolvedProxyDependencies);
+        // initial
+        Set<HGCoreDependency> result = new HashSet<>(_unfilteredCoreDependencies);
+        // Set<HGCoreDependency> resolvedProxies = new HashSet<>();
 
-        // fetch the selected nodes with successors
-        Set<HGNode> selectedNodesWithSuccessors = selectedNodes.stream()
-                .flatMap(node -> NodeSelections.getSuccessors(node, true).stream())
-                .filter(n -> unfilteredDependencyNodes.contains(n))
-                .collect(Collectors.toSet());
+        nodeSelections.forEach(
+                selection -> {
 
-        // get the selected nodes that are keys in the dependencies map
-        Set<HGNode> keys = dependenciesMap.keySet().stream().filter(selectedNodesWithSuccessors::contains)
-                .collect(Collectors.toSet());
+                    // fetch the appropriate dependencies map
+                    Map<HGNode, Set<HGCoreDependency>> dependenciesMap = selection.getType() == SourceOrTarget.SOURCE
+                            ? _sourceNode2CoreDependenciesMap
+                            : _targetNode2CoreDependenciesMap;
 
-        // resolve the filtered core dependencies
-        Set<HGCoreDependency> filteredCoreDependencies = keys.stream().flatMap(key -> dependenciesMap.get(key).stream())
-                .collect(Collectors.toSet());
+                    Set<HGNode> unfilteredDependencyNodes = selection.getType() == SourceOrTarget.SOURCE ?
+                            getUnfilteredSourceNodes(true, includeResolvedProxyDependencies) :
+                            getUnfilteredTargetNodes(true, includeResolvedProxyDependencies);
 
-        // resolve the filtered nodes
-        Set<HGNode> filterNodes = keys.stream().flatMap(key -> {
-            return dependenciesMap.get(key).stream()
-                    .map(dep -> selectedNodesType == SourceOrTarget.SOURCE ? dep.getTo() : dep.getFrom());
-        }).collect(Collectors.toSet());
+                    // fetch the selected nodes with successors
+                    Set<HGNode> selectedNodesWithSuccessors = selection.getNodes().stream()
+                            .flatMap(node -> NodeSelections.getSuccessors(node, true).stream())
+                            .filter(n -> unfilteredDependencyNodes.contains(n))
+                            .collect(Collectors.toSet());
+
+                    // get the selected nodes that are keys in the dependencies map
+                    Set<HGNode> keys = dependenciesMap.keySet().stream().filter(selectedNodesWithSuccessors::contains)
+                            .collect(Collectors.toSet());
+
+                    // resolve the filtered core dependencies
+                    Set<HGCoreDependency> filteredCoreDependencies = keys.stream().flatMap(key -> dependenciesMap.get(key).stream())
+                            .filter(coreDependency -> {
+                                if (coreDependency.getProxyDependencyParent() != null) {
+                                    // resolvedProxies.add(coreDependency);
+                                    return false;
+                                } else {
+                                    return result.contains(coreDependency);
+                                }
+                            })
+                            .collect(Collectors.toSet());
+
+                    result.retainAll(filteredCoreDependencies);
+                }
+        );
+
+        // result.addAll(resolvedProxies);
 
         // return the result
-        return new DefaultReferencedNodes(selectedNodes, selectedNodesType, filteredCoreDependencies,
-                filterNodes);
+        return new DefaultFilteredDependencies(result);
     }
 
     @Override
@@ -168,6 +185,11 @@ public class DefaultDependencySet implements IDependencySet {
         resolveProxyDependencies(coreDependencies);
     }
 
+    /**
+     * @param includePredecessors
+     * @param includeResolvedProxyDependencies
+     * @return
+     */
     Set<HGNode> getUnfilteredSourceNodes(boolean includePredecessors, boolean includeResolvedProxyDependencies) {
         if (includeResolvedProxyDependencies) {
             if (includePredecessors) {
@@ -187,6 +209,11 @@ public class DefaultDependencySet implements IDependencySet {
         }
     }
 
+    /**
+     * @param includePredecessors
+     * @param includeResolvedProxyDependencies
+     * @return
+     */
     Set<HGNode> getUnfilteredTargetNodes(boolean includePredecessors, boolean includeResolvedProxyDependencies) {
 
         if (includeResolvedProxyDependencies) {

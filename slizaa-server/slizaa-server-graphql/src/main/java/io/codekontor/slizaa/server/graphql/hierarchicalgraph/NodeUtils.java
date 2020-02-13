@@ -21,10 +21,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeComparator;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,6 +40,9 @@ public class NodeUtils {
         if (nodes != null && !nodes.isEmpty()) {
             HGRootNode rootNode = nodes.iterator().next().getRootNode();
             INodeComparator nodeComparator = rootNode.getExtension(INodeComparator.class);
+            if (nodeComparator == null) {
+                return new LinkedList<>(nodes);
+            }
             return nodes.stream().sorted(new Comparator<HGNode>() {
                 @Override
                 public int compare(HGNode node1, HGNode node2) {

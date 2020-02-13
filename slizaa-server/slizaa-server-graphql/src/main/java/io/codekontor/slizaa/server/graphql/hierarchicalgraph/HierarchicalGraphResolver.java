@@ -25,7 +25,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.server.service.selection.ISelectionService;
+import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
@@ -41,7 +41,7 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
     private ISlizaaService _slizaaService;
 
     @Autowired
-    private ISelectionService _selectionService;
+    private IAggregatedDependencySelectionService _aggregatedDependencySelectionService;
 
     /**
      * @return
@@ -86,7 +86,7 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
             HGNode fromNode =  hgRootNode.lookupNode(Long.parseLong(targetNodeId));
             // TODO NULL CHECK!
             HGAggregatedDependency aggregatedDependency = toNode.getOutgoingDependenciesTo(fromNode);
-            return new DependencySet(_selectionService, aggregatedDependency);
+            return new AggregatedDependencyDependencySet(_aggregatedDependencySelectionService, aggregatedDependency);
         });
     }
 

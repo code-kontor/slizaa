@@ -17,20 +17,24 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.core.selection;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultNodeSelection;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.Collections;
 
-public interface IReferencedNodes {
+public interface INodeSelection {
 
-    Collection<HGNode> getReferencedNodes();
+    static INodeSelection create(Collection<HGNode> nodes, SourceOrTarget type) {
+        return new DefaultNodeSelection(nodes, type);
+    }
 
-    SourceOrTarget getSelectedNodesType();
+    static INodeSelection create(HGNode node, SourceOrTarget type) {
+        return new DefaultNodeSelection(Collections.singletonList(node), type);
+    }
 
-    Set<HGCoreDependency> getSelectedCoreDependencies();
+    Collection<HGNode> getNodes();
 
-    Set<HGNode> getReferencedNodes(boolean includePredecessors);
+    SourceOrTarget getType();
 }

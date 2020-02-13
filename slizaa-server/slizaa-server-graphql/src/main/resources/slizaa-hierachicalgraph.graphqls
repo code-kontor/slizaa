@@ -116,29 +116,50 @@ type DependencyPage {
     dependencies: [Dependency!]!
 }
 
-type DependencySet{
+type DependencySet {
 
-    dependencies: [Dependency!]!
-
+    #
     size: Int!
+
+    #
+    dependencies: [Dependency!]!
 
     # Returns a dependency page with with the specified size
     dependencyPage(pageNumber: Int!, pageSize: Int!): DependencyPage
-
-    #
-    referencedNodes(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [Node!]!
-
-    #
-    referencedNodeIds(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [String!]!
-
-    #
-    filteredDependencies(selectedNodes: [ID!]!, selectedNodesType: NodeType!): DependencySet!
 
     # Returns a set of nodes filtered by the specified node type.
     filteredChildren(parentNode: ID!, parentNodeType: NodeType!): [Node!]!
 
     #
     filteredChildrenIds(parentNode: ID!, parentNodeType: NodeType!): [String!]!
+
+    #
+    filteredDependencies(nodeSelection: [NodeSelection!]!): FilteredDependencies!
+}
+
+type FilteredDependencies {
+
+    #
+    size: Int!
+
+    #
+    dependencies: [Dependency!]!
+
+    # Returns a dependency page with with the specified size
+    dependencyPage(pageNumber: Int!, pageSize: Int!): DependencyPage
+
+    #
+    nodes(nodeType: NodeType, includedPredecessors: Boolean): [Node!]!
+
+    #
+    nodeIds(nodeType: NodeType, includedPredecessors: Boolean): [ID!]!
+}
+
+input NodeSelection {
+
+    selectedNodeIds: [ID!]!
+
+    selectedNodesType: NodeType!
 }
 
 type MapEntry { key: String!, value: String }

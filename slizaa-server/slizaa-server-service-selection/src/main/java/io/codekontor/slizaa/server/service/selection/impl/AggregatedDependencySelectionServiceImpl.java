@@ -18,12 +18,18 @@
 package io.codekontor.slizaa.server.service.selection.impl;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.IDependencySet;
-import io.codekontor.slizaa.server.service.selection.ISelectionService;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
+import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
+import io.codekontor.slizaa.server.service.selection.IModifiableAggregatedDependencySelectionService;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -32,9 +38,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public abstract class AbstractSelectionService implements ISelectionService {
+@Component
+public class AggregatedDependencySelectionServiceImpl implements IModifiableAggregatedDependencySelectionService {
 
-    private Map<DependenciesSelectionKey, IDependencySet> _selectionMap;
+    private Map<AggregatedDependencySelectionKey, IDependencySet> _selectionMap;
 
     private ScheduledExecutorService _scheduledExecutorService;
 
@@ -62,12 +69,13 @@ public abstract class AbstractSelectionService implements ISelectionService {
         }
     }
 
-    protected IDependencySet getDependenciesSelection(HGAggregatedDependency aggregatedDependency) {
-        DependenciesSelectionKey key = new DependenciesSelectionKey(checkNotNull(aggregatedDependency));
+    @Override
+    public IDependencySet getAggregatedDependencyDependencySet(HGAggregatedDependency aggregatedDependency) {
+        AggregatedDependencySelectionKey key = new AggregatedDependencySelectionKey(checkNotNull(aggregatedDependency));
         synchronized (_lock) {
             IDependencySet dependencySet = _selectionMap.get(key);
             if (dependencySet == null) {
-                dependencySet = IDependencySet.newDependencySet(aggregatedDependency.getCoreDependencies());
+                dependencySet = IDependencySet.create(aggregatedDependency.getCoreDependencies());
             }
             _selectionMap.put(key, dependencySet);
             return dependencySet;
@@ -88,5 +96,10 @@ public abstract class AbstractSelectionService implements ISelectionService {
                 // TODO
             }
         };
+    }
+
+    @Override
+    public void dropSelections(HGRootNode rootNode) {
+        // TODO
     }
 }

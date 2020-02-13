@@ -23,11 +23,12 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface IDependencySet {
 
-    static IDependencySet newDependencySet(Collection<HGCoreDependency> dependencies) {
+    static IDependencySet create(Collection<HGCoreDependency> dependencies) {
         return new DefaultDependencySet(dependencies);
     }
 
@@ -47,5 +48,7 @@ public interface IDependencySet {
 
     Set<HGNode> getFilteredNodeChildren(HGNode node, SourceOrTarget sourceOrTarget, boolean resolveAndIncludeProxyDependencies);
 
-    IReferencedNodes computeReferencedNodes(Collection<HGNode> selectedNodes, SourceOrTarget selectedNodesType, boolean includeResolvedProxyDependencies);
+    IFilteredDependencies getFilteredDependencies(List<INodeSelection> nodeSelections, boolean includeResolvedProxyDependencies);
+
+    IFilteredDependencies getFilteredDependencies(INodeSelection nodeSelection, boolean includeResolvedProxyDependencies);
 }

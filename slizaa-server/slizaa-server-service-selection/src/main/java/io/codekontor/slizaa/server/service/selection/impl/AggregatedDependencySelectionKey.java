@@ -22,13 +22,13 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 
 import java.util.Objects;
 
-public class DependenciesSelectionKey {
+public class AggregatedDependencySelectionKey {
 
     private HGAggregatedDependency _aggregatedDependency;
 
     private long _lastAccessTime;
 
-    public DependenciesSelectionKey(HGAggregatedDependency aggregatedDependency) {
+    public AggregatedDependencySelectionKey(HGAggregatedDependency aggregatedDependency) {
         _aggregatedDependency = Preconditions.checkNotNull(aggregatedDependency);
         _lastAccessTime = System.currentTimeMillis();
     }
@@ -45,7 +45,7 @@ public class DependenciesSelectionKey {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DependenciesSelectionKey that = (DependenciesSelectionKey) o;
+        AggregatedDependencySelectionKey that = (AggregatedDependencySelectionKey) o;
         return _aggregatedDependency.equals(that._aggregatedDependency);
     }
 

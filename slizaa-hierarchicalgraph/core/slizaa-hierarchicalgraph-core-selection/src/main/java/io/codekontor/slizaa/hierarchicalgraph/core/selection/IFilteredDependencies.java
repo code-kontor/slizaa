@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-selection - Slizaa Static Software Analysis Tools
+ * slizaa-hierarchicalgraph-core-selection - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,12 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.selection;
+package io.codekontor.slizaa.hierarchicalgraph.core.selection;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 
-@Configuration
-@ComponentScan(basePackageClasses = { IAggregatedDependencySelectionService.class })
-public class SelectionServiceModuleConfiguration {
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+public interface IFilteredDependencies {
+
+    Collection<HGNode> getNodes(SourceOrTarget sourceOrTarget, boolean includePredecessors);
+
+    Collection<HGCoreDependency> getCoreDependencies();
 }

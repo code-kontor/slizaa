@@ -20,8 +20,9 @@ package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.NodeSelections;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.IReferencedNodes;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedGraph;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedTestGraphProviderRule;
 import org.junit.Before;
@@ -76,11 +77,10 @@ public class DefaultDependencySetTest {
     @Test
     public void testFilteredDependencies() {
 
-        IReferencedNodes referencedNodes = dependencySet.computeReferencedNodes(Collections.singleton(node(7193)), SourceOrTarget.SOURCE, false);
-        assertThat(referencedNodes.getSelectedCoreDependencies()).containsOnlyElementsOf(dependencySet.getUnfilteredCoreDependencies().stream().filter(dep -> dep.getFrom().getIdentifier().equals(Long.valueOf(7193))).collect(Collectors.toList()));
-        assertThat(referencedNodes.getReferencedNodes()).containsExactlyInAnyOrder(node(7193));
+        IFilteredDependencies filteredDependencies = dependencySet.getFilteredDependencies(INodeSelection.create(node(7193), SourceOrTarget.SOURCE), false);
 
-        assertThat(referencedNodes.getReferencedNodes(false)).containsExactlyInAnyOrder(node(6518), node(7544), node(8075));
+        assertThat(filteredDependencies.getCoreDependencies()).containsOnlyElementsOf(dependencySet.getUnfilteredCoreDependencies().stream().filter(dep -> dep.getFrom().getIdentifier().equals(Long.valueOf(7193))).collect(Collectors.toList()));
+        assertThat(filteredDependencies.getNodes(SourceOrTarget.TARGET,false)).containsExactlyInAnyOrder(node(6518), node(7544), node(8075));
     }
 
     /**
