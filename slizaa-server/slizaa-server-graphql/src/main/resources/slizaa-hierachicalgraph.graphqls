@@ -149,10 +149,10 @@ type FilteredDependencies {
     dependencyPage(pageNumber: Int!, pageSize: Int!): DependencyPage
 
     #
-    nodes(nodeType: NodeType, includedPredecessors: Boolean): [Node!]!
+    nodes(nodeType: NodeType!, includedPredecessors: Boolean!): [Node!]!
 
     #
-    nodeIds(nodeType: NodeType, includedPredecessors: Boolean): [ID!]!
+    nodeIds(nodeType: NodeType!, includedPredecessors: Boolean!): [ID!]!
 }
 
 input NodeSelection {

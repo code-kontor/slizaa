@@ -21,27 +21,19 @@ import java.util.List;
 
 public class NodeSelection {
 
-    private List<String> _selectedNodeIds;
+    private List<String> selectedNodeIds;
 
-    private NodeType _selectedNodesType;
+    private NodeType selectedNodesType;
 
     public NodeSelection() {
         // default constructor for graphql
     }
 
     public List<String> getSelectedNodeIds() {
-        return _selectedNodeIds;
+        return selectedNodeIds;
     }
 
     public NodeType getSelectedNodesType() {
-        return _selectedNodesType;
-    }
-
-    public void setSelectedNodeIds(List<String> _selectedNodeIds) {
-        this._selectedNodeIds = _selectedNodeIds;
-    }
-
-    public void setSelectedNodesType(NodeType _selectedNodesType) {
-        this._selectedNodesType = _selectedNodesType;
+        return selectedNodesType;
     }
 }

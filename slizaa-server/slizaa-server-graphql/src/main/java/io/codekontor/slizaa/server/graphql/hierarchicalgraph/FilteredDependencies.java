@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -112,8 +113,14 @@ public class FilteredDependencies {
         if (filteredDependencies == null || filteredDependencies.getCoreDependencies().isEmpty()) {
             return Collections.emptyList();
         }
-// TODO: includePredecessors
-        List<HGNode> nodeIds = filteredDependencies.getCoreDependencies().stream().map(dep -> NodeType.SOURCE.equals(nodeType) ? dep.getFrom() : dep.getTo()).distinct().collect(Collectors.toList());
-        return NodeUtils.toNodeIds(nodeIds);
+
+        Stream<HGNode> nodeIdStream = filteredDependencies.getCoreDependencies().stream().
+                map(dep -> NodeType.SOURCE.equals(nodeType) ? dep.getFrom() : dep.getTo());
+
+        if (includedPredecessors) {
+            nodeIdStream = nodeIdStream.flatMap(node -> Stream.concat(Stream.of(node), node.getPredecessors().stream()));
+        }
+
+        return NodeUtils.toNodeIds(nodeIdStream.distinct().collect(Collectors.toList()));
     }
 }
