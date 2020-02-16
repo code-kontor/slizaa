@@ -63,30 +63,30 @@ public abstract class AbstractDefaultDependencySetTest {
 
     /**
      *
-     * @param referencedNodes
+     * @param filteredDependencies
      * @param selectedNodesWithSuccessorsAndPredecessors
      * @param selectedNodesType
      * @param filteredCoreDependencies
      * @param filteredNodesWithPredecessors
      * @param filteredNodes
      */
-    protected void assertReferencedNodes(IFilteredDependencies referencedNodes,
-                                         HGNode[] selectedNodesWithSuccessorsAndPredecessors,
-                                         SourceOrTarget selectedNodesType,
-                                         HGCoreDependency[] filteredCoreDependencies,
-                                         HGNode[] filteredNodesWithPredecessors,
-                                         HGNode[] filteredNodes) {
+    protected void assertFilteredDependencies(IFilteredDependencies filteredDependencies,
+                                              HGNode[] selectedNodesWithSuccessorsAndPredecessors,
+                                              SourceOrTarget selectedNodesType,
+                                              HGCoreDependency[] filteredCoreDependencies,
+                                              HGNode[] filteredNodesWithPredecessors,
+                                              HGNode[] filteredNodes) {
 
         SourceOrTarget referencedNodesType = selectedNodesType.equals(SourceOrTarget.SOURCE) ? SourceOrTarget.TARGET : SourceOrTarget.SOURCE;
 
-        assertThat(referencedNodes.getNodes(selectedNodesType, true).containsAll(Arrays.asList(selectedNodesWithSuccessorsAndPredecessors)));
+        assertThat(filteredDependencies.getNodes(selectedNodesType, true).containsAll(Arrays.asList(selectedNodesWithSuccessorsAndPredecessors)));
 
-        assertThat(referencedNodes.getCoreDependencies()).containsExactlyInAnyOrder(filteredCoreDependencies);
+        assertThat(filteredDependencies.getCoreDependencies()).containsExactlyInAnyOrder(filteredCoreDependencies);
 
-        assertThat(referencedNodes.getNodes(referencedNodesType, true))
+        assertThat(filteredDependencies.getNodes(referencedNodesType, true))
                 .containsExactlyInAnyOrder(filteredNodesWithPredecessors);
 
-        assertThat(referencedNodes.getNodes(referencedNodesType, false))
+        assertThat(filteredDependencies.getNodes(referencedNodesType, false))
                 .containsExactlyInAnyOrder(filteredNodes);
     }
 }
