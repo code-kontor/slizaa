@@ -43,8 +43,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         this.state = {
             expandedSourceNodeIds: [],
             expandedTargetNodeIds: [],
-            selectedNodeIds: props.selectedNodeIds,
-            selectedNodesType: props.selectedNodesType,
+            selectedSourceNodeIds: props.selectedSourceNodeIds,
+            selectedTargetNodeIds: props.selectedTargetNodeIds,
             sourceNode: SlizaaNode.createRoot("Root", "default"),
             targetNode: SlizaaNode.createRoot("Root", "default"),
         };
@@ -52,16 +52,13 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
     public render() {
 
-        const selectedSourceNodeIds = this.state.selectedNodesType === NodeType.SOURCE ? this.state.selectedNodeIds : [];
-        const selectedTargetNodeIds = this.state.selectedNodesType === NodeType.TARGET ? this.state.selectedNodeIds : [];
-
         const variables : ReferencedNodesForAggregatedDependenciesVariables = {
             databaseId: this.props.databaseId,
             dependencySourceNodeId: this.props.sourceNodeId,
             dependencyTargetNodeId: this.props.targetNodeId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
-            selectedNodeIds: this.state.selectedNodeIds,
-            selectedNodesType: this.state.selectedNodesType,
+            selectedSourceNodeIds: this.state.selectedSourceNodeIds,
+            selectedTargetNodeIds: this.state.selectedTargetNodeIds,
         }
 
         return <Query<ReferencedNodesForAggregatedDependencies, ReferencedNodesForAggregatedDependenciesVariables>
@@ -75,9 +72,6 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                 if (error) {
                     return <h1>{error.message}</h1>
                 }
-
-                const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
-                const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
 
                 // TODO: merge with expanded IDs
                 const sourcePredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.sourcePredecessors == null ? [] : data.hierarchicalGraph.sourcePredecessors.predecessors.map((p) => p.id);
@@ -101,8 +95,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                         onExpand={this.onSourceExpand}
                         onSelect={this.onSourceSelect}
                         expandedKeys={combinedExpandedSourceNodeIds}
-                        selectedKeys={selectedSourceNodeIds}
-                        markedKeys={markedSourceNodeIds}
+                        selectedKeys={this.state.selectedSourceNodeIds}
+                        markedKeys={this.state.selectedSourceNodeIds}
                         loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
                         fetchIcon={this.fetchIcon}
                     /> :
@@ -114,8 +108,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
                         onExpand={this.onTargetExpand}
                         onSelect={this.onTargetSelect}
                         expandedKeys={combinedExpandedTargetNodeIds}
-                        selectedKeys={selectedTargetNodeIds}
-                        markedKeys={markedTargetNodeIds}
+                        selectedKeys={this.state.selectedTargetNodeIds}
+                        markedKeys={this.state.selectedTargetNodeIds}
                         loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
                         fetchIcon={this.fetchIcon}
                     /> :
@@ -147,8 +141,7 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
 
     private onSourceSelect = (selectedNodes: ISlizaaNode[]): void => {
         this.setState({
-            selectedNodeIds: selectedNodes.map((node) => node.key),
-            selectedNodesType: NodeType.SOURCE
+            selectedSourceNodeIds: selectedNodes.map((node) => node.key),
         })
     }
 
@@ -158,10 +151,9 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         })
     }
 
-    private onTargetSelect = (selectedItems: ISlizaaNode[]): void => {
+    private onTargetSelect = (selectedNodes: ISlizaaNode[]): void => {
         this.setState({
-            selectedNodeIds: selectedItems.map((node) => node.key),
-            selectedNodesType: NodeType.TARGET
+           selectedTargetNodeIds: selectedNodes.map((node) => node.key),
         })
     }
 

@@ -28,34 +28,42 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class NodeUtils {
 
-    public static List<Node> toNodes(Collection<HGNode> nodes) {
-        return sorted(checkNotNull(nodes)).stream().map(hgNode -> new Node(hgNode)).collect(Collectors.toList());
+    public static List<Node> toNodes(Collection<HGNode> nodes, boolean sorted) {
+        Collection<HGNode> result = sorted ? sorted(checkNotNull(nodes)) : checkNotNull(nodes);
+        return result.stream().map(hgNode -> new Node(hgNode)).collect(Collectors.toList());
     }
 
-    public static List<String> toNodeIds(Collection<HGNode> nodes) {
-        return sorted(checkNotNull(nodes)).stream().map(hgNode -> hgNode.getIdentifier().toString()).collect(Collectors.toList());
+    public static List<String> toNodeIds(Collection<HGNode> nodes, boolean sorted) {
+        Collection<HGNode> result = sorted ? sorted(checkNotNull(nodes)) : checkNotNull(nodes);
+        return result.stream().map(hgNode -> hgNode.getIdentifier().toString()).collect(Collectors.toList());
     }
 
     private static List<HGNode> sorted(Collection<HGNode> nodes) {
-        if (nodes != null && !nodes.isEmpty()) {
-            HGRootNode rootNode = nodes.iterator().next().getRootNode();
-            INodeComparator nodeComparator = rootNode.getExtension(INodeComparator.class);
-            if (nodeComparator == null) {
-                return new LinkedList<>(nodes);
-            }
-            return nodes.stream().sorted(new Comparator<HGNode>() {
-                @Override
-                public int compare(HGNode node1, HGNode node2) {
-                    int category1 = nodeComparator.category(node1);
-                    int category2 = nodeComparator.category(node2);
-                    if (category1 == category2) {
-                        return nodeComparator.compare(node1, node2);
-                    } else {
-                        return category1 - category2;
-                    }
+        try {
+            if (nodes != null && !nodes.isEmpty()) {
+                HGRootNode rootNode = nodes.iterator().next().getRootNode();
+                INodeComparator nodeComparator = rootNode.getExtension(INodeComparator.class);
+                if (nodeComparator == null) {
+                    return new LinkedList<>(nodes);
                 }
-            }).collect(Collectors.toList());
+                return nodes.stream().sorted(new Comparator<HGNode>() {
+                    @Override
+                    public int compare(HGNode node1, HGNode node2) {
+                        int category1 = nodeComparator.category(node1);
+                        int category2 = nodeComparator.category(node2);
+                        if (category1 == category2) {
+                            return nodeComparator.compare(node1, node2);
+                        } else {
+                            return category1 - category2;
+                        }
+                    }
+                }).collect(Collectors.toList());
+            }
+            return Collections.emptyList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(nodes);
+            throw e;
         }
-        return Collections.emptyList();
     }
 }

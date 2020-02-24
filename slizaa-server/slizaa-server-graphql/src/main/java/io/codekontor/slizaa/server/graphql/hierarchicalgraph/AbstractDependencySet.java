@@ -54,7 +54,7 @@ public abstract class AbstractDependencySet implements DependencySet {
                 dependencies().subList(startIndex, endIndex);
 
         int maxPages = IntMath.divide(dependencies().size(), pageSize, RoundingMode.CEILING);
-        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, partialResultList.size());
+        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, dependencies().size());
 
         return new DependencyPage(pageInfo, partialResultList);
     }
@@ -101,11 +101,6 @@ public abstract class AbstractDependencySet implements DependencySet {
             //
             if (_dependencies == null) {
                 _dependencies = Collections.emptyList();
-            }
-
-            // sort
-            if (_dependencies != null && !_dependencies.isEmpty()) {
-                Collections.sort(_dependencies, Comparator.comparing(dep -> dep.getSourceNode().getText()));
             }
         }
         return _dependencies;

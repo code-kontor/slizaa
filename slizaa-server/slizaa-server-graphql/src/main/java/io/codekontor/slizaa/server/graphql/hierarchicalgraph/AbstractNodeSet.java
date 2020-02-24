@@ -34,11 +34,11 @@ public abstract class AbstractNodeSet {
   }
 
   public List<Node> getNodes() {
-    return NodeUtils.toNodes(_hgNodeSet);
+    return NodeUtils.toNodes(_hgNodeSet, true);
   }
 
   public List<String> getNodeIds() {
-    return NodeUtils.toNodeIds(_hgNodeSet);
+    return NodeUtils.toNodeIds(_hgNodeSet, true);
   }
   
   protected Collection<HGNode> hgNodeSet() {

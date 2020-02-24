@@ -95,13 +95,16 @@ export const GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY = gql`
         $hierarchicalGraphId: ID!,
         $dependencySourceNodeId: ID!,
         $dependencyTargetNodeId: ID!,
-        $selectedNodeIds: [ID!]!,
-        $selectedNodesType: NodeType!
+        $selectedSourceNodeIds: [ID!]!,
+        $selectedTargetNodeIds: [ID!]!,
     ) {
         hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
             dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
                 size
-                referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
+                filteredDependencies(nodeSelection: [ {selectedNodeIds: $selectedSourceNodeIds, selectedNodesType: SOURCE}, {selectedNodeIds: $selectedTargetNodeIds, selectedNodesType: TARGET}]) {
+                    sourceNodeIds: referencedNodeIds(nodeType: SOURCE, includedPredecessors: true)
+                    targetNodeIds: referencedNodeIds(nodeType: TARGET, includedPredecessors: true)
+                }
             }
             sourcePredecessors: node(id: $dependencySourceNodeId) {
                 id
@@ -126,31 +129,35 @@ export const GQ_CORE_DEPENDENCIES_FOR_AGGREGATED_DEPENDENCY = gql`
         $dependencyTargetNodeId: ID!,
         $pageSize: Int!,
         $pageNumber: Int!,
+        $nodeSelections: [NodeSelection!]!
     ) {
         hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
             dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
-                size
-                dependencyPage(pageNumber: $pageNumber, pageSize: $pageSize) {
-                    pageInfo {
-                        pageNumber
-                        maxPages
-                        pageSize
-                        totalCount
-                    }
-                    dependencies {
-                        id
-                        isProxyDependency
-                        type
-                        weight
-                        sourceNode {
-                            id
-                            text
-                            iconIdentifier
+                filteredDependencies(nodeSelection: $nodeSelections) {
+
+                    size
+                    dependencyPage(pageNumber: $pageNumber, pageSize: $pageSize) {
+                        pageInfo {
+                            pageNumber
+                            maxPages
+                            pageSize
+                            totalCount
                         }
-                        targetNode {
+                        dependencies {
                             id
-                            text
-                            iconIdentifier
+                            isProxyDependency
+                            type
+                            weight
+                            sourceNode {
+                                id
+                                text
+                                iconIdentifier
+                            }
+                            targetNode {
+                                id
+                                text
+                                iconIdentifier
+                            }
                         }
                     }
                 }
@@ -158,7 +165,7 @@ export const GQ_CORE_DEPENDENCIES_FOR_AGGREGATED_DEPENDENCY = gql`
         }
     }`
 
-export const GQ_AGGREGATED_DEPENDENCY_DETAILS = gql`
+/* export const GQ_AGGREGATED_DEPENDENCY_DETAILS = gql`
     query AggregatedDependencyDetails(
         $databaseId: ID!,
         $hierarchicalGraphId: ID!,
@@ -172,7 +179,10 @@ export const GQ_AGGREGATED_DEPENDENCY_DETAILS = gql`
         hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
             dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
                 size
-                referencedNodeIds(selectedNodes: $selectedNodeIds, selectedNodesType: $selectedNodesType, includedPredecessors: true)
+                filteredDependencies(nodeSelection: [ {selectedNodeIds: $selectedNodeIds, selectedNodesType: $selectedNodesType}]) {
+                    sourceNodeIds: nodeIds(nodeType: SOURCE, includedPredecessors: true)
+                    targetNodeIds: nodeIds(nodeType: TARGET, includedPredecessors: true)
+                }
                 dependencyPage(pageNumber: $pageNumber, pageSize: $pageSize) {
                     pageInfo {
                         pageNumber
@@ -211,7 +221,7 @@ export const GQ_AGGREGATED_DEPENDENCY_DETAILS = gql`
             }
         }
     }`
-
+*/
 export const GQ_RESOLVED_PROXY_DEPENDENCY = gql`
     query ResolvedProxyDependency(
         $databaseId: ID!,

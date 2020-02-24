@@ -153,6 +153,12 @@ type FilteredDependencies {
 
     #
     nodeIds(nodeType: NodeType!, includedPredecessors: Boolean!): [ID!]!
+
+    #
+    referencedNodes(nodeType: NodeType!, includedPredecessors: Boolean!): [Node!]!
+
+    #
+    referencedNodeIds(nodeType: NodeType!, includedPredecessors: Boolean!): [ID!]!
 }
 
 input NodeSelection {

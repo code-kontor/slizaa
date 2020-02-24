@@ -50,23 +50,20 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
         this.state = {
             expandedSourceNodeIds: [],
             expandedTargetNodeIds: [],
-            selectedNodeIds: [],
-            selectedNodesType: NodeType.SOURCE,
+            selectedSourceNodeIds: [],
+            selectedTargetNodeIds: [],
         };
     }
 
     public render() {
-
-        const selectedSourceNodeIds = this.state.selectedNodesType === NodeType.SOURCE ? this.state.selectedNodeIds : [];
-        const selectedTargetNodeIds = this.state.selectedNodesType === NodeType.TARGET ? this.state.selectedNodeIds : [];
 
         const variables: ReferencedNodesForAggregatedDependenciesVariables = {
             databaseId: this.props.databaseId,
             dependencySourceNodeId: this.props.sourceNodeId,
             dependencyTargetNodeId: this.props.targetNodeId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
-            selectedNodeIds: [],
-            selectedNodesType: NodeType.SOURCE,
+            selectedSourceNodeIds: this.state.selectedSourceNodeIds,
+            selectedTargetNodeIds: this.state.selectedTargetNodeIds,
         }
 
         return <Query<ReferencedNodesForAggregatedDependencies, ReferencedNodesForAggregatedDependenciesVariables>
@@ -81,12 +78,9 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
                     return <h1>{error.message}</h1>
                 }
 
-                if (loading) {
-                    return <div/>
-                }
 
-                const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.SOURCE ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
-                const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || this.state.selectedNodeIds.length === 0 || this.state.selectedNodesType === NodeType.TARGET ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.referencedNodeIds;
+                const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || !data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.sourceNodeIds;
+                const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || !data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.targetNodeIds
 
                 // TODO: merge with expanded IDs
                 const sourcePredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.sourcePredecessors == null ? [] : data.hierarchicalGraph.sourcePredecessors.predecessors.map((p) => p.id);
@@ -110,7 +104,7 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
                         onExpand={this.onSourceExpand}
                         onSelect={this.onSourceSelect}
                         expandedKeys={combinedExpandedSourceNodeIds}
-                        selectedKeys={selectedSourceNodeIds}
+                        selectedKeys={this.state.selectedSourceNodeIds}
                         markedKeys={markedSourceNodeIds}
                         loadData={this.loadChildrenFilteredByDependencySource(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
                         fetchIcon={this.fetchIcon}
@@ -133,7 +127,7 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
                         onExpand={this.onTargetExpand}
                         onSelect={this.onTargetSelect}
                         expandedKeys={combinedExpandedTargetNodeIds}
-                        selectedKeys={selectedTargetNodeIds}
+                        selectedKeys={this.state.selectedTargetNodeIds}
                         markedKeys={markedTargetNodeIds}
                         loadData={this.loadChildrenFilteredByDependencyTarget(this.props.client, this.props.sourceNodeId, this.props.targetNodeId)}
                         fetchIcon={this.fetchIcon}
@@ -169,8 +163,7 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
 
     private onSourceSelect = (selectedNodes: ISlizaaNode[]): void => {
         this.setState({
-            selectedNodeIds: selectedNodes.map((node) => node.key),
-            selectedNodesType: NodeType.SOURCE
+            selectedSourceNodeIds: selectedNodes.map((node) => node.key),
         })
     }
 
@@ -182,8 +175,7 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
 
     private onTargetSelect = (selectedItems: ISlizaaNode[]): void => {
         this.setState({
-            selectedNodeIds: selectedItems.map((node) => node.key),
-            selectedNodesType: NodeType.TARGET
+            selectedTargetNodeIds: selectedItems.map((node) => node.key),
         })
     }
 

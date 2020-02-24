@@ -21,7 +21,7 @@ import * as React from 'react';
 import {Query} from "react-apollo";
 import {
     CoreDependenciesForAggregatedDependencies,
-    CoreDependenciesForAggregatedDependencies_hierarchicalGraph_dependencySetForAggregatedDependency_dependencyPage_dependencies as DependencyRecord,
+    CoreDependenciesForAggregatedDependencies_hierarchicalGraph_dependencySetForAggregatedDependency_filteredDependencies_dependencyPage_dependencies as DependencyRecord,
     CoreDependenciesForAggregatedDependenciesVariables
 } from "../../../gqlqueries/__generated__/CoreDependenciesForAggregatedDependencies";
 import {
@@ -76,6 +76,7 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
             dependencySourceNodeId: this.props.dependencySourceNodeId,
             dependencyTargetNodeId: this.props.dependencyTargetNodeId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
+            nodeSelections: [],
             pageNumber: this.state.currentPage,
             pageSize: this.PAGE_SIZE,
         }
@@ -96,18 +97,18 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
                     data &&
                     data.hierarchicalGraph &&
                     data.hierarchicalGraph.dependencySetForAggregatedDependency &&
-                    data.hierarchicalGraph.dependencySetForAggregatedDependency.dependencyPage &&
-                    data.hierarchicalGraph.dependencySetForAggregatedDependency.dependencyPage.pageInfo ?
-                        data.hierarchicalGraph.dependencySetForAggregatedDependency.dependencyPage.pageInfo :
+                    data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage &&
+                    data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage.pageInfo ?
+                        data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage.pageInfo :
                         {maxPages: 0, pageNumber: 1, pageSize: this.PAGE_SIZE, totalCount: 0};
 
                 const dependencies =
                     data &&
                     data.hierarchicalGraph &&
                     data.hierarchicalGraph.dependencySetForAggregatedDependency &&
-                    data.hierarchicalGraph.dependencySetForAggregatedDependency.dependencyPage &&
-                    data.hierarchicalGraph.dependencySetForAggregatedDependency.dependencyPage.dependencies ?
-                        data.hierarchicalGraph.dependencySetForAggregatedDependency.dependencyPage.dependencies :
+                    data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage &&
+                    data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage.dependencies ?
+                        data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage.dependencies :
                         [];
 
                 return <Table

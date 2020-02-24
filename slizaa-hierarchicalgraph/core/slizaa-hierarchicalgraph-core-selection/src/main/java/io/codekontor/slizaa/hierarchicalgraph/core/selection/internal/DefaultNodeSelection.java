@@ -18,30 +18,52 @@
 package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
 
 import static com.google.common.base.Preconditions.*;
+
+import com.google.common.collect.Streams;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DefaultNodeSelection implements INodeSelection {
 
-    private Collection<HGNode> _nodes;
+    private Set<HGNode> _nodes;
 
     private SourceOrTarget _type;
 
     public DefaultNodeSelection(Collection<HGNode> _nodes, SourceOrTarget _type) {
-        this._nodes = checkNotNull(_nodes) ;
+        this._nodes = new HashSet<>(checkNotNull(_nodes));
         this._type = checkNotNull(_type);
     }
 
     @Override
-    public Collection<HGNode> getNodes() {
+    public Set<HGNode> getNodes() {
         return _nodes;
+    }
+
+    @Override
+    public Set<HGNode> getNodes(boolean includePredecessors) {
+        return includePredecessors ? _nodes.stream().flatMap(node -> Streams.concat(Stream.of(node), node.getPredecessors().stream())).collect(Collectors.toSet()) : Collections.unmodifiableSet(_nodes);
     }
 
     @Override
     public SourceOrTarget getType() {
         return _type;
+    }
+
+    @Override
+    public boolean isSourceNodeSelection() {
+        return _type.equals(SourceOrTarget.SOURCE);
+    }
+
+    @Override
+    public boolean isTargetNodeSelection() {
+        return _type.equals(SourceOrTarget.TARGET);
     }
 }

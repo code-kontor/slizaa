@@ -1,21 +1,21 @@
 /**
  * slizaa-hierarchicalgraph-core-selection - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
+package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.xmibased;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
@@ -23,13 +23,13 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.NodeSelections;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedGraph;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedTestGraphProviderRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -77,10 +77,16 @@ public class DefaultDependencySetTest {
     @Test
     public void testFilteredDependencies() {
 
-        IFilteredDependencies filteredDependencies = dependencySet.getFilteredDependencies(INodeSelection.create(node(7193), SourceOrTarget.SOURCE), false);
+        dependencySet.getUnfilteredCoreDependencies().forEach(dep -> System.out.printf("%s [%s] - %s [%s]\n",
+                dep.getFrom().getIdentifier(),
+                dep.getFrom().getPredecessors().stream().map(n -> n.getIdentifier()).collect(Collectors.toList()),
+                dep.getTo().getIdentifier(),
+                dep.getTo().getPredecessors().stream().map(n -> n.getIdentifier()).collect(Collectors.toList())));
 
-        assertThat(filteredDependencies.getCoreDependencies()).containsOnlyElementsOf(dependencySet.getUnfilteredCoreDependencies().stream().filter(dep -> dep.getFrom().getIdentifier().equals(Long.valueOf(7193))).collect(Collectors.toList()));
-        assertThat(filteredDependencies.getNodes(SourceOrTarget.TARGET,false)).containsExactlyInAnyOrder(node(6518), node(7544), node(8075));
+        IFilteredDependencies filteredDependencies = dependencySet.getFilteredDependencies(INodeSelection.create(node(7193), SourceOrTarget.SOURCE));
+
+        assertThat(filteredDependencies.getEffectiveCoreDependencies()).containsOnlyElementsOf(dependencySet.getUnfilteredCoreDependencies().stream().filter(dep -> dep.getFrom().getIdentifier().equals(Long.valueOf(7193))).collect(Collectors.toList()));
+        assertThat(filteredDependencies.getEffectiveNodes(SourceOrTarget.TARGET, false)).containsExactlyInAnyOrder(node(6518), node(7544), node(8075));
     }
 
     /**

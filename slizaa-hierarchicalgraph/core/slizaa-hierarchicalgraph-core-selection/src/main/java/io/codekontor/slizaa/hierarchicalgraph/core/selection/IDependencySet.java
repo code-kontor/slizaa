@@ -44,11 +44,11 @@ public interface IDependencySet {
      *
      * @return
      */
-    Collection<HGCoreDependency> getUnfilteredCoreDependencies();
+    Set<HGCoreDependency> getUnfilteredCoreDependencies();
 
     Set<HGNode> getFilteredNodeChildren(HGNode node, SourceOrTarget sourceOrTarget, boolean resolveAndIncludeProxyDependencies);
 
-    IFilteredDependencies getFilteredDependencies(List<INodeSelection> nodeSelections, boolean includeResolvedProxyDependencies);
+    IFilteredDependencies getFilteredDependencies(Collection<INodeSelection> nodeSelections);
 
-    IFilteredDependencies getFilteredDependencies(INodeSelection nodeSelection, boolean includeResolvedProxyDependencies);
+    IFilteredDependencies getFilteredDependencies(INodeSelection... nodeSelection);
 }

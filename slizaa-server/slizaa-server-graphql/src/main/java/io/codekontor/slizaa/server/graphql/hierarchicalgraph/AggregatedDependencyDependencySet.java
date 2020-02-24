@@ -18,18 +18,19 @@
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphUtil;
 import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,12 +56,12 @@ public class AggregatedDependencyDependencySet extends AbstractDependencySet {
 
     @Override
     protected List<Node> onFilteredChildren(String parentNode, NodeType parentNodeType) {
-        return NodeUtils.toNodes(filteredHgNodesChildren(parentNode, parentNodeType));
+        return NodeUtils.toNodes(filteredHgNodesChildren(parentNode, parentNodeType), true);
     }
 
     @Override
     protected List<String> onFilteredChildrenIds(String parentNode, NodeType parentNodeType) {
-        return NodeUtils.toNodeIds(filteredHgNodesChildren(parentNode, parentNodeType));
+        return NodeUtils.toNodeIds(filteredHgNodesChildren(parentNode, parentNodeType), true);
     }
 
     @Override
@@ -69,9 +70,8 @@ public class AggregatedDependencyDependencySet extends AbstractDependencySet {
             return Collections.emptyList();
         }
 
-        return _aggregatedDependency.getCoreDependencies().stream()
-                .sorted(Comparator.comparing(dep -> labelDefinitionProvider.getLabelDefinition(dep.getFrom()).getText()))
-                .map(dep -> new Dependency(dep)).collect(Collectors.toList());
+        List<HGCoreDependency> coreDependencies = GraphUtil.sortCoreDependencies(_aggregatedDependency.getCoreDependencies());
+        return coreDependencies.stream().map(dep -> new Dependency(dep)).collect(Collectors.toList());
     }
 
     @Override
@@ -83,7 +83,7 @@ public class AggregatedDependencyDependencySet extends AbstractDependencySet {
         }).collect(Collectors.toList());
 
         // TODO: RESOLVE PROXY
-        IFilteredDependencies filteredDependencies = _selectionService.getAggregatedDependencyDependencySet(_aggregatedDependency).getFilteredDependencies(nodeSelections, false);
+        IFilteredDependencies filteredDependencies = _selectionService.getAggregatedDependencyDependencySet(_aggregatedDependency).getFilteredDependencies(nodeSelections);
         return new FilteredDependencies(filteredDependencies);
     }
 

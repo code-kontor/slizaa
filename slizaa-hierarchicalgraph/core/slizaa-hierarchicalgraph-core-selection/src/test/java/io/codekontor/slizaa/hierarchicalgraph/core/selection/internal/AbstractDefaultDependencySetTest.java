@@ -79,14 +79,14 @@ public abstract class AbstractDefaultDependencySetTest {
 
         SourceOrTarget referencedNodesType = selectedNodesType.equals(SourceOrTarget.SOURCE) ? SourceOrTarget.TARGET : SourceOrTarget.SOURCE;
 
-        assertThat(filteredDependencies.getNodes(selectedNodesType, true).containsAll(Arrays.asList(selectedNodesWithSuccessorsAndPredecessors)));
+        assertThat(filteredDependencies.getEffectiveNodes(selectedNodesType, true).containsAll(Arrays.asList(selectedNodesWithSuccessorsAndPredecessors)));
 
-        assertThat(filteredDependencies.getCoreDependencies()).containsExactlyInAnyOrder(filteredCoreDependencies);
+        assertThat(filteredDependencies.getEffectiveCoreDependencies()).containsExactlyInAnyOrder(filteredCoreDependencies);
 
-        assertThat(filteredDependencies.getNodes(referencedNodesType, true))
+        assertThat(filteredDependencies.getEffectiveNodes(referencedNodesType, true))
                 .containsExactlyInAnyOrder(filteredNodesWithPredecessors);
 
-        assertThat(filteredDependencies.getNodes(referencedNodesType, false))
+        assertThat(filteredDependencies.getEffectiveNodes(referencedNodesType, false))
                 .containsExactlyInAnyOrder(filteredNodes);
     }
 }

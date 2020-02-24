@@ -21,13 +21,23 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 public interface IFilteredDependencies {
 
-    Collection<HGNode> getNodes(SourceOrTarget sourceOrTarget, boolean includePredecessors);
+    //
+    boolean hasNodeSelections(SourceOrTarget sourceOrTarget);
 
-    Collection<HGCoreDependency> getCoreDependencies();
+    //
+    List<INodeSelection> getNodeSelections(SourceOrTarget sourceOrTarget);
+
+    // returns the intersection of source-selected and target-selected dependencies
+    Set<HGCoreDependency> getEffectiveCoreDependencies();
+
+    // returns all nodes that are part of the filtered core dependencies
+    Set<HGNode> getEffectiveNodes(SourceOrTarget sourceOrTarget, boolean includePredecessors);
+
+    //
+    Set<HGNode> getReferencedNodes(SourceOrTarget sourceOrTarget, boolean includePredecessors);
 }

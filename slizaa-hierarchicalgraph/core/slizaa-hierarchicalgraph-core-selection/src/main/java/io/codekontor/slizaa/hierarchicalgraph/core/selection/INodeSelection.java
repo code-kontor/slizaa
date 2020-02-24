@@ -23,6 +23,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultNod
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 public interface INodeSelection {
 
@@ -34,7 +35,13 @@ public interface INodeSelection {
         return new DefaultNodeSelection(Collections.singletonList(node), type);
     }
 
-    Collection<HGNode> getNodes();
+    Set<HGNode> getNodes();
+
+    Set<HGNode> getNodes(boolean includePredecessors);
+
+    boolean isSourceNodeSelection();
+
+    boolean isTargetNodeSelection();
 
     SourceOrTarget getType();
 }

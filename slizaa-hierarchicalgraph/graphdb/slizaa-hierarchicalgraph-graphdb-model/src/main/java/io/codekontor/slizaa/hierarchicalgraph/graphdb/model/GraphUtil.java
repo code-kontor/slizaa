@@ -17,12 +17,28 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.model;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.impl.InternalQueryUtils;
 import org.eclipse.emf.common.util.EMap;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 
+import java.util.Collection;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class GraphUtil {
 
+  public static void loadLabelsAndProperties(List<HGNode> hgNodes){
+    InternalQueryUtils.loadLabelsAndProperties(checkNotNull(hgNodes));
+  }
+
+  public static List<HGCoreDependency> sortCoreDependencies(Collection<HGCoreDependency> hgCoreDependencies){
+    return InternalQueryUtils.sortCoreDependencies(checkNotNull(hgCoreDependencies));
+  }
+
+  @Deprecated
   public static void dump(HGRootNode rootNode) {
 
     System.out.println(rootNode);
