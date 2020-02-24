@@ -27,16 +27,14 @@ import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependenci
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.NodeSelections;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultNodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedGraph;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedTestGraphProviderRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -115,6 +113,45 @@ public class DefaultFilteredDependenciesTest {
 
         // get the filtered dependencies
         IFilteredDependencies filteredDependencies = dependencySet.getFilteredDependencies(sourceSelection);
+
+        // assertions
+        assertThat(filteredDependencies.hasNodeSelections(SourceOrTarget.SOURCE)).isTrue();
+        assertThat(filteredDependencies.hasNodeSelections(SourceOrTarget.TARGET)).isFalse();
+
+        assertThat(filteredDependencies.getNodeSelections(SourceOrTarget.SOURCE)).containsExactlyInAnyOrder(sourceSelection);
+        assertThat(filteredDependencies.getNodeSelections(SourceOrTarget.TARGET).isEmpty()).isTrue();
+
+        assertThat(filteredDependencies.getEffectiveCoreDependencies()).containsExactlyInAnyOrder(expectedEffectiveDependencies);
+
+        assertThat(filteredDependencies.getEffectiveNodes(SourceOrTarget.SOURCE, true)).containsExactlyInAnyOrder(expectedEffectiveSourceNodes);
+        assertThat(filteredDependencies.getEffectiveNodes(SourceOrTarget.TARGET, true)).containsExactlyInAnyOrder(expectedEffectiveTargetNodes);
+
+        assertThat(filteredDependencies.getReferencedNodes(SourceOrTarget.SOURCE, true).isEmpty()).isTrue();
+        assertThat(filteredDependencies.getReferencedNodes(SourceOrTarget.TARGET, true)).containsExactlyInAnyOrder(expectedEffectiveTargetNodes);
+    }
+
+    @Test
+    public void testFilteredDependencies_1b() {
+
+        //
+        HGCoreDependency[] expectedEffectiveDependencies = dependencySet.getUnfilteredCoreDependencies().stream().
+                filter(dep -> dep.getFrom().equals(selectedSourceNode) || dep.getFrom().isSuccessorOf(selectedSourceNode)).
+                distinct().
+                toArray(HGCoreDependency[]::new);
+
+        HGNode[] expectedEffectiveSourceNodes = Arrays.stream(expectedEffectiveDependencies).
+                flatMap(dep -> Stream.concat(Stream.of(dep.getFrom()), dep.getFrom().getPredecessors().stream())).
+                distinct().
+                toArray(HGNode[]::new);
+
+
+        HGNode[] expectedEffectiveTargetNodes = Arrays.stream(expectedEffectiveDependencies).
+                flatMap(dep -> Stream.concat(Stream.of(dep.getTo()), dep.getTo().getPredecessors().stream())).
+                distinct().
+                toArray(HGNode[]::new);
+
+        // get the filtered dependencies
+        IFilteredDependencies filteredDependencies = dependencySet.getFilteredDependencies(sourceSelection, INodeSelection.create(Collections.emptyList(), SourceOrTarget.TARGET));
 
         // assertions
         assertThat(filteredDependencies.hasNodeSelections(SourceOrTarget.SOURCE)).isTrue();

@@ -135,7 +135,8 @@ public class DefaultFilteredDependencies implements IFilteredDependencies {
                         this._targetFilteredCoreDependencies :
                         this._sourceFilteredCoreDependencies;
 
-        if (selectedCoreDependencies == null) {
+        if ((sourceOrTarget.equals(SourceOrTarget.SOURCE) && (_targetNodeSelections == null || _targetNodeSelections.isEmpty())) ||
+                (sourceOrTarget.equals(SourceOrTarget.TARGET) && (_sourceNodeSelections == null || _sourceNodeSelections.isEmpty()))) {
             return Collections.emptySet();
         }
 
@@ -148,7 +149,6 @@ public class DefaultFilteredDependencies implements IFilteredDependencies {
 
         return nodeStream.collect(Collectors.toSet());
     }
-
 
 
     private Set<HGNode> effectiveSourceNodes() {

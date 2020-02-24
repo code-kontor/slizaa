@@ -83,21 +83,19 @@ public class DefaultDependencySet implements IDependencySet {
         boolean hasSourceNodeSelections = nodeSelections.stream().anyMatch(nodeSelection -> nodeSelection.isSourceNodeSelection());
         boolean hasTargetNodeSelections = nodeSelections.stream().anyMatch(nodeSelection -> nodeSelection.isTargetNodeSelection());
 
-        Set<HGCoreDependency> sourceFilteredDependencies =
-                hasSourceNodeSelections ?
-                        new HashSet<>(_unfilteredCoreDependencies) :
-                        null;
-
-        Set<HGCoreDependency> targetFilteredDependencies =
-                hasTargetNodeSelections ?
-                        new HashSet<>(_unfilteredCoreDependencies) :
-                        null;
+        Set<HGCoreDependency> sourceFilteredDependencies = new HashSet<>(_unfilteredCoreDependencies);
+        Set<HGCoreDependency> targetFilteredDependencies = new HashSet<>(_unfilteredCoreDependencies);
 
         List<INodeSelection> sourceNodeSelections = hasSourceNodeSelections ? new ArrayList<>() : null;
         List<INodeSelection> targetNodeSelections = hasTargetNodeSelections ? new ArrayList<>() : null;
 
         nodeSelections.forEach(
                 selection -> {
+
+                    // skip empty selections
+                    if (selection.getNodes().isEmpty()) {
+                        return;
+                    }
 
                     Map<HGNode, Set<HGCoreDependency>> dependenciesMap;
                     Set<HGCoreDependency> filteredDependencies;

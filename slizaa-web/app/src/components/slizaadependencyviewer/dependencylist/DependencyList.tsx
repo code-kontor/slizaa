@@ -32,6 +32,7 @@ import {
     GQ_CORE_DEPENDENCIES_FOR_AGGREGATED_DEPENDENCY,
     GQ_RESOLVED_PROXY_DEPENDENCY
 } from "../../../gqlqueries/GqlQueries";
+import {NodeType} from "../../../gqlqueries/query-types";
 import './DependencyList.css';
 import {IDependencyListProp} from "./IDependencyListProps";
 import {IDependencyListState} from "./IDependencyListState";
@@ -76,7 +77,7 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
             dependencySourceNodeId: this.props.dependencySourceNodeId,
             dependencyTargetNodeId: this.props.dependencyTargetNodeId,
             hierarchicalGraphId: this.props.hierarchicalGraphId,
-            nodeSelections: [],
+            nodeSelections: [{selectedNodeIds: this.props.selectedSourceNodeIds, selectedNodesType:NodeType.SOURCE}, {selectedNodeIds:this.props.selectedTargetNodeIds, selectedNodesType:NodeType.TARGET}],
             pageNumber: this.state.currentPage,
             pageSize: this.PAGE_SIZE,
         }

@@ -59,17 +59,19 @@ public class FilteredDependencies {
             return new DependencyPage(new PageInfo(1, 0, 0, 0), Collections.emptyList());
         }
 
-        int startIndex = (pageNumber - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, filteredDependencies.getEffectiveCoreDependencies().size());
+        List<HGCoreDependency> sortedCoreDependencies = GraphUtil.sortCoreDependencies(filteredDependencies.getEffectiveCoreDependencies());
 
-        List<Dependency> partialResultList = startIndex > filteredDependencies.getEffectiveCoreDependencies().size() ?
+        int startIndex = (pageNumber - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, sortedCoreDependencies.size());
+
+        List<Dependency> partialResultList = startIndex > sortedCoreDependencies.size() ?
                 Collections.emptyList() :
-                new LinkedList<>(filteredDependencies.getEffectiveCoreDependencies()).subList(startIndex, endIndex)
+                new LinkedList<>(sortedCoreDependencies).subList(startIndex, endIndex)
                         .stream().map(coreDependency -> new Dependency(coreDependency))
                         .collect(Collectors.toList());
 
-        int maxPages = IntMath.divide(filteredDependencies.getEffectiveCoreDependencies().size(), pageSize, RoundingMode.CEILING);
-        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, filteredDependencies.getEffectiveCoreDependencies().size());
+        int maxPages = IntMath.divide(sortedCoreDependencies.size(), pageSize, RoundingMode.CEILING);
+        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, sortedCoreDependencies.size());
 
         return new DependencyPage(pageInfo, partialResultList);
     }
@@ -108,7 +110,7 @@ public class FilteredDependencies {
     public List<Node> referencedNodes(NodeType nodeType, boolean includedPredecessors) {
         checkNotNull(nodeType);
 
-        if (filteredDependencies == null || filteredDependencies.getEffectiveCoreDependencies().isEmpty()) {
+        if (filteredDependencies == null /*|| filteredDependencies.getEffectiveCoreDependencies().isEmpty()*/) {
             return Collections.emptyList();
         }
 
@@ -118,7 +120,7 @@ public class FilteredDependencies {
     public List<String> referencedNodeIds(NodeType nodeType, boolean includedPredecessors) {
         checkNotNull(nodeType);
 
-        if (filteredDependencies == null || filteredDependencies.getEffectiveCoreDependencies().isEmpty()) {
+        if (filteredDependencies == null /*|| filteredDependencies.getEffectiveCoreDependencies().isEmpty()*/) {
             return Collections.emptyList();
         }
 

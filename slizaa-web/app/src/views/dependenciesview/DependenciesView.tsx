@@ -210,8 +210,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             hierarchicalGraphId={this.props.hierarchicalGraphId}
             sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
             targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
-            selectedNodeIds={[]}
-            selectedNodesType={NodeType.SOURCE}
         />
     }
 

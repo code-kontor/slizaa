@@ -17,7 +17,6 @@
  */
 
 import ApolloClient from "apollo-client";
-import {NodeType} from "../../model/NodeType";
 
 export interface ISlizaaDependencyViewerProps {
     client: ApolloClient<any>,
@@ -26,6 +25,4 @@ export interface ISlizaaDependencyViewerProps {
     sourceNodeId: string,
     targetNodeId: string,
     height: number,
-    selectedNodeIds: string[],
-    selectedNodesType: NodeType,
 }

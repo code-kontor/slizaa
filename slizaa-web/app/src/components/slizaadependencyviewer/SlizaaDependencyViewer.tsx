@@ -17,8 +17,8 @@
  */
 
 import ApolloClient from "apollo-client";
-import {CSSProperties} from 'react';
 import * as React from 'react';
+import {CSSProperties} from 'react';
 import {Query} from "react-apollo";
 import {
     ReferencedNodesForAggregatedDependencies,
@@ -79,8 +79,8 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
                 }
 
 
-                const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || !data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.sourceNodeIds;
-                const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || !data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.targetNodeIds
+                const markedSourceNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.sourceNodeIds.length === 0 ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.sourceNodeIds;
+                const markedTargetNodeIds = !data || !data.hierarchicalGraph || !data.hierarchicalGraph.dependencySetForAggregatedDependency || data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.targetNodeIds.length === 0 ? undefined : data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.targetNodeIds
 
                 // TODO: merge with expanded IDs
                 const sourcePredecessors: string[] = !data || !data.hierarchicalGraph || data.hierarchicalGraph.sourcePredecessors == null ? [] : data.hierarchicalGraph.sourcePredecessors.predecessors.map((p) => p.id);
@@ -117,6 +117,8 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
                         hierarchicalGraphId={this.props.hierarchicalGraphId}
                         dependencySourceNodeId={this.props.sourceNodeId}
                         dependencyTargetNodeId={this.props.targetNodeId}
+                        selectedSourceNodeIds={this.state.selectedSourceNodeIds}
+                        selectedTargetNodeIds={this.state.selectedTargetNodeIds}
                         height={this.props.height}
                     /> :
                     <div/>

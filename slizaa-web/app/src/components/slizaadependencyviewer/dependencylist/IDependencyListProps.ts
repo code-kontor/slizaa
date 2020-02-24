@@ -22,4 +22,6 @@ export interface IDependencyListProp {
     hierarchicalGraphId: string
     dependencySourceNodeId: string
     dependencyTargetNodeId: string
+    selectedSourceNodeIds: string[]
+    selectedTargetNodeIds: string[]
 }
