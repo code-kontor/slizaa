@@ -26,16 +26,15 @@ public class ResolveProxyDefaultDependencySetTest extends AbstractDefaultDepende
 
     @Test
     public void testResolveProxyDependencyOnAggregatedDependency() {
-
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isFalse();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(0);
 
         aggregatedDependency().resolveProxyDependencies();
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isTrue();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(2);
     }
@@ -44,14 +43,14 @@ public class ResolveProxyDefaultDependencySetTest extends AbstractDefaultDepende
     public void testResolveProxyDependencyOnProxyDependency() {
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isFalse();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(0);
 
         proxyDependency().resolve();
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isTrue();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(2);
     }
@@ -60,14 +59,14 @@ public class ResolveProxyDefaultDependencySetTest extends AbstractDefaultDepende
     public void testResolveProxyDependencyOnDependencySet() {
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isFalse();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(0);
 
         dependencySet().resolveAllProxyDependencies();
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isTrue();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(2);
     }
@@ -76,14 +75,14 @@ public class ResolveProxyDefaultDependencySetTest extends AbstractDefaultDepende
     public void testResolveProxyDependencyForSourceNode() {
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isFalse();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(0);
 
         dependencySet().resolveProxyDependencies(testGraph.a4(), SourceOrTarget.SOURCE);
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isTrue();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(2);
     }
@@ -92,14 +91,14 @@ public class ResolveProxyDefaultDependencySetTest extends AbstractDefaultDepende
     public void testResolveProxyDependencyForTargetNode() {
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isFalse();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(0);
 
         dependencySet().resolveProxyDependencies(testGraph.b4(), SourceOrTarget.TARGET);
 
         assertThat(dependencySet().getUnfilteredCoreDependencies()).hasSize(6);
-        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency().getCoreDependencies());
+        assertThat(dependencySet().getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency().getCoreDependencies());
         assertThat(proxyDependency().isResolved()).isTrue();
         assertThat(proxyDependency().getAccumulatedCoreDependencies()).hasSize(2);
     }

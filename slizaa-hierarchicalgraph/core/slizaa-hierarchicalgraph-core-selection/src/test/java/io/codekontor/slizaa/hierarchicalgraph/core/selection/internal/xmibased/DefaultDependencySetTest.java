@@ -52,8 +52,8 @@ public class DefaultDependencySetTest {
 
     @Test
     public void testUnfilteredDependencies() {
-        assertThat(dependencySet.getUnfilteredCoreDependencies()).hasSize(9);
-        assertThat(dependencySet.getUnfilteredCoreDependencies()).containsExactlyElementsOf(aggregatedDependency.getCoreDependencies());
+        assertThat(dependencySet.getUnfilteredCoreDependencies()).hasSize(aggregatedDependency.getCoreDependencies().size());
+        assertThat(dependencySet.getUnfilteredCoreDependencies()).containsOnlyElementsOf(aggregatedDependency.getCoreDependencies());
     }
 
     @Test
