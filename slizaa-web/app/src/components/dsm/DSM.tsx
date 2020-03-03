@@ -212,8 +212,10 @@ export class DSM extends React.Component<IDsmProps, {}> {
     public render() {
         return (
             <div id="stage">
-                <canvas id="markedCellLayer" ref={ref => (this.markedCellLayerCanvasRef = ref)}/>
-                <canvas id="main" ref={ref => (this.canvasRef = ref)}/>
+                <div id="dsm-canvas-container" >
+                    <canvas id="markedCellLayer" ref={ref => (this.markedCellLayerCanvasRef = ref)}/>
+                    <canvas id="main" ref={ref => (this.canvasRef = ref)}/>
+                </div>
             </div>
         );
     }

@@ -19,16 +19,20 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
-import { NodeType } from "./../query-types";
-
 // ====================================================
 // GraphQL query operation: ReferencedNodesForAggregatedDependencies
 // ====================================================
 
+export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_dependencySetForAggregatedDependency_filteredDependencies {
+  __typename: "FilteredDependencies";
+  sourceNodeIds: string[];
+  targetNodeIds: string[];
+}
+
 export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_dependencySetForAggregatedDependency {
   __typename: "DependencySet";
   size: number;
-  referencedNodeIds: string[];
+  filteredDependencies: ReferencedNodesForAggregatedDependencies_hierarchicalGraph_dependencySetForAggregatedDependency_filteredDependencies;
 }
 
 export interface ReferencedNodesForAggregatedDependencies_hierarchicalGraph_sourcePredecessors_predecessors {
@@ -90,6 +94,6 @@ export interface ReferencedNodesForAggregatedDependenciesVariables {
   hierarchicalGraphId: string;
   dependencySourceNodeId: string;
   dependencyTargetNodeId: string;
-  selectedNodeIds: string[];
-  selectedNodesType: NodeType;
+  selectedSourceNodeIds: string[];
+  selectedTargetNodeIds: string[];
 }

@@ -17,19 +17,9 @@
  */
 package io.codekontor.slizaa.server.service.selection;
 
-import java.util.Collection;
-import java.util.Set;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+public interface IModifiableAggregatedDependencySelectionService extends IAggregatedDependencySelectionService {
 
-public interface ISelectionService {
-
-    Set<HGNode> getChildrenFilteredByDependencySources(HGAggregatedDependency aggregatedDependency, HGNode node);
-
-    Set<HGNode> getChildrenFilteredByDependencyTargets(HGAggregatedDependency aggregatedDependency, HGNode node);
-
-    Set<HGNode> getReferencedSourceNodes(HGAggregatedDependency aggregatedDependency, Collection<HGNode> selectedTargetNodes, boolean includePredecessors);
-
-    Set<HGNode> getReferencedTargetNodes(HGAggregatedDependency aggregatedDependency, Collection<HGNode> selectedSourceNodes, boolean includePredecessors);
+    void dropSelections(HGRootNode rootNode);
 }

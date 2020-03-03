@@ -25,7 +25,7 @@ export interface ISlizaaDependencyTreeProps {
     hierarchicalGraphId: string,
     sourceNodeId: string,
     targetNodeId: string,
-    selectedNodeIds: string[],
-    selectedNodesType: NodeType,
+    selectedSourceNodeIds: string[],
+    selectedTargetNodeIds: string[],
     onNodesSelected?: (selectedNodeIds: string[], selectedNodesType: NodeType) => void
 }

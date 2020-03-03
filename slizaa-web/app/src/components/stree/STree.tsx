@@ -110,7 +110,6 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
                 loadData={this.loadData}
                 showIcon={true}
                 showLine={false}
-                style={{overflow: "auto"}}
                 key={this.createUniqueId(10)}
             >
                 {this.renderTreeNodes(this.state.rootNodes)}

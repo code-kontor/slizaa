@@ -45,6 +45,11 @@ text {
 #stage {
     position: relative;
 }
+
+#dsm-canvas-container {
+    padding: 5px 5px;
+}
+
 canvas { position: absolute; }
 #markedCellLayer { z-index: 2}
 #main { z-index: 1}

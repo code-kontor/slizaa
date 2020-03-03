@@ -18,10 +18,7 @@
 package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.IReferencedNodes;
 import org.junit.Test;
-
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

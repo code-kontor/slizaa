@@ -17,12 +17,60 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
+import com.google.common.base.Function;
+import com.google.common.math.IntMath;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphUtil;
+
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Utils {
+
+  /**
+   *
+   * @param sortedElements
+   * @param pageNumber
+   * @param pageSize
+   * @param dependencyCreator
+   * @param <T>
+   * @return
+   */
+  public static <T> DependencyPage getDependencyPage(List<T> sortedElements,
+                                                     int pageNumber,
+                                                     int pageSize,
+                                                     Function<T, Dependency> dependencyCreator) {
+
+    if (pageNumber < 1) {
+      throw new IndexOutOfBoundsException("Invalid");
+    }
+
+    if (sortedElements == null || sortedElements.isEmpty()) {
+      return new DependencyPage(new PageInfo(1, 0, 0, 0), Collections.emptyList());
+    }
+
+    // compute max pages
+    int maxPages = IntMath.divide(sortedElements.size(), pageSize, RoundingMode.CEILING);
+    if (pageNumber > maxPages) {
+      pageNumber = maxPages;
+    }
+
+    int startIndex = (pageNumber - 1) * pageSize;
+    int endIndex = Math.min(startIndex + pageSize, sortedElements.size());
+
+    List<Dependency> partialResultList = startIndex > sortedElements.size() ?
+            Collections.emptyList() :
+            sortedElements.subList(startIndex, endIndex)
+                    .stream().map(element -> dependencyCreator.apply(element))
+                    .collect(Collectors.toList());
+
+    return new DependencyPage(new PageInfo(pageNumber, maxPages, pageSize, sortedElements.size()), partialResultList);
+  }
 
   /**
    * @param node
@@ -33,5 +81,12 @@ public class Utils {
     //
     return checkNotNull(checkNotNull(node).getRootNode()
         .getExtension(ILabelDefinitionProvider.class));
+  }
+
+
+  public static void main(String[] args) {
+
+    List<String> strings = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+    System.out.println(strings.size() + " : " + strings.subList(0,10));
   }
 }

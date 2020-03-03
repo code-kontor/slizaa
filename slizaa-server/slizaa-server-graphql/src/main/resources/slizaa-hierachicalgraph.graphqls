@@ -15,6 +15,9 @@ extend type HierarchicalGraph {
     # Returns the nodes with the given ids
     nodes(ids: [ID]!): NodeSet!
 
+    # Returns the node with the given id
+    dependency(id: ID!): Dependency
+
     # Returns a dependency set based on an aggregated dependency
     dependencySetForAggregatedDependency(sourceNodeId: ID!, targetNodeId: ID!): DependencySet
 }
@@ -69,9 +72,13 @@ type Node {
 }
 
 type Dependency {
+    id: ID!
     sourceNode: Node!
     targetNode: Node!
-    weight: Int
+    type: String!
+    weight: Int!
+    isProxyDependency: Boolean!
+    resolvedDependencies: [Dependency!]!
 }
 
 type DependencyMatrix {
@@ -97,24 +104,71 @@ type StronglyConnectedComponent {
 	nodePositions: [Int!]!
 }
 
-type DependencySet{
+type PageInfo {
+    pageNumber: Int!
+    maxPages: Int!
+    pageSize: Int!
+    totalCount: Int!
+}
 
+type DependencyPage {
+    pageInfo: PageInfo
     dependencies: [Dependency!]!
+}
 
+type DependencySet {
+
+    #
     size: Int!
 
-    referencedNodes(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [Node!]!
+    #
+    dependencies: [Dependency!]!
 
-    referencedNodeIds(selectedNodes: [ID!]!, selectedNodesType: NodeType!, includedPredecessors: Boolean): [String!]!
-
-    filteredDependencies(selectedNodes: [ID!]!, selectedNodesType: NodeType!): DependencySet!
+    # Returns a dependency page with with the specified size
+    dependencyPage(pageNumber: Int!, pageSize: Int!): DependencyPage
 
     # Returns a set of nodes filtered by the specified node type.
     filteredChildren(parentNode: ID!, parentNodeType: NodeType!): [Node!]!
 
     #
     filteredChildrenIds(parentNode: ID!, parentNodeType: NodeType!): [String!]!
+
+    #
+    filteredDependencies(nodeSelection: [NodeSelection!]!): FilteredDependencies!
 }
+
+type FilteredDependencies {
+
+    #
+    size: Int!
+
+    #
+    dependencies: [Dependency!]!
+
+    # Returns a dependency page with with the specified size
+    dependencyPage(pageNumber: Int!, pageSize: Int!): DependencyPage
+
+    #
+    nodes(nodeType: NodeType!, includedPredecessors: Boolean!): [Node!]!
+
+    #
+    nodeIds(nodeType: NodeType!, includedPredecessors: Boolean!): [ID!]!
+
+    #
+    referencedNodes(nodeType: NodeType!, includedPredecessors: Boolean!): [Node!]!
+
+    #
+    referencedNodeIds(nodeType: NodeType!, includedPredecessors: Boolean!): [ID!]!
+}
+
+input NodeSelection {
+
+    selectedNodeIds: [ID!]!
+
+    selectedNodesType: NodeType!
+}
+
+type MapEntry { key: String!, value: String }
 
 # The Query type
 extend type Query {

@@ -1,5 +1,5 @@
-/**
- * slizaa-server-service-selection - Slizaa Static Software Analysis Tools
+/*
+ * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.selection;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-
-public interface IModifiableSelectionService extends ISelectionService {
-
-    void dropSelections(HGRootNode rootNode);
+export interface IDependencyListProp {
+    height?: number
+    databaseId: string
+    hierarchicalGraphId: string
+    dependencySourceNodeId: string
+    dependencyTargetNodeId: string
+    selectedSourceNodeIds: string[]
+    selectedTargetNodeIds: string[]
 }

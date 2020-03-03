@@ -43,30 +43,6 @@ public class DependencySelections {
    * </p>
    *
    * @param dependencies
-   * @param adapter
-   */
-  public static void addAdapter(Collection<? extends AbstractHGDependency> dependencies, Adapter adapter) {
-    checkNotNull(adapter);
-    checkNotNull(dependencies).forEach((dep) -> dep.eAdapters().add(adapter));
-  }
-  
-  /**
-   * <p>
-   * </p>
-   *
-   * @param dependencies
-   * @param adapter
-   */
-  public static void removeAdapter(Collection<? extends AbstractHGDependency> dependencies, Adapter adapter) {
-    checkNotNull(adapter);
-    checkNotNull(dependencies).forEach((dep) -> dep.eAdapters().remove(adapter));
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @param dependencies
    * @return
    */
   public static Set<HGCoreDependency> getCoreDependencies(AbstractHGDependency... dependencies) {

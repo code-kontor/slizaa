@@ -47,9 +47,6 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbRootNodeSourc
 public class ExtendedGraphDbNodeSourceTrait {
 
   /** - */
-  private static final String   BATCH_UPDATE_QUERY = "MATCH (p) where id(p) in { ids } RETURN p";
-
-  /** - */
   private GraphDbNodeSourceImpl _nodeSource;
 
   /**
@@ -119,17 +116,17 @@ public class ExtendedGraphDbNodeSourceTrait {
    * </p>
    */
   public void loadPropertiesAndLabelsForChildren() {
-    batchUpdate(this._nodeSource.getNode().getChildren());
+    InternalQueryUtils.loadLabelsAndProperties(this._nodeSource.getNode().getChildren());
   }
 
   /**
    * <p>
    * </p>
    *
-   * @param nodeProperties
+   * @param node
    * @return
    */
-  private EList<String> setLabels(Node node) {
+  EList<String> setLabels(Node node) {
     checkNotNull(node);
 
     // lazy init
@@ -161,10 +158,10 @@ public class ExtendedGraphDbNodeSourceTrait {
    * <p>
    * </p>
    *
-   * @param jsonObject
+   * @param node
    * @return
    */
-  private EMap<String, String> setProperties(Node node) {
+  EMap<String, String> setProperties(Node node) {
     checkNotNull(node);
 
     // lazy init
@@ -185,45 +182,6 @@ public class ExtendedGraphDbNodeSourceTrait {
 
     // return the result
     return this._nodeSource.properties;
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @param hgNodes
-   */
-  private void batchUpdate(List<HGNode> hgNodes) {
-
-    Map<Long, HGNode> nodes = new HashMap<>();
-    hgNodes.forEach((n) -> nodes.put((Long) n.getIdentifier(), n));
-
-    // query
-    Map<String, Object> params = new HashMap<>();
-    params.put("ids", nodes.keySet());
-    Future<StatementResult> result = getBoltClient().asyncExecCypherQuery(BATCH_UPDATE_QUERY, params);
-
-    try {
-
-      result.get().forEachRemaining(record -> {
-
-        Node node = record.get(0).asNode();
-
-        HGNode hgNode = nodes.get(new Long(node.id()));
-
-        // set the labels and properties
-        ((ExtendedGraphDbNodeSourceImpl) hgNode.getNodeSource()).getTrait().setLabels(node);
-        ((ExtendedGraphDbNodeSourceImpl) hgNode.getNodeSource()).getTrait().setProperties(node);
-
-      });
-
-    } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ExecutionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
   }
 
   /**

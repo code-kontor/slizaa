@@ -111,7 +111,7 @@ public class NodeResolver implements GraphQLResolver<Node> {
     List<HGAggregatedDependency> dependenciesTo =  node.getHgNode().getOutgoingDependenciesTo(targetNodes);
 
     //
-    return dependenciesTo.stream().map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getAggregatedWeight())).collect(Collectors.toList());
+    return dependenciesTo.stream().map(dep -> new Dependency(dep)).collect(Collectors.toList());
   }
 
   public List<Dependency> getDependenciesFrom(Node node, List<String> sourceNodeIds) {
@@ -123,6 +123,6 @@ public class NodeResolver implements GraphQLResolver<Node> {
 
     //
     return dependenciesFrom
-            .stream().map(dep -> new Dependency(new Node(dep.getFrom()), new Node(dep.getTo()), dep.getAggregatedWeight())).collect(Collectors.toList());
+            .stream().map(dep -> new Dependency(dep)).collect(Collectors.toList());
   }
 }

@@ -18,10 +18,12 @@
 package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.IReferencedNodes;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.SimpleTestModelRule;
 import org.junit.Before;
 import org.junit.Rule;
+
+import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,32 +63,30 @@ public abstract class AbstractDefaultDependencySetTest {
 
     /**
      *
-     * @param referencedNodes
+     * @param filteredDependencies
      * @param selectedNodesWithSuccessorsAndPredecessors
      * @param selectedNodesType
      * @param filteredCoreDependencies
      * @param filteredNodesWithPredecessors
      * @param filteredNodes
      */
-    protected void assertReferencedNodes(IReferencedNodes referencedNodes,
-                                       HGNode[] selectedNodesWithSuccessorsAndPredecessors,
-                                       SourceOrTarget selectedNodesType,
-                                       HGCoreDependency[] filteredCoreDependencies,
-                                       HGNode[] filteredNodesWithPredecessors,
-                                       HGNode[] filteredNodes) {
+    protected void assertFilteredDependencies(IFilteredDependencies filteredDependencies,
+                                              HGNode[] selectedNodesWithSuccessorsAndPredecessors,
+                                              SourceOrTarget selectedNodesType,
+                                              HGCoreDependency[] filteredCoreDependencies,
+                                              HGNode[] filteredNodesWithPredecessors,
+                                              HGNode[] filteredNodes) {
 
-        assertThat(referencedNodes.getReferencedNodes())
-                .containsExactlyInAnyOrder(selectedNodesWithSuccessorsAndPredecessors);
+        SourceOrTarget referencedNodesType = selectedNodesType.equals(SourceOrTarget.SOURCE) ? SourceOrTarget.TARGET : SourceOrTarget.SOURCE;
 
-        assertThat(referencedNodes.getSelectedNodesType()).isEqualTo(selectedNodesType);
+        assertThat(filteredDependencies.getEffectiveNodes(selectedNodesType, true).containsAll(Arrays.asList(selectedNodesWithSuccessorsAndPredecessors)));
 
-        assertThat(referencedNodes.getSelectedCoreDependencies())
-                .containsExactlyInAnyOrder(filteredCoreDependencies);
+        assertThat(filteredDependencies.getEffectiveCoreDependencies()).containsExactlyInAnyOrder(filteredCoreDependencies);
 
-        assertThat(referencedNodes.getReferencedNodes(true))
+        assertThat(filteredDependencies.getEffectiveNodes(referencedNodesType, true))
                 .containsExactlyInAnyOrder(filteredNodesWithPredecessors);
 
-        assertThat(referencedNodes.getReferencedNodes(false))
+        assertThat(filteredDependencies.getEffectiveNodes(referencedNodesType, false))
                 .containsExactlyInAnyOrder(filteredNodes);
     }
 }

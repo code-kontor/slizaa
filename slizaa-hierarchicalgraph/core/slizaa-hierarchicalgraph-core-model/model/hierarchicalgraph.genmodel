@@ -88,6 +88,9 @@
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/lookupNode">
         <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/lookupNode/identifier"/>
       </genOperations>
+      <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/lookupCoreDependency">
+        <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/lookupCoreDependency/identifier"/>
+      </genOperations>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/getExtension">
         <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/getExtension/clazz"/>
         <genTypeParameters ecoreTypeParameter="hierarchicalgraph.ecore#//HGRootNode/getExtension/T"/>
@@ -142,6 +145,7 @@
         <genTypeParameters ecoreTypeParameter="hierarchicalgraph.ecore#//HGCoreDependency/getDependencySource/T"/>
       </genOperations>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGCoreDependency/isProxyDependency"/>
+      <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGCoreDependency/getIdentifier"/>
     </genClasses>
     <genClasses ecoreClass="hierarchicalgraph.ecore#//HGProxyDependency">
       <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//HGProxyDependency/resolved"/>

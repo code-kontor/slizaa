@@ -46,7 +46,12 @@ public class ExtendedHGCoreDependencyImpl extends HGCoreDependencyImpl {
   public HGRootNode getRootNode() {
     return getFrom().getRootNode();
   }
-  
+
+  @Override
+  public Object getIdentifier() {
+    return dependencySource.getIdentifier();
+  }
+
   /**
    * {@inheritDoc}
    */

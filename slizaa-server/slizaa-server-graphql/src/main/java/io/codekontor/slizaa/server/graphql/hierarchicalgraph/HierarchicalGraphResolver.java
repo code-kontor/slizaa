@@ -22,9 +22,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.server.service.selection.ISelectionService;
+import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
@@ -40,13 +41,20 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
     private ISlizaaService _slizaaService;
 
     @Autowired
-    private ISelectionService _selectionService;
+    private IAggregatedDependencySelectionService _aggregatedDependencySelectionService;
 
     /**
      * @return
      */
     public Node rootNode(HierarchicalGraph hierarchicalGraph) {
         return nullSafe(hierarchicalGraph, hgRootNode -> new Node(hgRootNode));
+    }
+
+    public Dependency dependency(HierarchicalGraph hierarchicalGraph, String id) {
+        return nullSafe(hierarchicalGraph, hgRootNode -> {
+            HGCoreDependency coreDependency = hgRootNode.lookupCoreDependency(Long.parseLong(id));
+            return coreDependency != null ? new Dependency(coreDependency) : null;
+        });
     }
 
     /**
@@ -76,9 +84,11 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
         return nullSafe(hierarchicalGraph, hgRootNode -> {
             HGNode toNode = hgRootNode.lookupNode(Long.parseLong(sourceNodeId));
             HGNode fromNode =  hgRootNode.lookupNode(Long.parseLong(targetNodeId));
-            // TODO NULL CHECK!
             HGAggregatedDependency aggregatedDependency = toNode.getOutgoingDependenciesTo(fromNode);
-            return new DependencySet(_selectionService, aggregatedDependency);
+
+            return aggregatedDependency == null ?
+                new EmptyDependencySet() :
+                new AggregatedDependencyDependencySet(_aggregatedDependencySelectionService, aggregatedDependency);
         });
     }
 

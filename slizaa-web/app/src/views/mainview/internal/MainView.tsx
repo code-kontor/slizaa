@@ -59,7 +59,7 @@ export class MainView extends React.Component<IProps, IState> {
           style={{ minHeight: '100vh' }}>
           <Layout.Header style={{ padding: 0 }}>
             <Link to="/">
-              <svg height="40px" viewBox="0 0 493.923 175.948" style={{ paddingLeft: "24px", verticalAlign: "middle" }}>
+              <svg height="30px" viewBox="0 0 493.923 175.948" style={{ paddingLeft: "24px", verticalAlign: "middle" }}>
                 <SlizaaSvg />
               </svg>
             </Link>
@@ -96,7 +96,7 @@ export class MainView extends React.Component<IProps, IState> {
                 </Menu.Item>
               </Menu>
             </Layout.Sider>
-            <Layout.Content style={{ padding: 8, minHeight: 280 }}>
+            <Layout.Content style={{ padding: 4, minHeight: 280 }}>
               <Route exact={true} path="/" component={DependenciesView} />
             </Layout.Content>
           </Layout>

@@ -28,6 +28,11 @@ export enum NodeType {
   TARGET = "TARGET",
 }
 
+export interface NodeSelection {
+  selectedNodeIds: string[];
+  selectedNodesType: NodeType;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

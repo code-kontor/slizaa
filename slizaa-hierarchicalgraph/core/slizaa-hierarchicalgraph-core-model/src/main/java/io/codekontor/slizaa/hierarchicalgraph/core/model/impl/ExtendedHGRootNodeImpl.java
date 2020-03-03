@@ -50,6 +50,9 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
   /** - */
   protected Map<Object, HGNode> _idToNodeMap;
 
+  /** - */
+  protected Map<Object, HGCoreDependency> _idToCoreDependencyMap;
+
   /**
    * <p>
    * Creates a new instance of type {@link ExtendedHGRootNodeImpl}.
@@ -173,6 +176,17 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
       return this;
     }
     return result;
+  }
+
+  @Override
+  public HGCoreDependency lookupCoreDependency(Object identifier) {
+
+    if (this._idToCoreDependencyMap == null) {
+      Map<Object, HGCoreDependency> hgCoreDependencyMap = idToCoreDependencyMap();
+      this.getAccumulatedOutgoingCoreDependencies().forEach(coreDependency -> hgCoreDependencyMap.put(coreDependency.getIdentifier(), coreDependency));
+    }
+
+    return this._idToCoreDependencyMap.get(identifier);
   }
 
   /**
@@ -321,6 +335,13 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
       this._idToNodeMap = new HashMap<>();
     }
     return this._idToNodeMap;
+  }
+
+  private Map<Object, HGCoreDependency> idToCoreDependencyMap() {
+    if (this._idToCoreDependencyMap == null) {
+      this._idToCoreDependencyMap = new HashMap<>();
+    }
+    return this._idToCoreDependencyMap;
   }
 
   @Override
