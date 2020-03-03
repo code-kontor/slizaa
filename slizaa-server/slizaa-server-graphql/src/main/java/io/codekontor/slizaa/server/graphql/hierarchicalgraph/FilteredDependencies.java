@@ -51,29 +51,15 @@ public class FilteredDependencies {
 
     public DependencyPage getDependencyPage(int pageNumber, int pageSize) {
 
-        if (pageNumber < 1) {
-            throw new IndexOutOfBoundsException("Invalid");
-        }
+        // sort the dependencies...
+        List<HGCoreDependency> sortedDependencies = filteredDependencies == null ? Collections.emptyList() : GraphUtil.sortCoreDependencies(filteredDependencies.getEffectiveCoreDependencies());
 
-        if (filteredDependencies == null || filteredDependencies.getEffectiveCoreDependencies().isEmpty()) {
-            return new DependencyPage(new PageInfo(1, 0, 0, 0), Collections.emptyList());
-        }
-
-        List<HGCoreDependency> sortedCoreDependencies = GraphUtil.sortCoreDependencies(filteredDependencies.getEffectiveCoreDependencies());
-
-        int startIndex = (pageNumber - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, sortedCoreDependencies.size());
-
-        List<Dependency> partialResultList = startIndex > sortedCoreDependencies.size() ?
-                Collections.emptyList() :
-                new LinkedList<>(sortedCoreDependencies).subList(startIndex, endIndex)
-                        .stream().map(coreDependency -> new Dependency(coreDependency))
-                        .collect(Collectors.toList());
-
-        int maxPages = IntMath.divide(sortedCoreDependencies.size(), pageSize, RoundingMode.CEILING);
-        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, sortedCoreDependencies.size());
-
-        return new DependencyPage(pageInfo, partialResultList);
+        // ... and create the dependency page
+        return Utils.getDependencyPage(
+                sortedDependencies,
+                pageNumber,
+                pageSize,
+                (coreDependency) -> new Dependency(coreDependency));
     }
 
     public List<Dependency> getDependencies() {

@@ -45,3 +45,9 @@
 .ant-table-column-title {
     font-weight: bold;
 }
+
+.ant-table-expand-icon-th, .ant-table-row-expand-icon-cell {
+    width: 25px;
+    min-width: 25px;
+    text-align: center;
+}

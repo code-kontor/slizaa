@@ -23,14 +23,15 @@ div.dsm-container {
 
 div.dsm-selection {
     overflow: hidden;
-    min-height: 28px;
-    height: 28px;
+    min-height: 33px;
+    height: 33px;
     font-size: 12px;
     border-bottom: #C8CEd3 solid thin;
 }
 
 div.dsm {
     overflow: auto;
+    padding-left: 0px;
     height: 100%;
     width: 100%;
 }
@@ -38,6 +39,7 @@ div.dsm {
 .selected-dependency-container {
     display: flex;
     flex-direction: row;
+    padding: 6px 0px 2px 8px;
 }
 
 .selected-dependency-arrow {

@@ -109,20 +109,22 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                                 initialWidth={this.state.layout.upperDividerPosition}
                                 onWidthChanged={this.onUpperSplitLayoutWidthChanged}
                                 left={
-                                    <Card title="Hierarchical Graph">
+                                    <Card title="Hierarchical Graph"
+                                          padding={0}>
                                         {this.hierarchicalGraph(cl)}
                                     </Card>
                                 }
                                 right={
                                     <Card title="Dependencies Overview"
-                                          allowOverflow={false}>
+                                          allowOverflow={false}
+                                          padding={0}>
                                         {this.dependenciesOverview(cl)}
                                     </Card>
                                 }
                             />
                         }
                         bottom={
-                            <Card title="Dependencies Tree" allowOverflow={false}>
+                            <Card title="Dependencies Details" allowOverflow={false} padding={0}>
                                 {this.dependencyDetailViewer(cl)}
                             </Card>
                         }/>
@@ -195,7 +197,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         return null;
     }
 
-    private dependencyDetailViewer = (client: ApolloClient<any>) : React.ReactNode => {
+    private dependencyDetailViewer = (client: ApolloClient<any>): React.ReactNode => {
 
         // return empty div if selected dependency is undefined
         if (this.state.mainDependencySelection === undefined) {
@@ -205,114 +207,13 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         return <SlizaaDependencyViewer
             key={this.state.mainDependencySelection.sourceNodeLabel.id + "-" + this.state.mainDependencySelection.targetNodeLabel.id}
             client={client}
-            height={ ( (this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000 ) - 170 }
+            height={((this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000) - 135}
             databaseId={this.props.databaseId}
             hierarchicalGraphId={this.props.hierarchicalGraphId}
             sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
             targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
         />
     }
-
-/*
-    private dependenciesTree(client: ApolloClient<any>): React.ReactNode {
-
-
-        // return empty div if selected dependency is undefined
-        if (this.state.mainDependencySelection === undefined) {
-            return <div/>;
-        }
-
-        const selNodeIds: string[] = this.state.dependenciesTree ?
-            (this.state.dependenciesTree.selectionNodeType === NodeType.SOURCE ?
-                this.state.dependenciesTree.sourceTreeNodeSelection.selectedNodeIds :
-                this.state.dependenciesTree.targetTreeNodeSelection.selectedNodeIds) :
-            [];
-
-        const selNodeType: NodeType = this.state.dependenciesTree ?
-            this.state.dependenciesTree.selectionNodeType :
-            NodeType.SOURCE;
-
-        //
-        return <SlizaaDependencyTree
-            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeLabel.id + "-" + this.state.mainDependencySelection.targetNodeLabel.id}
-            client={client}
-            databaseId={this.props.databaseId}
-            hierarchicalGraphId={this.props.hierarchicalGraphId}
-            sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
-            targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
-            selectedNodeIds={selNodeIds}
-            selectedNodesType={selNodeType}
-            onNodesSelected={this.onDependencyTreeNodesSelected}
-        />
-    }
-
-    private dependenciesList(client: ApolloClient<any>): React.ReactNode {
-
-        // return empty div if selected dependency is undefined
-        if (this.state.mainDependencySelection === undefined) {
-            return <div/>;
-        }
-
-        //
-        return <SlizaaDependencyList
-            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId + "-" + this.state.mainDependencySelection.sourceNodeLabel.id + "-" + this.state.mainDependencySelection.targetNodeLabel.id}
-            client={client}
-            databaseId={this.props.databaseId}
-            hierarchicalGraphId={this.props.hierarchicalGraphId}
-            sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
-            targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
-        />
-    }
-
-    private onDependencyTreeNodesSelected = (aSelectedNodeIds: string[], aSelectedNodesType: NodeType): void => {
-
-        const expandedSourceNodeIds: string[] = this.state.dependenciesTree ? this.state.dependenciesTree.sourceTreeNodeSelection.selectedNodeIds : [];
-        const expandedTargetNodeIds: string[] = this.state.dependenciesTree ? this.state.dependenciesTree.targetTreeNodeSelection.selectedNodeIds : [];
-
-        if (aSelectedNodesType === NodeType.SOURCE) {
-            this.setState({
-                dependenciesTree: {
-                    selectionNodeType: NodeType.SOURCE,
-                    sourceTreeNodeSelection: {
-                        expandedNodeIds: expandedSourceNodeIds,
-                        selectedNodeIds: aSelectedNodeIds,
-                    },
-                    targetTreeNodeSelection: {
-                        expandedNodeIds: expandedTargetNodeIds,
-                        selectedNodeIds: [],
-                    }
-                }
-            });
-        } else if (aSelectedNodesType === NodeType.TARGET) {
-            this.setState({
-                dependenciesTree: {
-                    selectionNodeType: NodeType.TARGET,
-                    sourceTreeNodeSelection: {
-                        expandedNodeIds: expandedSourceNodeIds,
-                        selectedNodeIds: [],
-                    },
-                    targetTreeNodeSelection: {
-                        expandedNodeIds: expandedTargetNodeIds,
-                        selectedNodeIds: aSelectedNodeIds,
-                    }
-                }
-            });
-        } else {
-            this.setState({
-                dependenciesTree: {
-                    selectionNodeType: NodeType.SOURCE,
-                    sourceTreeNodeSelection: {
-                        expandedNodeIds: expandedSourceNodeIds,
-                        selectedNodeIds: [],
-                    },
-                    targetTreeNodeSelection: {
-                        expandedNodeIds: expandedTargetNodeIds,
-                        selectedNodeIds: [],
-                    }
-                }
-            });
-        }
-    }*/
 
     private onSelectDependency = (aSelection: IDsmSelection | undefined): void => {
         if (aSelection !== undefined) {
@@ -351,21 +252,9 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         });
     }
 
-    /*
-    private onLowerSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
-        this.setState({
-            layout: {
-                ...this.state.layout,
-                lowerDividerPosition: newWidth,
-            }
-        });
-    }
-     */
-
-
     private updateWindowDimensions = (): void => {
 
-        const HEADER_SIZE_WITH_MARGIN = 80;
+        const HEADER_SIZE_WITH_MARGIN = 55;
 
         const newHeight = window.innerHeight - HEADER_SIZE_WITH_MARGIN;
 

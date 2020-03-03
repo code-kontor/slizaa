@@ -84,9 +84,11 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
         return nullSafe(hierarchicalGraph, hgRootNode -> {
             HGNode toNode = hgRootNode.lookupNode(Long.parseLong(sourceNodeId));
             HGNode fromNode =  hgRootNode.lookupNode(Long.parseLong(targetNodeId));
-            // TODO NULL CHECK!
             HGAggregatedDependency aggregatedDependency = toNode.getOutgoingDependenciesTo(fromNode);
-            return new AggregatedDependencyDependencySet(_aggregatedDependencySelectionService, aggregatedDependency);
+
+            return aggregatedDependency == null ?
+                new EmptyDependencySet() :
+                new AggregatedDependencyDependencySet(_aggregatedDependencySelectionService, aggregatedDependency);
         });
     }
 

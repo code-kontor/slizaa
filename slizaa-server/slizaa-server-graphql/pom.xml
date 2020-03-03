@@ -63,6 +63,25 @@
 			<version>3.9</version>
 		</dependency>
 
+		<!-- TEST -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa</groupId>
+			<artifactId>slizaa-hierarchicalgraph-graphdb-testfwk</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa</groupId>
+			<artifactId>slizaa-hierarchicalgraph-graphdb-mapping-testfwk</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 

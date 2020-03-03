@@ -18,18 +18,24 @@
 import * as React from 'react';
 import './Card.css';
 
-export interface IProps {
+export interface ICardProps {
     title: string
     allowOverflow?: boolean
+    padding?: number
 }
 
-export class Card extends React.Component<IProps> {
+export class Card extends React.Component<ICardProps> {
 
     public render() {
 
+        const styleProperties = {
+            overflow: this.props.allowOverflow !== undefined && !this.props.allowOverflow ? 'hidden' : 'auto',
+            padding: this.props.padding !== undefined ? this.props.padding + 'px ' + this.props.padding + 'px' : '10px 10px',
+        }
+
         const body = this.props.allowOverflow !== undefined && !this.props.allowOverflow ?
-            <div className="slizaa-card-body" style={{overflow: 'hidden'}}>{this.props.children}</div> :
-            <div className="slizaa-card-body" style={{overflow: 'auto'}}>{this.props.children}</div>;
+            <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div> :
+            <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div>;
 
         return (
             <div className="slizaa-card" >

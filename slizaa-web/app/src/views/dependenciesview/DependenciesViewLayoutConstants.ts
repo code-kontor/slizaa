@@ -18,5 +18,5 @@
 
 export class DependenciesViewProps {
 
-    public static GUTTER_SIZE = 8;
+    public static GUTTER_SIZE = 4;
 }

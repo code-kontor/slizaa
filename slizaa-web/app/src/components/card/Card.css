@@ -25,17 +25,16 @@
 }
 
 .slizaa-card-title {
-    font-size: 0.9rem;
-    padding: 10px 10px;
+    font-size: 0.85rem;
+    padding: 5px 8px;
     background-color: #F0F3F5;
     border: 1px solid #C8CEd3;
     border-radius: 5px 5px 0px 0px;
-    font-weight: 700;
+    font-weight: 600;
     flex: 0 0 0px;
 }
 
 .slizaa-card-body {
-    padding: 10px 10px;
     border: 1px solid #C8CEd3;
     border-radius: 0px 0px 5px 5px;
     border-top: none;

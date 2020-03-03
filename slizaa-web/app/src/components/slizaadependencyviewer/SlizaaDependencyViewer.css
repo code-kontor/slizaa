@@ -24,6 +24,7 @@
 .dependencyViewerContainer-Left {
     flex: 0 1 auto;
     width: 20%;
+    overflow: auto;
 }
 
 .dependencyViewerContainer-Center {
@@ -35,4 +36,5 @@
 .dependencyViewerContainer-Right {
     flex: 0 1 auto;
     width: 20%;
+    overflow: auto;
 }

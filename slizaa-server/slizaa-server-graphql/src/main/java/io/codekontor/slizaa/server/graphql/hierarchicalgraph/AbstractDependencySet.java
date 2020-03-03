@@ -17,11 +17,7 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
-import com.google.common.math.IntMath;
-
-import java.math.RoundingMode;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractDependencySet implements DependencySet {
@@ -37,26 +33,7 @@ public abstract class AbstractDependencySet implements DependencySet {
     }
 
     public DependencyPage getDependencyPage(int pageNumber, int pageSize) {
-
-        if (pageNumber < 1) {
-            throw new IndexOutOfBoundsException("Invalid");
-        }
-
-        if (dependencies().isEmpty()) {
-            return new DependencyPage(new PageInfo(1, 0, 0, 0), Collections.emptyList());
-        }
-
-        int startIndex = (pageNumber - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, dependencies().size());
-
-        List<Dependency> partialResultList = startIndex > dependencies().size() ?
-                Collections.emptyList() :
-                dependencies().subList(startIndex, endIndex);
-
-        int maxPages = IntMath.divide(dependencies().size(), pageSize, RoundingMode.CEILING);
-        PageInfo pageInfo = new PageInfo(pageNumber, maxPages, pageSize, dependencies().size());
-
-        return new DependencyPage(pageInfo, partialResultList);
+        return Utils.getDependencyPage(dependencies(), pageNumber, pageSize, dep -> dep);
     }
 
     public List<Node> filteredChildren(String parentNode, NodeType parentNodeType) {
