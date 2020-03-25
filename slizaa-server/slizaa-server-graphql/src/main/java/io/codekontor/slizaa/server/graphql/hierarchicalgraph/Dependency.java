@@ -24,6 +24,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,7 +81,11 @@ public class Dependency {
                 proxyDependency.resolve();
             }
             List<HGCoreDependency> coreDependencies = ((HGProxyDependency)_hgDependency).getAccumulatedCoreDependencies();
-            return coreDependencies.stream().map(coreDep -> new Dependency(coreDep)).collect(Collectors.toList());
+            return coreDependencies.stream()
+                    .map(coreDep -> new Dependency(coreDep))
+
+                    .sorted(Comparator.comparing(dep -> dep.getSourceNode().getText() + dep.getType() + dep.getTargetNode()))
+                    .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
