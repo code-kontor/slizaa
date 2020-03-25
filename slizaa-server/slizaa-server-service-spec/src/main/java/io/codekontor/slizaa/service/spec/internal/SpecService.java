@@ -17,80 +17,69 @@
  */
 package io.codekontor.slizaa.service.spec.internal;
 
-import java.util.ArrayList;
+import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
+import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
+import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
+import io.codekontor.slizaa.server.spec.ContentDefinitionSpec;
+import io.codekontor.slizaa.server.spec.GraphDatabaseSpec;
+import io.codekontor.slizaa.server.spec.ServerExtensionSpec;
+import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
+import io.codekontor.slizaa.service.spec.ISpecService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.codekontor.slizaa.server.spec.GraphDatabaseSpec;
-import io.codekontor.slizaa.server.spec.ServerExtensionSpec;
-import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
-import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
-import io.codekontor.slizaa.service.spec.ISpecService;
-
 /**
- * 
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 @Component
 public class SpecService implements ISpecService {
 
-  @Autowired
-  private ISlizaaService _slizaaService;
+    @Autowired
+    private ISlizaaService _slizaaService;
 
-  @Override
-  public void reconfigure(SlizaaServerSpec slizaaServerSpec) {
+    @Override
+    public void reconfigure(SlizaaServerSpec slizaaServerSpec) {
 
-  }
+    }
 
-  @Override
-  public SlizaaServerSpec fetchSpec() {
+    @Override
+    public SlizaaServerSpec fetchSpec() {
 
-    // server extensions
-    List<ServerExtensionSpec> serverExtensionSpecs =new ArrayList<>();
+        //
+        List<ServerExtensionSpec> extensionSpecs =
+                _slizaaService.getBackendService().getInstalledExtensions()
+                        .stream().map(toServerExtensionsSpec()).collect(Collectors.toList());
 
-    List<GraphDatabaseSpec> graphDatabaseSpecs = new ArrayList<>();
+        // graph databases
+        List<GraphDatabaseSpec> databaseSpecs =
+                _slizaaService.getGraphDatabases().stream().map(toGraphdatabaseSpec())
+                        .collect(Collectors.toList());
 
-    //
-    return new SlizaaServerSpec(serverExtensionSpecs, graphDatabaseSpecs);
+        return new SlizaaServerSpec(extensionSpecs, databaseSpecs);
+    }
 
+    private Function<IExtension, ServerExtensionSpec> toServerExtensionsSpec() {
+        return extension -> new ServerExtensionSpec(extension.getSymbolicName(),
+                extension.getVersion().toString());
+    }
 
-//    ServerExtensionSpec[]  _slizaaService.getExtensionService().getExtensions().stream().map(toServerExtensionsSpec())
-//            .toArray(ServerExtensionSpec[]::new);
-//
-//    SlizaaServerSpec result = new SlizaaServerSpec();
-//
-//    // extensions
-//    result.serverExtensions();
-//
-//    // graph databases
-//    result.graphDatabases(_slizaaService.getGraphDatabases().stream().map(toGraphdatabaseSpec())
-//        .toArray(GraphdatabaseSpec[]::new));
-//
-//    return result;
-  }
+    private Function<IGraphDatabase, GraphDatabaseSpec> toGraphdatabaseSpec() {
+        return graphDatabase -> {
 
-  private Function<IExtension, ServerExtensionSpec> toServerExtensionsSpec() {
-    return extension -> new ServerExtensionSpec(extension.getSymbolicName(),
-        extension.getVersion().toString());
-  }
+            // map content definition
+            String contentDefinitionFactoryId = graphDatabase.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId();
+            String contentDefinition = graphDatabase.getContentDefinition().toExternalRepresentation();
+            ContentDefinitionSpec contentDefinitionSpec = new ContentDefinitionSpec(contentDefinitionFactoryId, contentDefinition);
 
-//  private Function<IGraphDatabase, GraphDatabaseSpec> toGraphdatabaseSpec() {
-//    return graphDatabase -> {
-//
-//      GraphdatabaseSpec result = GraphdatabaseSpec.graphDatabaseConfiguration(graphDatabase.getIdentifier());
-//      result.forceRebuild(true);
-//
-//      String contentDefinitionFactoryId = graphDatabase.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId();
-//      String contentDefinition = graphDatabase.getContentDefinition().toExternalRepresentation();
-//
-//      result.contentDefinition(contentDefinitionFactoryId, contentDefinition);
-//
-//      return result;
-//    };
-//  }
+            // map database specification
+            GraphDatabaseSpec graphDatabaseSpec = new GraphDatabaseSpec(graphDatabase.getIdentifier(), contentDefinitionSpec);
+
+            // return the result
+            return graphDatabaseSpec;
+        };
+    }
 }

@@ -47,6 +47,7 @@
 		<module>slizaa-server-spec</module>
         <module>slizaa-server-command</module>
         <module>slizaa-server-service-selection</module>
+        <module>slizaa-server-admin-rest</module>
     </modules>
 
 </project>
