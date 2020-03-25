@@ -58,16 +58,16 @@ export class MainView extends React.Component<IProps, IState> {
         <Layout
           style={{ minHeight: '100vh' }}>
           <Layout.Header style={{ padding: 0 }}>
+            <Icon
+                className="trigger"
+                type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+                onClick={this.toggleCollapsed}
+            />
             <Link to="/">
-              <svg height="30px" viewBox="0 0 493.923 175.948" style={{ paddingLeft: "24px", verticalAlign: "middle" }}>
+              <svg height="30px" viewBox="0 0 493.923 175.948" style={{ verticalAlign: "middle" }}>
                 <SlizaaSvg />
               </svg>
             </Link>
-            <Icon
-              className="trigger"
-              type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-              onClick={this.toggleCollapsed}
-            />
             <SlizaaHgChooser
               currentDatabase={this.props.currentDatabase}
               currentHierarchicalGraph={this.props.currentHierarchicalGraph}

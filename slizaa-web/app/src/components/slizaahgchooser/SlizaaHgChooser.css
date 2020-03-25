@@ -19,16 +19,26 @@
 .slizaaHgChooser {
     display: "inline-block";
     float: "right";
-    margin-right: 15px; 
+    margin-right: 15px;
 }
 
 .slizaaHgChooser-dropdown-database {
-    margin-right: 15px; 
+    margin-right: 15px;
 }
 
 .slizaaHgChooser-button {
     padding: 0px;
     border-radius: 5px;
+    font-size: 12px;
+    height: auto;
+}
+
+.ant-dropdown-menu-item {
+    font-size: 12px;
+}
+
+.ant-dropdown-menu-item, .ant-dropdown-menu-submenu-title {
+    padding: 0px 12px;
 }
 
 .slizaaHgChooser-button-key {
