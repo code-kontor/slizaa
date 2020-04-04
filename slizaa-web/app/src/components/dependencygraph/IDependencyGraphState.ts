@@ -18,6 +18,6 @@
 
 import {ElkNode} from "elkjs";
 
-export interface ISlizaaDependencyListState {
-    node?: ElkNode
+export interface IDependencyGraphState {
+    rootNode?: ElkNode;
 }
