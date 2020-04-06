@@ -38,3 +38,7 @@
     width: 20%;
     overflow: auto;
 }
+
+tr.ant-table-row > td {
+    padding: 4px 8px !important;
+}
