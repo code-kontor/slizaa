@@ -17,7 +17,9 @@
  */
 // See: http://www.html5rocks.com/en/tutorials/canvas/hidpi/
 // See: 
-export function setupCanvas(canvas: HTMLCanvasElement, context: any, customWidth?: number, customHeight?: number): number {
+export function setupCanvas(canvas: HTMLCanvasElement, context: any, customWidth?: number, customHeight?: number, scale?: number): number {
+
+    const scaleFactor = scale === undefined || scale <= 0 ? 1 : scale;
 
     const width = customWidth ||
         canvas.width || // attr, eg: <canvas width='400'>
@@ -38,11 +40,11 @@ export function setupCanvas(canvas: HTMLCanvasElement, context: any, customWidth
 
     // Adjust canvas if ratio =/= 1
     if (deviceRatio !== bsRatio) {
-        canvas.width = Math.round(width * ratio);
-        canvas.height = Math.round(height * ratio);
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        context.scale(ratio, ratio);
+        canvas.width = Math.round(width * ratio) * scaleFactor;
+        canvas.height = Math.round(height * ratio) * scaleFactor;
+        canvas.style.width = width  * scaleFactor + 'px';
+        canvas.style.height = height  * scaleFactor + 'px';
+        context.scale(ratio * scaleFactor, ratio *scaleFactor);
     }
     return ratio;
 };

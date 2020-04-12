@@ -15,25 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IDependenciesTreeSelection, IDependencySelection, ITreeNodeSelection} from "./IDependencyViewModel";
+import {IDependencyGraphRepresentation, IDependencySelection} from "../IDependencyViewModel";
 
-export interface IDependenciesViewState {
-    databaseId: string
-    hierarchicalGraphId: string
-    layout: IIDependenciesViewLayout
-    mainTreeNodeSelection: ITreeNodeSelection
-    mainDependencySelection?: IDependencySelection
-    dependenciesTree?: IDependenciesTreeSelection
-}
-
-export interface IIDependenciesViewLayout {
-    upperDividerPosition: number
-    horizontalRatio: number
-    height: number
-    dsmSetting: IDsmSettings
-}
-
-export interface IDsmSettings {
+export interface IDsmPartProps extends IDependencyGraphRepresentation {
+    dependencySelection?: IDependencySelection;
+    horizontalBoxSize?: number;
+    verticalBoxSize?: number;
     horizontalSideMarkerHeight: number;
     verticalSideMarkerWidth: number;
+    onSideMarkerResize?: (horizontalSideMarkerHeight: number | undefined, verticalSideMarkerWidth: number | undefined) => void;
+    onSelect?:  (selection: IDependencySelection | undefined) => void;
 }

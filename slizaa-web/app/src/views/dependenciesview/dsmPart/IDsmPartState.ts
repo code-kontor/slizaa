@@ -15,9 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {IDsmProps} from "../../../components/dsm/IDsmProps";
-import {IDependencySelection} from "../IDependenciesViewState";
+import {IDependencySelection} from "../IDependencyViewModel";
 
-export interface IDependencyOverviewPartProps extends IDsmProps {
-    dependencySelection?: IDependencySelection
+export class IDsmPartState {
+    public hoveredDependency?: IDependencySelection
 }

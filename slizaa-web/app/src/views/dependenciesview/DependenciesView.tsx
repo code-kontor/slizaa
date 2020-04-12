@@ -24,19 +24,22 @@ import {Card} from 'src/components/card';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
 import {HorizontalSplitLayout, VerticalSplitLayout} from 'src/components/layout';
 import {IAppState} from 'src/redux/IAppState';
-import {IDsmSelection} from "../../components/dsm/IDsmProps";
 import {SlizaaDependencyViewer} from "../../components/slizaadependencyviewer/SlizaaDependencyViewer";
-// import {SlizaaDependencyList} from "../../components/slizaadependencylist/SlizaaDependencyList";
-// import {SlizaaDependencyTree} from "../../components/slizaadependencytree";
-import {DsmForNodeChildren, DsmForNodeChildrenVariables} from "../../gqlqueries/__generated__/DsmForNodeChildren";
+import {
+    DsmForNodeChildren,
+    DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix,
+    DsmForNodeChildrenVariables
+} from "../../gqlqueries/__generated__/DsmForNodeChildren";
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../gqlqueries/GqlQueries";
 import {ISlizaaNode} from "../../model/ISlizaaNode";
 import {NodeType} from "../../model/NodeType";
 import './DependenciesView.css';
 import {DependenciesViewProps} from "./DependenciesViewLayoutConstants";
-import {DependencyOverviewPart} from "./dsmPart/DependencyOverviewPart";
+import {DependencyGraphPart} from "./dependencyGraphPart";
+import {DsmPart} from "./dsmPart/DsmPart";
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
 import {IDependenciesViewState} from "./IDependenciesViewState";
+import {IDependencySelection} from "./IDependencyViewModel";
 
 
 export class DependenciesView extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
@@ -118,7 +121,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                                     <Card title="Dependencies Overview"
                                           allowOverflow={false}
                                           padding={0}>
-                                        {this.dependenciesOverview(cl)}
+                                        {this.dependencyGraph(cl)}
                                     </Card>
                                 }
                             />
@@ -145,10 +148,71 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
     }
 
+    private dependencyGraph(client: ApolloClient<any>): React.ReactNode {
+
+        return this.queryAndConsume(client, (matrix) => {
+
+            if (matrix === undefined) {
+                return <h1>undefined</h1>
+            }
+
+            // get  the data
+            const {orderedNodes, cells, stronglyConnectedComponents} = matrix;
+
+            return <DependencyGraphPart
+                orderedNodes={orderedNodes}
+                dependencies={cells}
+                stronglyConnectedComponents={stronglyConnectedComponents}
+                dependencySelection={this.state.mainDependencySelection}
+            />
+        })
+    }
+
     /**
      * Creates the dependencies overview component.
      */
-    private dependenciesOverview(client: ApolloClient<any>): React.ReactNode {
+    // @ts-ignore
+    private dependencyStructureMatrixPart(client: ApolloClient<any>): React.ReactNode {
+
+        return this.queryAndConsume(client, (matrix) => {
+
+            // get  the data
+            const {orderedNodes, cells, stronglyConnectedComponents} = matrix;
+
+            return <DsmPart
+                orderedNodes={orderedNodes}
+                dependencies={cells}
+                stronglyConnectedComponents={stronglyConnectedComponents}
+                horizontalBoxSize={35}
+                verticalBoxSize={35}
+                horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
+                verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
+                onSideMarkerResize={this.onSideMarkerResize}
+                onSelect={this.onSelectDependency}
+                dependencySelection={this.state.mainDependencySelection}
+            />
+        })
+    }
+
+    private dependencyDetailViewer = (client: ApolloClient<any>): React.ReactNode => {
+
+        // return empty div if selected dependency is undefined
+        if (this.state.mainDependencySelection === undefined) {
+            return <div/>;
+        }
+
+        return <SlizaaDependencyViewer
+            key={this.state.mainDependencySelection.sourceNode.id + "-" + this.state.mainDependencySelection.targetNode.id}
+            client={client}
+            height={((this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000) - 135}
+            databaseId={this.props.databaseId}
+            hierarchicalGraphId={this.props.hierarchicalGraphId}
+            sourceNodeId={this.state.mainDependencySelection.sourceNode.id}
+            targetNodeId={this.state.mainDependencySelection.targetNode.id}
+        />
+    }
+
+    private queryAndConsume(client: ApolloClient<any>, consumer: (matrix: DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix) => React.ReactNode): React.ReactNode {
 
         if (this.state.mainTreeNodeSelection.selectedNodeIds.length > 0) {
 
@@ -160,7 +224,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             };
 
             return <Query<DsmForNodeChildren, DsmForNodeChildrenVariables> query={query} variables={queryVariables}
-                                                                           fetchPolicy="cache-first">
+                                                                           fetchPolicy="no-cache">
                 {({loading, data, error}) => {
 
                     if (loading) {
@@ -175,21 +239,12 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                         return <div>UNDEFINED - TODO</div>
                     }
 
-                    // get  the data
-                    const {orderedNodes, cells, stronglyConnectedComponents} = data.hierarchicalGraph.node.children.dependencyMatrix
+                    const matrix = data.hierarchicalGraph.node.children.dependencyMatrix;
 
-                    return <DependencyOverviewPart
-                        labels={orderedNodes}
-                        cells={cells}
-                        stronglyConnectedComponents={stronglyConnectedComponents}
-                        horizontalBoxSize={35}
-                        verticalBoxSize={35}
-                        horizontalSideMarkerHeight={this.state.layout.dsmSetting.horizontalSideMarkerHeight}
-                        verticalSideMarkerWidth={this.state.layout.dsmSetting.verticalSideMarkerWidth}
-                        onSideMarkerResize={this.onSideMarkerResize}
-                        onSelect={this.onSelectDependency}
-                        dependencySelection={this.state.mainDependencySelection}
-                    />
+                    // tslint:disable-next-line:no-console
+                    console.log(matrix)
+
+                    return consumer(matrix);
                 }}
             </Query>
 
@@ -197,26 +252,9 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         return null;
     }
 
-    private dependencyDetailViewer = (client: ApolloClient<any>): React.ReactNode => {
-
-        // return empty div if selected dependency is undefined
-        if (this.state.mainDependencySelection === undefined) {
-            return <div/>;
-        }
-
-        return <SlizaaDependencyViewer
-            key={this.state.mainDependencySelection.sourceNodeLabel.id + "-" + this.state.mainDependencySelection.targetNodeLabel.id}
-            client={client}
-            height={((this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000) - 135}
-            databaseId={this.props.databaseId}
-            hierarchicalGraphId={this.props.hierarchicalGraphId}
-            sourceNodeId={this.state.mainDependencySelection.sourceNodeLabel.id}
-            targetNodeId={this.state.mainDependencySelection.targetNodeLabel.id}
-        />
-    }
-
-    private onSelectDependency = (aSelection: IDsmSelection | undefined): void => {
+    private onSelectDependency = (aSelection: IDependencySelection | undefined): void => {
         if (aSelection !== undefined) {
+
             this.setState({
                 dependenciesTree: {
                     selectionNodeType: NodeType.SOURCE,
@@ -230,9 +268,9 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     }
                 },
                 mainDependencySelection: {
-                    sourceNodeLabel: aSelection.sourceLabel,
-                    targetNodeLabel: aSelection.targetLabel,
-                    weight: aSelection.selectedCell.value
+                    selectedEdge: aSelection.selectedEdge,
+                    sourceNode: aSelection.sourceNode,
+                    targetNode: aSelection.targetNode,
                 }
             });
         } else {

@@ -21,15 +21,15 @@ import {ApolloConsumer} from "react-apollo";
 import {DSM} from "../../../components/dsm";
 import {IDsmLabel, IDsmSelection} from "../../../components/dsm/IDsmProps";
 import {fetchSvg} from "../../../components/slizaaicon";
-import {IDependencySelection} from "../IDependenciesViewState";
-import './DependencyOverviewPart.css';
-import {IDependencyOverviewPartProps} from "./IDependencyOverviewPartProps";
-import {IDependencyOverviewPartState} from "./IDependencyOverviewPartState";
+import {IDependencySelection} from "../IDependencyViewModel";
+import './DsmPart.css';
+import {IDsmPartProps} from "./IDsmPartProps";
+import {IDsmPartState} from "./IDsmPartState";
 import {ImageLabel} from "./ImageLabel";
 
-export class DependencyOverviewPart extends React.Component<IDependencyOverviewPartProps, IDependencyOverviewPartState> {
+export class DsmPart extends React.Component<IDsmPartProps, IDsmPartState> {
 
-    constructor(props: Readonly<IDependencyOverviewPartProps>) {
+    constructor(props: Readonly<IDsmPartProps>) {
         super(props);
 
         this.state = {
@@ -51,15 +51,15 @@ export class DependencyOverviewPart extends React.Component<IDependencyOverviewP
                         {selectedDependencyLabel}
                     </div>
                     <div className="dsm">
-                        <DSM labels={this.props.labels}
-                             cells={this.props.cells}
+                        <DSM labels={this.props.orderedNodes}
+                             cells={this.props.dependencies}
                              stronglyConnectedComponents={this.props.stronglyConnectedComponents}
                              horizontalBoxSize={35}
                              verticalBoxSize={35}
                              horizontalSideMarkerHeight={this.props.horizontalSideMarkerHeight}
                              verticalSideMarkerWidth={this.props.verticalSideMarkerWidth}
                              onSideMarkerResize={this.props.onSideMarkerResize}
-                             onSelect={this.props.onSelect}
+                             onSelect={this.onSelect}
                              onHover={this.onHoverDependency}
                              iconProvider={this.iconProvider(cl)}
                         />
@@ -69,13 +69,27 @@ export class DependencyOverviewPart extends React.Component<IDependencyOverviewP
         </ApolloConsumer>
     }
 
+    private onSelect = (aSelection: IDsmSelection | undefined): void => {
+        if (this.props.onSelect !== undefined) {
+
+            const selection: IDependencySelection | undefined = aSelection !== undefined ? {
+                selectedEdge: aSelection.selectedCell,
+                sourceNode: aSelection.sourceLabel,
+                targetNode: aSelection.targetLabel,
+
+            } : undefined;
+
+            this.props.onSelect(selection)
+        }
+    }
+
     private onHoverDependency = (aSelection: IDsmSelection | undefined): void => {
         if (aSelection !== undefined) {
             this.setState({
                 hoveredDependency: {
-                    sourceNodeLabel: aSelection.sourceLabel,
-                    targetNodeLabel: aSelection.targetLabel,
-                    weight: aSelection.selectedCell.value
+                    selectedEdge: aSelection.selectedCell,
+                    sourceNode: aSelection.sourceLabel,
+                    targetNode: aSelection.targetLabel,
                 }
             });
         } else {
@@ -91,10 +105,10 @@ export class DependencyOverviewPart extends React.Component<IDependencyOverviewP
 
         if (aSelection !== undefined) {
             element = <div className="selected-dependency-container">
-                <ImageLabel iconId={aSelection.sourceNodeLabel.iconIdentifier} label={aSelection.sourceNodeLabel.text}/>
+                <ImageLabel iconId={aSelection.sourceNode.iconIdentifier} label={aSelection.sourceNode.text}/>
                 <div className="selected-dependency-arrow">⟹</div>
-                <ImageLabel iconId={aSelection.targetNodeLabel.iconIdentifier} label={aSelection.targetNodeLabel.text}/>
-                <div className="selected-dependency-weight">({aSelection.weight} Dependencies)</div>
+                <ImageLabel iconId={aSelection.targetNode.iconIdentifier} label={aSelection.targetNode.text}/>
+                <div className="selected-dependency-weight">({aSelection.selectedEdge.value} Dependencies)</div>
             </div>
         } else {
             element = <div className="selected-dependency-container"/>

@@ -18,15 +18,17 @@
 import ELK, {ElkExtendedEdge, ElkNode, ElkPoint} from 'elkjs/lib/elk.bundled.js'
 import * as React from "react";
 import {setupCanvas} from "../dsm/DpiFixer";
+import {IDependencyGraphEdge, IDependencyGraphProps} from "./IDependencyGraphProps";
 import {IDependencyGraphState} from "./IDependencyGraphState";
 
-export class DependencyGraph extends React.Component<any, IDependencyGraphState> {
+export class DependencyGraph extends React.Component<IDependencyGraphProps, IDependencyGraphState> {
 
-    private readonly LINE_RANGE = 4;
+    private readonly DEFAULT_SCALE = 1.6;
 
+    private readonly CLICKABLE_EDGE_RANGE = 4;
     private readonly CORNER_RADIUS = 3;
-    private readonly NODE_HEIGHT = 30;
-    private readonly NODE_WIDTH = 170;
+    private readonly NODE_HEIGHT = 20;
+    private readonly NODE_WIDTH = 150;
 
     private canvasRef: HTMLCanvasElement | null;
     private renderingContext: CanvasRenderingContext2D | null;
@@ -34,21 +36,17 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
     private markedDependencyLayerCanvasRef: HTMLCanvasElement | null;
     private markedDependencyLayerRenderingContext: CanvasRenderingContext2D | null;
 
-    private rootNode: ElkNode | null;
-    private selectedEdge?: ElkExtendedEdge;
+    private nodeLayout: ElkNode | null;
 
-    // private currentlyMarkedX: number | undefined;
-    // private currentlyMarkedY: number | undefined;
+    private selectedEdge?: IDependencyGraphEdge;
+
     private newlyMarkedX: number | undefined;
     private newlyMarkedY: number | undefined;
 
-    private parentMap : Map<string, ElkNode | undefined>;
-
-    constructor(props: any) {
+    constructor(props: IDependencyGraphProps) {
         super(props);
 
         this.state = {};
-        this.parentMap = new Map();
     }
 
     public componentDidMount(): void {
@@ -56,15 +54,37 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
         if (this.canvasRef && this.markedDependencyLayerCanvasRef) {
             this.renderingContext = this.canvasRef.getContext("2d");
             this.markedDependencyLayerRenderingContext = this.markedDependencyLayerCanvasRef.getContext("2d");
-
             if (this.renderingContext) {
-                this.renderingContext.canvas.onmousedown = ((event: MouseEvent) => {
+                this.renderingContext.canvas.onclick = ((event: MouseEvent) => {
                     this.newlyMarkedX = event.offsetX;
                     this.newlyMarkedY = event.offsetY;
                     this.updateMarkerLayer();
                 }).bind(this)
             }
         }
+
+        const arrayOfEdges = this.props.edges.map(value => ({
+            id: value.id,
+            // labels: [{text: value.weight}],
+            sources: [value.sourceId],
+            targets: [value.targetId],
+        }));
+        const arrayOfNodes = this.props.nodes.map(value => ({
+            height: this.NODE_HEIGHT,
+            id: value.id,
+            labels: [{text: value.text}],
+            width: this.NODE_WIDTH,
+        }));
+        const arrayOfScss = this.props.scss.map(value =>
+            ({
+                children: value.nodes.map(n => ({id: n.id, labels: [{text: n.text}], width: this.NODE_WIDTH, height: this.NODE_HEIGHT})),
+                id: value.id,
+                // layoutOptions: {
+                //     'org.eclipse.elk.layered.edgeLabels.sideSelection': 'ALWAYS_UP',
+                //     'org.eclipse.elk.spacing.edgeLabel': '4',
+                // },
+            })
+        );
 
         const elk = new ELK();
         // tslint:disable:object-literal-sort-keys
@@ -73,37 +93,22 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
             layoutOptions: {
                 'elk.algorithm': 'layered',
                 'org.eclipse.elk.direction': 'DOWN',
-                'org.eclipse.elk.layered.spacing.edgeNodeBetweenLayers': '20',
+                'org.eclipse.elk.layered.mergeEdges': 'true',
+                // 'org.eclipse.elk.layered.spacing.edgeNodeBetweenLayers': '10',
                 'org.eclipse.elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
                 'org.eclipse.elk.hierarchyHandling': 'INCLUDE_CHILDREN',
+                // 'org.eclipse.elk.spacing.edgeLabel': '4',
+                // 'org.eclipse.elk.layered.edgeLabels.sideSelection': 'ALWAYS_UP'
             },
-            children: [
-                {id: "n1", width: this.NODE_WIDTH, height: this.NODE_HEIGHT},
-                {id: "n2", width: this.NODE_WIDTH, height: this.NODE_HEIGHT},
-                {id: "n5", width: this.NODE_WIDTH, height: this.NODE_HEIGHT},
-                {
-                    id: "virt",
-                    children: [
-                        {id: "n3", width: this.NODE_WIDTH, height: this.NODE_HEIGHT},
-                        {id: "n4", width: this.NODE_WIDTH, height: this.NODE_HEIGHT},
-                    ]
-                },
-                {id: "n6", width: this.NODE_WIDTH, height: this.NODE_HEIGHT},
-            ],
-            edges: [
-                {id: "e1", sources: ["n1"], targets: ["n6"]},
-                {id: "e2", sources: ["n2"], targets: ["n5"]},
-                {id: "e3", sources: ["n5"], targets: ["n3"]},
-                {id: "e4", sources: ["n3"], targets: ["n4"]},
-                {id: "e5", sources: ["n4"], targets: ["n3"]},
-                {id: "e6", sources: ["n3"], targets: ["n6"]},
-                {id: "e7", sources: ["n2"], targets: ["n6"]},
-            ]
+            children: [...arrayOfNodes, ...arrayOfScss],
+            edges: arrayOfEdges
         }
 
+        // @ts-ignore
         elk.layout(graph)
+            // @ts-ignore
             .then((value) => {
-                this.rootNode = value;
+                this.nodeLayout = value;
                 this.draw();
             })
             // tslint:disable-next-line:no-console
@@ -117,126 +122,150 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
         </div>
     }
 
+    private scale = () => {
+        return this.DEFAULT_SCALE;
+    }
+
     private draw = () => {
 
         if (this.canvasRef && this.renderingContext &&
             this.markedDependencyLayerCanvasRef && this.markedDependencyLayerRenderingContext &&
-            this.rootNode && this.rootNode.width && this.rootNode.height) {
-
+            this.nodeLayout && this.nodeLayout.width && this.nodeLayout.height) {
 
             const renderingContext = this.renderingContext;
-            const markedDependencyLayerRenderingContext = this.markedDependencyLayerRenderingContext;
-            const scale = 1.6;
 
             // tslint:disable-next-line:no-console
-            console.log(JSON.stringify(this.rootNode))
+            // console.log(JSON.stringify(this.nodeLayout))
 
             // setup the canvas
-            setupCanvas(this.canvasRef, this.renderingContext, this.rootNode.width * scale, this.rootNode.height * scale);
-            renderingContext.scale(scale, scale)
+            setupCanvas(this.canvasRef, this.renderingContext, this.nodeLayout.width, this.nodeLayout.height, this.scale());
+            setupCanvas(this.markedDependencyLayerCanvasRef, this.markedDependencyLayerRenderingContext, this.nodeLayout.width, this.nodeLayout.height, this.scale());
 
-            setupCanvas(this.markedDependencyLayerCanvasRef, this.markedDependencyLayerRenderingContext, this.rootNode.width * scale, this.rootNode.height * scale);
-            markedDependencyLayerRenderingContext.scale(scale, scale)
-
-            //
-            this.parentMap.clear();
+            // we have to "fix" the coordinates for edges
+            this.postProcessLayout();
 
             // draw the nodes
-            if (this.rootNode.children) {
-                this.rootNode.children.forEach(node => {
-                        this.parentMap.set(node.id, undefined);
-                        this.drawNode(renderingContext, node, 0, 0);
+            if (this.nodeLayout.children) {
+                this.nodeLayout.children.forEach(node => {
+                        this.drawNode(renderingContext, node);
                     }
                 )
             }
 
             // draw the edges
-            if (this.rootNode.edges) {
-                this.rootNode.edges.forEach(edge => {
-
-                        const extendedEdge: ElkExtendedEdge = edge as ElkExtendedEdge;
-
-                        const sourceParent = this.parentMap.get(extendedEdge.sources[0]);
-                        const targetParent = this.parentMap.get(extendedEdge.targets[0]);
-
-                        const offsetX = sourceParent !== undefined && targetParent !== undefined && sourceParent === targetParent && sourceParent.x !== undefined?
-                                        sourceParent.x : 0;
-
-                        const offsetY = sourceParent !== undefined && targetParent !== undefined && sourceParent === targetParent && sourceParent.y !== undefined ?
-                                        sourceParent.y : 0;
-
-                        extendedEdge.sections.forEach(section => {
-
-                            renderingContext.strokeStyle = section.startPoint.y > section.endPoint.y ? "#FF0000" : "#000000";
-                            renderingContext.fillStyle = section.startPoint.y > section.endPoint.y ? "#FF0000" : "#000000";
-
-                            let lastPoint : ElkPoint =  {
-                                x: section.startPoint.x + offsetX,
-                                y: section.startPoint.y + offsetY
-                            };
-
-                            renderingContext.beginPath();
-                            renderingContext.moveTo(lastPoint.x, lastPoint.y);
-
-                            //
-                            if (section.bendPoints) {
-
-                                // tslint:disable-next-line:prefer-for-of
-                                for (let i = 0; i < section.bendPoints.length; i++) {
-
-                                    const currentPoint :  ElkPoint = {
-                                        x: section.bendPoints[i].x + offsetX,
-                                        y: section.bendPoints[i].y + offsetY
-                                    };
-                                    const nextPoint = i < section.bendPoints.length - 1 ? section.bendPoints[i + 1] : {
-                                        x: section.endPoint.x + offsetX,
-                                        y: section.endPoint.y + offsetY
-                                    };
-
-                                    const lastDeltaX = currentPoint.x - lastPoint.x;
-                                    const lastDeltaY = currentPoint.y - lastPoint.y;
-                                    const nextDeltaX = nextPoint.x - currentPoint.x;
-                                    const nextDeltaY = nextPoint.y - currentPoint.y;
-
-                                    if (lastDeltaX !== 0) {
-                                        renderingContext.lineTo(lastDeltaX > 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS, currentPoint.y);
-                                        renderingContext.quadraticCurveTo(currentPoint.x, currentPoint.y, currentPoint.x, nextDeltaY < 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS);
-                                    } else if (lastDeltaY !== 0) {
-                                        renderingContext.lineTo(currentPoint.x, lastDeltaY > 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS);
-                                        renderingContext.quadraticCurveTo(currentPoint.x, currentPoint.y, nextDeltaX < 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS, currentPoint.y);
-                                    }
-
-                                    lastPoint = currentPoint;
-                                }
-                            }
-
-                            renderingContext.lineTo(section.endPoint.x  + offsetX, section.endPoint.y + offsetY);
-                            renderingContext.stroke();
-
-                            this.drawArrowhead(renderingContext, lastPoint, {x: section.endPoint.x  + offsetX, y: section.endPoint.y + offsetY}, 4);
-                        })
+            if (this.nodeLayout.edges) {
+                this.nodeLayout.edges.forEach(edge => {
+                        this.drawEdge(renderingContext, edge as ElkExtendedEdge,);
                     }
                 )
             }
         }
     }
 
-    private updateMarkerLayer = () => {
-        if (this.newlyMarkedX && this.newlyMarkedY) {
-            this.selectedEdge = this.doIt(this.newlyMarkedX / 1.6, this.newlyMarkedY / 1.6);
-            // tslint:disable-next-line:no-console
-            console.log(this.selectedEdge)
+    private postProcessLayout = () => {
+
+        if (this.nodeLayout) {
+
+            //
+            const parentMap: Map<string, ElkNode | undefined> = new Map();
+
+            if (this.nodeLayout.children) {
+
+                // fix the node layout
+                this.nodeLayout.children.forEach(node => {
+
+                        parentMap.set(node.id, undefined);
+
+                        const offsetX = node.x !== undefined ? node.x : 0;
+                        const offsetY = node.y !== undefined ? node.y : 0;
+
+                        if (node.children) {
+                            node.children.forEach(n => {
+
+                                parentMap.set(n.id, node);
+
+                                n.x = n.x !== undefined ? n.x + offsetX : offsetX;
+                                n.y = n.y !== undefined ? n.y + offsetY : offsetY;
+                            });
+                        }
+                    }
+                )
+            }
+
+            // fix the edges
+            if (this.nodeLayout.edges) {
+
+                this.nodeLayout.edges.forEach(edge => {
+
+                    const extendedEdge: ElkExtendedEdge = edge as ElkExtendedEdge;
+
+                    const sourceParent = parentMap.get(extendedEdge.sources[0]);
+                    const targetParent = parentMap.get(extendedEdge.targets[0]);
+                    const offsetX = sourceParent !== undefined && targetParent !== undefined && sourceParent.id === targetParent.id && sourceParent.x !== undefined ? sourceParent.x : 0;
+                    const offsetY = sourceParent !== undefined && targetParent !== undefined && sourceParent.id === targetParent.id && sourceParent.y !== undefined ? sourceParent.y : 0;
+
+                    if (extendedEdge.labels) {
+                        extendedEdge.labels.forEach(label => {
+                                if (label.x !== undefined && label.y !== undefined) {
+                                    label.x = label.x + offsetX;
+                                    label.y = label.y + offsetY;
+                                }
+                            }
+                        )
+                    }
+
+                    // fix the sections
+                    extendedEdge.sections.forEach(section => {
+
+                        section.startPoint.x = section.startPoint.x + offsetX;
+                        section.startPoint.y = section.startPoint.y + offsetY;
+
+                        if (section.bendPoints) {
+                            section.bendPoints.forEach(bendPoint => {
+                                bendPoint.x = bendPoint.x + offsetX;
+                                bendPoint.y = bendPoint.y + offsetY;
+                            })
+                        }
+
+                        section.endPoint.x = section.endPoint.x + offsetX;
+                        section.endPoint.y = section.endPoint.y + offsetY;
+                    })
+                });
+            }
         }
     }
 
-    private drawNode = (context: CanvasRenderingContext2D, node: ElkNode, offsetX: number, offsetY: number) => {
+    private updateMarkerLayer = () => {
+
+        if (this.newlyMarkedX && this.newlyMarkedY) {
+
+            const newlySelected = this.computeSelectedEdge(this.newlyMarkedX / this.scale(), this.newlyMarkedY /  this.scale());
+
+            // draw
+            if (this.markedDependencyLayerCanvasRef && this.markedDependencyLayerRenderingContext) {
+
+                // clear the canvas
+                this.markedDependencyLayerRenderingContext.clearRect(0, 0, this.markedDependencyLayerRenderingContext.canvas.width, this.markedDependencyLayerRenderingContext.canvas.height)
+
+                if (newlySelected !== undefined) {
+                    this.markedDependencyLayerRenderingContext.lineWidth = 2;
+                    this.drawEdge(this.markedDependencyLayerRenderingContext, newlySelected)
+                }
+            }
+
+            this.selectedEdge = newlySelected !== undefined ? this.props.edges.find(edge => edge.id === newlySelected.id) : undefined;
+            if (this.props.onEdgeSelected) {
+                this.props.onEdgeSelected(this.selectedEdge);
+            }
+        }
+    }
+
+    private drawNode = (context: CanvasRenderingContext2D, node: ElkNode) => {
 
         if (node.x && node.y && node.width && node.height) {
 
-            const nodeX = node.x + offsetX;
-            const nodeY = node.y + offsetY;
-
             context.save();
+            context.font ="9px Arial"
 
             if (node.children) {
 
@@ -244,23 +273,22 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
 
                 this.roundRect(
                     context,
-                    nodeX,
-                    nodeY,
+                    node.x,
+                    node.y,
                     node.width,
                     node.height,
                     this.CORNER_RADIUS,
                     true,
                     false
                 );
-            }
-            else {
+            } else {
 
                 context.fillStyle = "rgba(255, 255, 255, 1.0)";
 
                 this.roundRect(
                     context,
-                    nodeX,
-                    nodeY,
+                    node.x,
+                    node.y,
                     node.width,
                     node.height,
                     this.CORNER_RADIUS,
@@ -270,26 +298,86 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
 
                 // ...set the clipping area
                 context.beginPath();
-                context.rect(nodeX,
-                    nodeY,
+                context.rect(node.x,
+                    node.y,
                     node.width,
                     node.height,);
                 context.clip();
 
+                const nodeLabel = node.labels && node.labels[0] ? node.labels[0].text : node.id;
                 context.fillStyle = "rgba(0, 0, 0, 1.0)";
                 context.textAlign = "left";
                 context.textBaseline = "middle";
-                context.fillText("i.c.s.h." + node.id, nodeX + (this.NODE_HEIGHT / 2), nodeY + (this.NODE_HEIGHT / 2));
+                context.fillText(nodeLabel, node.x + (this.NODE_HEIGHT / 2), node.y + (this.NODE_HEIGHT / 2));
             }
             context.restore();
 
             if (node.children) {
                 node.children.forEach(n => {
-                    this.parentMap.set(n.id, node);
-                    this.drawNode(context, n, nodeX, nodeY);
+                    this.drawNode(context, n);
                 });
             }
         }
+    }
+
+
+    private drawEdge = (context: CanvasRenderingContext2D, extendedEdge: ElkExtendedEdge) => {
+
+        context.save();
+        context.font ="9px Arial"
+        context.setLineDash([3, 2]);
+
+        if (extendedEdge.labels && extendedEdge.labels[0]) {
+            const label = extendedEdge.labels[0];
+            if (label.x !== undefined && label.y !== undefined) {
+                context.fillText(label.text, label.x, label.y);
+            }
+        }
+
+        extendedEdge.sections.forEach(section => {
+
+            context.strokeStyle = section.startPoint.y > section.endPoint.y ? "#FF0000" : "#000000";
+            context.fillStyle = section.startPoint.y > section.endPoint.y ? "#FF0000" : "#000000";
+
+            let lastPoint: ElkPoint = section.startPoint;
+
+            context.beginPath();
+            context.moveTo(lastPoint.x, lastPoint.y);
+
+            //
+            if (section.bendPoints) {
+
+                // tslint:disable-next-line:prefer-for-of
+                for (let i = 0; i < section.bendPoints.length; i++) {
+
+                    const currentPoint: ElkPoint = section.bendPoints[i];
+                    const nextPoint = i < section.bendPoints.length - 1 ? section.bendPoints[i + 1] : section.endPoint;
+
+                    const lastDeltaX = currentPoint.x - lastPoint.x;
+                    const lastDeltaY = currentPoint.y - lastPoint.y;
+                    const nextDeltaX = nextPoint.x - currentPoint.x;
+                    const nextDeltaY = nextPoint.y - currentPoint.y;
+
+                    if (lastDeltaX !== 0) {
+                        context.lineTo(lastDeltaX > 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS, currentPoint.y);
+                        context.quadraticCurveTo(currentPoint.x, currentPoint.y, currentPoint.x, nextDeltaY < 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS);
+                    } else if (lastDeltaY !== 0) {
+                        context.lineTo(currentPoint.x, lastDeltaY > 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS);
+                        context.quadraticCurveTo(currentPoint.x, currentPoint.y, nextDeltaX < 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS, currentPoint.y);
+                    }
+
+                    lastPoint = currentPoint;
+                }
+            }
+
+            const endpointYOffset = section.endPoint.y > section.startPoint.y ? -5 : +5;
+            context.lineTo(section.endPoint.x, section.endPoint.y + endpointYOffset);
+            context.stroke();
+
+            this.drawArrowhead(context, lastPoint, section.endPoint, 4);
+        })
+
+        context.restore();
     }
 
     /**
@@ -367,10 +455,10 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
         }
     }
 
-    private doIt = (pointX: number, pointY: number): ElkExtendedEdge | undefined => {
+    private computeSelectedEdge = (pointX: number, pointY: number): ElkExtendedEdge | undefined => {
 
-        if (this.rootNode && this.rootNode.edges) {
-            for (const edge of this.rootNode.edges) {
+        if (this.nodeLayout && this.nodeLayout.edges) {
+            for (const edge of this.nodeLayout.edges) {
                 const extendedEdge: ElkExtendedEdge = edge as ElkExtendedEdge;
                 for (const section of extendedEdge.sections) {
 
@@ -395,8 +483,8 @@ export class DependencyGraph extends React.Component<any, IDependencyGraphState>
     }
 
     private isPointOnLine = (startX: number, startY: number, endX: number, endY: number, pointX: number, pointY: number) => {
-        return (startX < endX ? (startX - this.LINE_RANGE <= pointX && pointX <= endX + this.LINE_RANGE) : (endX - this.LINE_RANGE <= pointX && pointX <= startX + this.LINE_RANGE)) &&
-            (startY < endY ? (startY - this.LINE_RANGE <= pointY && pointY <= endY + this.LINE_RANGE) : (endY - this.LINE_RANGE <= pointY && pointY <= startY + this.LINE_RANGE));
+        return (startX < endX ? (startX - this.CLICKABLE_EDGE_RANGE <= pointX && pointX <= endX + this.CLICKABLE_EDGE_RANGE) : (endX - this.CLICKABLE_EDGE_RANGE <= pointX && pointX <= startX + this.CLICKABLE_EDGE_RANGE)) &&
+            (startY < endY ? (startY - this.CLICKABLE_EDGE_RANGE <= pointY && pointY <= endY + this.CLICKABLE_EDGE_RANGE) : (endY - this.CLICKABLE_EDGE_RANGE <= pointY && pointY <= startY + this.CLICKABLE_EDGE_RANGE));
     }
 }
 

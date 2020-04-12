@@ -17,11 +17,62 @@
  */
 import '../src/SlizaaApp.css'
 
-import { storiesOf } from '@storybook/react';
+import {storiesOf} from '@storybook/react';
 import * as React from 'react';
 import {DependencyGraph} from "../src/components/dependencygraph";
+import {IDependencyGraphEdge} from "../src/components/dependencygraph/IDependencyGraphProps";
 
 storiesOf('DependencyGraph', module)
     .add('Simple DependencyGraph', () => (
-        <DependencyGraph />
+        <DependencyGraph
+            nodes={[
+                {id: "n1", text: "module n1", iconIdentifier: ""},
+                {id: "n2", text: "module n2", iconIdentifier: ""},
+                {id: "n3", text: "module n3", iconIdentifier: ""},
+                {id: "n4", text: "module n4", iconIdentifier: ""},
+                {id: "n5", text: "module n5", iconIdentifier: ""},
+                {id: "n6", text: "module n6", iconIdentifier: ""},
+            ]}
+            edges={[
+                {id: "e1", sourceId: "n1", targetId: "n6", weight: 12},
+                {id: "e2", sourceId: "n2", targetId: "n5", weight: 123},
+                {id: "e3", sourceId: "n5", targetId: "n3", weight: 1046},
+                {id: "e4", sourceId: "n3", targetId: "n4", weight: 25},
+                {id: "e5", sourceId: "n4", targetId: "n3", weight: 26},
+                {id: "e6", sourceId: "n3", targetId: "n6", weight: 345},
+                {id: "e7", sourceId: "n2", targetId: "n6", weight: 176}
+            ]}
+            scss={[]}/>
+    ))
+    .add('Simple DependencyGraph 2', () => (
+        <DependencyGraph
+            onEdgeSelected={handleSelect}
+            nodes={[
+                {id: "n1", text: "module n1", iconIdentifier: ""},
+                {id: "n2", text: "module n2", iconIdentifier: ""},
+                {id: "n5", text: "module n5", iconIdentifier: ""},
+                {id: "n6", text: "module n6", iconIdentifier: ""},
+            ]}
+            edges={[
+                {id: "e1", sourceId: "n1", targetId: "n6", weight: 2},
+                {id: "e2", sourceId: "n2", targetId: "n5", weight: 36},
+                {id: "e3", sourceId: "n5", targetId: "n3", weight: 375},
+                {id: "e4", sourceId: "n3", targetId: "n4", weight: 945},
+                {id: "e5", sourceId: "n4", targetId: "n3", weight: 66},
+                {id: "e6", sourceId: "n3", targetId: "n6", weight: 6},
+                {id: "e7", sourceId: "n2", targetId: "n6", weight: 3686}
+            ]}
+            scss={[{
+                id: "virt",
+                nodes: [
+                    {id: "n3", text: "module n3", iconIdentifier: ""},
+                    {id: "n4", text: "module n4", iconIdentifier: ""}
+                ]
+            }
+            ]}/>
     ));
+
+function handleSelect(edge: IDependencyGraphEdge | undefined) {
+    // tslint:disable-next-line
+    console.log(edge !== undefined ? edge.id : "undefined");
+}
