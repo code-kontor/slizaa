@@ -23,12 +23,15 @@ import {IDependencyGraphState} from "./IDependencyGraphState";
 
 export class DependencyGraph extends React.Component<IDependencyGraphProps, IDependencyGraphState> {
 
-    private readonly DEFAULT_SCALE = 1.6;
+    private readonly DEFAULT_SCALE = 1.0;
 
-    private readonly CLICKABLE_EDGE_RANGE = 4;
+    private readonly CLICKABLE_EDGE_RANGE = 6;
     private readonly CORNER_RADIUS = 3;
-    private readonly NODE_HEIGHT = 20;
-    private readonly NODE_WIDTH = 150;
+    private readonly NODE_HEIGHT = 25;
+    private readonly NODE_WIDTH = 250;
+    private readonly NODE_PADDING = 10;
+
+    private readonly TEXT_FONT = "12px Arial";
 
     private canvasRef: HTMLCanvasElement | null;
     private renderingContext: CanvasRenderingContext2D | null;
@@ -93,7 +96,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
             layoutOptions: {
                 'elk.algorithm': 'layered',
                 'org.eclipse.elk.direction': 'DOWN',
-                'org.eclipse.elk.layered.mergeEdges': 'true',
+                'org.eclipse.elk.layered.mergeEdges': 'false',
                 // 'org.eclipse.elk.layered.spacing.edgeNodeBetweenLayers': '10',
                 'org.eclipse.elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
                 'org.eclipse.elk.hierarchyHandling': 'INCLUDE_CHILDREN',
@@ -265,7 +268,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
         if (node.x && node.y && node.width && node.height) {
 
             context.save();
-            context.font ="9px Arial"
+            context.font = this.TEXT_FONT;
 
             if (node.children) {
 
@@ -300,7 +303,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
                 context.beginPath();
                 context.rect(node.x,
                     node.y,
-                    node.width,
+                    node.width - this.NODE_PADDING,
                     node.height,);
                 context.clip();
 
@@ -308,7 +311,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
                 context.fillStyle = "rgba(0, 0, 0, 1.0)";
                 context.textAlign = "left";
                 context.textBaseline = "middle";
-                context.fillText(nodeLabel, node.x + (this.NODE_HEIGHT / 2), node.y + (this.NODE_HEIGHT / 2));
+                context.fillText(nodeLabel, node.x + this.NODE_PADDING, node.y + (this.NODE_HEIGHT / 2));
             }
             context.restore();
 
