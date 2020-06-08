@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {Dropdown, Menu} from 'antd';
+import {ClickParam} from "antd/lib/menu";
 import * as React from 'react';
 import './Card.css';
+import {EmptyIcon, HeartIcon, PandaIcon} from "./CardIcons";
 
 export interface ICardProps {
     title: string
@@ -26,7 +29,26 @@ export interface ICardProps {
 
 export class Card extends React.Component<ICardProps> {
 
+
+
     public render() {
+
+        const menu = (
+            <Menu onClick={this.handleMenuClick} selectedKeys={["1"]}>
+                <Menu.Item key="1" >
+                    <EmptyIcon />
+                    1st menu item
+                </Menu.Item>
+                <Menu.Item key="2">
+                    <HeartIcon />
+                    2nd menu item
+                </Menu.Item>
+                <Menu.Item key="3">
+                    <EmptyIcon />
+                    3rd item
+                </Menu.Item>
+            </Menu>
+        );
 
         const styleProperties = {
             overflow: this.props.allowOverflow !== undefined && !this.props.allowOverflow ? 'hidden' : 'auto',
@@ -39,10 +61,23 @@ export class Card extends React.Component<ICardProps> {
 
         return (
             <div className="slizaa-card" >
-                <div className="slizaa-card-title">{this.props.title}</div>
+                <div className="slizaa-card-title" >
+                    <div style={{ float: "left", width: "50%"}}>{this.props.title}</div>
+                    <div style={{ display: "inline-block", float: "right"}}>
+                        <Dropdown overlay={menu} placement="bottomRight">
+                            <HeartIcon />
+                        </Dropdown>
+                        <PandaIcon style={{ paddingLeft: "5px" }} />
+                    </div>
+                </div>
                 {body}
             </div>
         );
+    }
+
+    private handleMenuClick = (param: ClickParam): void => {
+        // tslint:disable-next-line:no-console
+        console.log('click left button', param);
     }
 
 }
