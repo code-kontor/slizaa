@@ -71,7 +71,9 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
     }
 
     public render() {
-
+        if (!this.props.databaseId || !this.props.hierarchicalGraphId) {
+            return null;
+        }
         const variables: CoreDependenciesForAggregatedDependenciesVariables = {
             databaseId: this.props.databaseId,
             dependencySourceNodeId: this.props.dependencySourceNodeId,
@@ -136,6 +138,10 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
     }
 
     private expandedRowRender = (record: DependencyRecord) => {
+
+        if (!this.props.databaseId || !this.props.hierarchicalGraphId) {
+            return null;
+        }
 
         const variables: ResolvedProxyDependencyVariables = {
             databaseId: this.props.databaseId,

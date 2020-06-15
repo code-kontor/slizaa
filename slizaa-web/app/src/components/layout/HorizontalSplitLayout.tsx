@@ -16,21 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import * as React from 'react';
-
 import {HorizontalSplitLayoutOverlay} from "./HorizontalSplitLayoutOverlay";
 
 export interface IProps {
     id: string
-    left: JSX.Element
-    right: JSX.Element
-    initialWidth: number
+    top: JSX.Element
+    bottom: JSX.Element
+    height: number
     gutter: number
-    onWidthChanged?: (id: string, newWidth: number) => void;
+    initialRatio: number
+    onRatioChanged?: (id: string, newRatio: number) => void
 }
 
 export interface IState {
-    width: number,
-    gutter: number
+    gutter: number,
+    currentRatio: number
 }
 
 export class HorizontalSplitLayout extends React.Component<IProps, IState> {
@@ -38,66 +38,73 @@ export class HorizontalSplitLayout extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            gutter: this.props.gutter,
-            width: props.initialWidth
+            currentRatio: props.initialRatio,
+            gutter: props.gutter,
         };
     }
 
     public componentWillReceiveProps(nextProps: IProps) {
-        if (nextProps.initialWidth !== this.state.width) {
-            this.setState({
-                gutter: nextProps.gutter,
-                width: nextProps.initialWidth
-            })
-        }
+        this.setState( {
+            currentRatio: nextProps.initialRatio,
+            gutter: nextProps.gutter,
+        });
     }
 
     public render() {
         return (
-            <div style={{height: "100%", position: "relative"}}>
+            <div style={{
+                height: this.props.height + "px",
+                position: "relative",
+                width: "100%"
+            }}>
 
                 <HorizontalSplitLayoutOverlay
-                    width={this.state.width}
+                    height={this.props.height}
+                    initialRatio={this.state.currentRatio}
                     gutter={this.state.gutter}
-                    onWidthChanged={this.handleNewWidth}/>
+                    onRatioChanged={this.handleRatioChanged}
+                />
 
-                <div className="contentFlexContainer"
-                     style={{
-                         backgroundColor: "transparent",
-                         display: "flex",
-                         flexFlow: "row",
-                         height: "100%",
-                         overflow: "hidden",
-                     }}>
+                <div style={{
+                    backgroundColor: "transparent",
+                    display: "flex",
+                    flexFlow: "column",
+                    height: "100%",
+                    overflow: "hidden",
+                    width: "100%",
+                }}>
 
-                    <div className="item item1" style={{
-                        flex: "0 0 " + this.state.width + "px",
-                        overflow: "hidden",
+                    <div style={{
+                        flex: "0 0 " + (this.state.currentRatio / 1000) * this.props.height + "px",
+                        height: "100%",
+                        overflow: "hidden"
                     }}>
-                        {this.props.left}
+                        {this.props.top}
                     </div>
-                    <div className="verticalDivider" style={{
+
+                    <div style={{
                         backgroundColor: "transparent",
-                        width: this.props.gutter + "px"
+                        height: this.state.gutter + "px"
                     }}/>
-                    <div className="item item2" style={{
+
+                    <div style={{
                         flex: "1 0 0px",
                         overflow: "hidden"
                     }}>
-                        {this.props.right}
+                        {this.props.bottom}
                     </div>
-                </div>
 
+                </div>
             </div>
         );
     }
 
-    private handleNewWidth = (newWidth: number): void => {
+    private handleRatioChanged = (newRatio: number): void => {
         this.setState({
-            width: newWidth > 0 ? newWidth : 0
+            currentRatio: newRatio
         })
-        if (this.props.onWidthChanged) {
-            this.props.onWidthChanged(this.props.id, newWidth)
+        if (this.props.onRatioChanged) {
+            this.props.onRatioChanged(this.props.id, newRatio)
         }
     }
 }

@@ -57,6 +57,10 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
 
     public render() {
 
+        if (!this.props.databaseId || !this.props.hierarchicalGraphId) {
+            return null;
+        }
+
         const variables: ReferencedNodesForAggregatedDependenciesVariables = {
             databaseId: this.props.databaseId,
             dependencySourceNodeId: this.props.sourceNodeId,

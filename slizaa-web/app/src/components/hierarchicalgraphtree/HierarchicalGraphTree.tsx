@@ -49,10 +49,13 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
   }
 
   public loadData = (parent: SlizaaNode, callback: () => void): Promise<{}> => {
-    return fetchChildren(this.props.client, parent, this.props.databaseId, this.props.hierarchicalGraphId, callback);
+    return fetchChildren(this.props.client, parent, this.props.databaseId ? this.props.databaseId : "", this.props.hierarchicalGraphId ? this.props.hierarchicalGraphId : "", callback);
   }
 
   public render() {
+    if (!this.props.databaseId || !this.props.hierarchicalGraphId) {
+      return null;
+    }
     return (
       <STree
         rootNode={this.state.rootNode}

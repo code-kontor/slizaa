@@ -17,7 +17,7 @@
  */
 
 export interface IDependenciesViewProps {
-    databaseId: string
-    hierarchicalGraphId: string
-    dispatchSidemarkerResize: (horizontalHeight: number, verticalWidth: number) => void
+    databaseId?: string
+    hierarchicalGraphId?: string
+    dispatchSidemarkerResize?: (horizontalHeight: number, verticalWidth: number) => void
 }

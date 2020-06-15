@@ -17,47 +17,43 @@
  */
 import './SlizaaApp.css';
 
-import { defaultDataIdFromObject, InMemoryCache } from 'apollo-cache-inmemory';
+import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
 import ApolloClient from 'apollo-client';
-import { createHttpLink } from 'apollo-link-http';
+import {createHttpLink} from 'apollo-link-http';
 import * as React from "react";
-import { Component } from "react";
-import { ApolloProvider } from 'react-apollo';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import { appReducer } from './redux/Reducers';
-import MainView from './views/mainview/internal/MainView';
+import {Component} from "react";
+import {ApolloProvider} from 'react-apollo';
+import {DatabaseAndHierarchicalGraphProvider} from "./components/slizaahgchooser/DatabaseAndHierarchicalGraphProvider";
+import {MainView} from "./views/mainview";
 
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_SLIZAA_API_URL ? process.env.REACT_APP_SLIZAA_API_URL : window.location.href.replace(window.location.pathname, '/graphql/')
+    uri: process.env.REACT_APP_SLIZAA_API_URL ? process.env.REACT_APP_SLIZAA_API_URL : window.location.href.replace(window.location.pathname, '/graphql/')
 });
 
 // create the apollo client instance
 const client = new ApolloClient({
     cache: new InMemoryCache({
-    dataIdFromObject: object => {
-      switch (object.__typename) {
-        default: return defaultDataIdFromObject(object); // fall back to default handling
-      }
-    }
-  }),
-  link: httpLink,
+        dataIdFromObject: object => {
+            switch (object.__typename) {
+                default:
+                    return defaultDataIdFromObject(object); // fall back to default handling
+            }
+        }
+    }),
+    link: httpLink,
 });
-
-const store = createStore(appReducer, composeWithDevTools());
 
 class SlizaaApp extends Component {
 
-  public render() {
-    return (
-      <ApolloProvider client={client}>
-        <Provider store={store}>
-            <MainView />
-        </Provider>
-      </ApolloProvider>
-    );
-  }
+    public render() {
+        return (
+            <ApolloProvider client={client}>
+                <DatabaseAndHierarchicalGraphProvider>
+                    <MainView/>
+                </DatabaseAndHierarchicalGraphProvider>
+            </ApolloProvider>
+        );
+    }
 }
 
 export default SlizaaApp;

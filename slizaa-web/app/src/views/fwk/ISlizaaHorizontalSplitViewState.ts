@@ -15,14 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-export interface IAppState {
-    currentDatabase: string | undefined;
-    currentHierarchicalGraph: string | undefined;
-}
 
-export function defaultState(): IAppState {
-    return {
-        currentDatabase: undefined,
-        currentHierarchicalGraph: undefined,
-    };
+export interface ISlizaaHorizontalSplitViewState {
+    viewHeight: number
+    horizontalSplitRatio: number
 }

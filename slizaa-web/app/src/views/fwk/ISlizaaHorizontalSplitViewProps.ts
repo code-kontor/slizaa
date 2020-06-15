@@ -15,25 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { AppActions } from './Actions';
-import { defaultState, IAppState } from './IAppState';
 
-export function appReducer(state: IAppState = defaultState(), action: AppActions): IAppState {
-
-    // handle action
-    if (action.type === "ACTION_SELECT_DATABASE") {
-        return {
-            ...state,
-            currentDatabase: action.selectedDatabaseId
-        }
-    }
-    else if (action.type === "ACTION_SELECT_HIERARCHICAL_GRAPH") {
-        return {
-            ...state,
-            currentHierarchicalGraph: action.selectedHierarchicalGraphId
-        }
-    }
-
-    // default handling
-    return state;
+export interface ISlizaaHorizontalSplitViewProps {
+    id: string,
+    top: JSX.Element,
+    bottom: JSX.Element,
 }

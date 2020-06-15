@@ -19,11 +19,9 @@ import {Spin} from 'antd';
 import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
-import {connect} from 'react-redux';
 import {Card} from 'src/components/card';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
-import {HorizontalSplitLayout, VerticalSplitLayout} from 'src/components/layout';
-import {IAppState} from 'src/redux/IAppState';
+import {VerticalSplitLayout} from 'src/components/layout';
 import {SlizaaDependencyViewer} from "../../components/slizaadependencyviewer/SlizaaDependencyViewer";
 import {
     DsmForNodeChildren,
@@ -33,6 +31,7 @@ import {
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../gqlqueries/GqlQueries";
 import {ISlizaaNode} from "../../model/ISlizaaNode";
 import {NodeType} from "../../model/NodeType";
+import {SlizaaHorizontalSplitView} from "../fwk/SlizaaHorizontalSplitView";
 import './DependenciesView.css';
 import {DependenciesViewProps} from "./DependenciesViewLayoutConstants";
 import {DependencyGraphPart} from "./dependencyGraphPart";
@@ -44,20 +43,20 @@ import {IDependencySelection} from "./IDependencyViewModel";
 
 export class DependenciesView extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
 
-    public static getDerivedStateFromProps(props: IDependenciesViewProps, state: IDependenciesViewState) {
-        if (props.databaseId !== state.databaseId ||
-            props.hierarchicalGraphId !== state.hierarchicalGraphId) {
-            return {
-                databaseId: props.databaseId,
-                hierarchicalGraphId: props.hierarchicalGraphId,
-                mainTreeNodeSelection: {
-                    expandedNodeIds: ["-1"],
-                    selectedNodeIds: [],
-                }
-            };
-        }
-        return null;
-    }
+    // public static getDerivedStateFromProps(props: IDependenciesViewProps, state: IDependenciesViewState) {
+    //     if (props.databaseId !== state.databaseId ||
+    //         props.hierarchicalGraphId !== state.hierarchicalGraphId) {
+    //         return {
+    //             databaseId: props.databaseId,
+    //             hierarchicalGraphId: props.hierarchicalGraphId,
+    //             mainTreeNodeSelection: {
+    //                 expandedNodeIds: ["-1"],
+    //                 selectedNodeIds: [],
+    //             }
+    //         };
+    //     }
+    //     return null;
+    // }
 
     constructor(props: IDependenciesViewProps) {
         super(props);
@@ -81,76 +80,87 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         }
     }
 
-    public componentDidMount(): void {
-        this.updateWindowDimensions();
-        window.addEventListener('resize', this.updateWindowDimensions);
-    }
-
-    public componentWillUnmount(): void {
-        window.removeEventListener('resize', this.updateWindowDimensions);
-    }
-
     public render() {
-
-        if (!this.props.hierarchicalGraphId) {
-            return null
-        }
-
         return (
             <ApolloConsumer>
-                {cl =>
-                    <VerticalSplitLayout
+                {cl => (
+                    <SlizaaHorizontalSplitView
                         id="dependencyViewMain"
-                        height={this.state.layout.height}
-                        gutter={DependenciesViewProps.GUTTER_SIZE}
-                        initialRatio={this.state.layout.horizontalRatio}
-                        onRatioChanged={this.onHorizontalRatioChanged}
                         top={
-                            <HorizontalSplitLayout
+                            <VerticalSplitLayout
                                 id="upper"
                                 gutter={DependenciesViewProps.GUTTER_SIZE}
                                 initialWidth={this.state.layout.upperDividerPosition}
                                 onWidthChanged={this.onUpperSplitLayoutWidthChanged}
                                 left={
-                                    <Card title="Hierarchical Graph"
-                                          padding={0}>
-                                        {this.hierarchicalGraph(cl)}
-                                    </Card>
+                                    this.hierarchicalGraphCard(cl)
                                 }
                                 right={
-                                    <Card title="Dependencies Overview"
-                                          allowOverflow={false}
-                                          padding={0}>
-                                        {this.dependencyGraph(cl)}
-                                    </Card>
+                                    this.dependenciesOverviewCard(cl)
                                 }
                             />
                         }
-                        bottom={
-                            <Card title="Dependencies Details" allowOverflow={false} padding={0}>
-                                {this.dependencyDetailViewer(cl)}
-                            </Card>
-                        }/>
+                        bottom={this.dependencyDetailsCard(cl)}
+                    />)
                 }
             </ApolloConsumer>
         );
     }
 
-    private hierarchicalGraph(client: ApolloClient<any>): React.ReactNode {
-        return <HierarchicalGraphTree
-            key={this.props.databaseId + "-" + this.props.hierarchicalGraphId}
-            client={client}
-            databaseId={this.props.databaseId}
-            hierarchicalGraphId={this.props.hierarchicalGraphId}
-            onSelect={this.onMainTreeSelect}
-            onExpand={this.onMainTreeExpand}
-            expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
-            checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
+    private hierarchicalGraphCard(cl: ApolloClient<any>): React.ReactElement {
+        return <Card title="Hierarchical Graph"
+                     id="hierarchicalGraph"
+                     padding={0}>
+            <HierarchicalGraphTree
+                key={this.state.databaseId + "-" + this.state.hierarchicalGraphId}
+                client={cl}
+                databaseId={this.state.databaseId}
+                hierarchicalGraphId={this.state.hierarchicalGraphId}
+                onSelect={this.onMainTreeSelect}
+                onExpand={this.onMainTreeExpand}
+                expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
+                checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
+        </Card>;
     }
 
+    private dependenciesOverviewCard(cl: ApolloClient<any>): React.ReactElement {
+        return <Card title="Dependencies Overview"
+                     id="dependenciesOverview"
+                     allowOverflow={true}
+                     padding={0}>
+            {this.dependencyGraph(cl)}
+        </Card>;
+    }
+
+    private dependencyDetailsCard(client: ApolloClient<any>): React.ReactElement {
+
+        const node: React.ReactElement = this.state.mainDependencySelection === undefined ?
+
+            // return empty div if selected dependency is undefined
+            <div/> :
+
+            // else retunr the dependency viewer
+            <SlizaaDependencyViewer
+                key={this.state.mainDependencySelection.sourceNode.id + "-" + this.state.mainDependencySelection.targetNode.id}
+                client={client}
+                height={((this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000) - 135}
+                databaseId={this.state.databaseId}
+                hierarchicalGraphId={this.state.hierarchicalGraphId}
+                sourceNodeId={this.state.mainDependencySelection.sourceNode.id}
+                targetNodeId={this.state.mainDependencySelection.targetNode.id}
+            />
+
+        return <Card
+            id="dependenciesDetails"
+            title="Dependencies Details" allowOverflow={false} padding={0}>
+            {node}
+        </Card>;
+    }
+
+    // @ts-ignore
     private dependencyGraph(client: ApolloClient<any>): React.ReactNode {
 
-        return this.queryAndConsume(client, (matrix) => {
+        return this.queryAndConsume(client, this.state.databaseId, this.state.hierarchicalGraphId, (matrix) => {
 
             if (matrix === undefined) {
                 return <h1>undefined</h1>
@@ -174,7 +184,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
     // @ts-ignore
     private dependencyStructureMatrixPart(client: ApolloClient<any>): React.ReactNode {
 
-        return this.queryAndConsume(client, (matrix) => {
+        return this.queryAndConsume(client, this.state.databaseId, this.state.hierarchicalGraphId, (matrix) => {
 
             // get  the data
             const {orderedNodes, cells, stronglyConnectedComponents} = matrix;
@@ -194,32 +204,18 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         })
     }
 
-    private dependencyDetailViewer = (client: ApolloClient<any>): React.ReactNode => {
+    private queryAndConsume(client: ApolloClient<any>, aDatabaseId: string | undefined, aHierarchicalGraphId: string | undefined, consumer: (matrix: DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix) => React.ReactNode): React.ReactNode {
 
-        // return empty div if selected dependency is undefined
-        if (this.state.mainDependencySelection === undefined) {
-            return <div/>;
+        if (!aDatabaseId || !aHierarchicalGraphId) {
+            return null;
         }
-
-        return <SlizaaDependencyViewer
-            key={this.state.mainDependencySelection.sourceNode.id + "-" + this.state.mainDependencySelection.targetNode.id}
-            client={client}
-            height={((this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000) - 135}
-            databaseId={this.props.databaseId}
-            hierarchicalGraphId={this.props.hierarchicalGraphId}
-            sourceNodeId={this.state.mainDependencySelection.sourceNode.id}
-            targetNodeId={this.state.mainDependencySelection.targetNode.id}
-        />
-    }
-
-    private queryAndConsume(client: ApolloClient<any>, consumer: (matrix: DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix) => React.ReactNode): React.ReactNode {
 
         if (this.state.mainTreeNodeSelection.selectedNodeIds.length > 0) {
 
             const query = GQ_DSM_FOR_NODE_CHILDREN;
             const queryVariables = {
-                databaseId: this.props.databaseId,
-                hierarchicalGraphId: this.props.hierarchicalGraphId,
+                databaseId: aDatabaseId,
+                hierarchicalGraphId: aHierarchicalGraphId,
                 nodeId: this.state.mainTreeNodeSelection.selectedNodeIds[0]
             };
 
@@ -290,30 +286,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         });
     }
 
-    private updateWindowDimensions = (): void => {
-
-        const HEADER_SIZE_WITH_MARGIN = 55;
-
-        const newHeight = window.innerHeight - HEADER_SIZE_WITH_MARGIN;
-
-        this.setState(
-            {
-                layout: {
-                    ...this.state.layout,
-                    height: newHeight,
-                }
-            });
-    }
-
-    private onHorizontalRatioChanged = (id: string, newRation: number): void => {
-        this.setState(
-            {
-                layout: {
-                    ...this.state.layout,
-                    horizontalRatio: newRation,
-                }
-            })
-    }
 
     private onMainTreeExpand = (aExpandedNodeIds: string[]): void => {
         this.setState(
@@ -351,17 +323,4 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             }
         );
     }
-
-
 }
-
-const mapStateToProps = (state: IAppState) => {
-    return {
-        databaseId: state.currentDatabase,
-        hierarchicalGraphId: state.currentHierarchicalGraph
-    };
-};
-
-export default connect(mapStateToProps)(
-    DependenciesView
-);

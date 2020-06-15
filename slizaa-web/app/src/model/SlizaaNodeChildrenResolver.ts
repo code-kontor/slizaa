@@ -64,10 +64,15 @@ export function fetchChildren( aApolloClient: ApolloClient<NodeChildren>, aParen
     });
 }
 
-export function fetchChildrenFilterByDependencySet( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aNodeType: NodeType, dependencySourceNodeId: string, dependencyTargetNodeId: string, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
+export function fetchChildrenFilterByDependencySet( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aNodeType: NodeType, dependencySourceNodeId: string, dependencyTargetNodeId: string, aDatabaseId: string | undefined, aHierarchicalGraphId: string | undefined, callback: () => void): Promise<{}> {
 
     // create new result promise
     return new Promise(async (resolve, reject) => {
+
+        if (!aDatabaseId || !aHierarchicalGraphId) {
+            resolve();
+            return;
+        }
 
         // return if children already have been resolved...
         if (aParentNode.internalChildren) {

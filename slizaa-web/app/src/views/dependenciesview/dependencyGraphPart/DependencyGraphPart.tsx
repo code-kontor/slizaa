@@ -44,10 +44,10 @@ export class DependencyGraphPart extends React.Component<IDependencyGraphPartPro
             }));
 
         return <DependencyGraph
-            onEdgeSelected={this.handleSelect}
-            nodes={nodes}
-            edges={edges}
-            scss={[]}/>
+                onEdgeSelected={this.handleSelect}
+                nodes={nodes}
+                edges={edges}
+                scss={[]}/>
     }
 
     private handleSelect = (edge: IDependencyGraphEdge | undefined): void => {

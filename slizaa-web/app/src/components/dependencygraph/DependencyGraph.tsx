@@ -18,6 +18,7 @@
 import ELK, {ElkExtendedEdge, ElkNode, ElkPoint} from 'elkjs/lib/elk.bundled.js'
 import * as React from "react";
 import {setupCanvas} from "../dsm/DpiFixer";
+import './DependencyGraph.css';
 import {IDependencyGraphEdge, IDependencyGraphProps} from "./IDependencyGraphProps";
 import {IDependencyGraphState} from "./IDependencyGraphState";
 
@@ -32,6 +33,8 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
     private readonly NODE_PADDING = 10;
 
     private readonly TEXT_FONT = "12px Arial";
+
+    private containerRef: HTMLDivElement | null;
 
     private canvasRef: HTMLCanvasElement | null;
     private renderingContext: CanvasRenderingContext2D | null;
@@ -68,7 +71,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
 
         const arrayOfEdges = this.props.edges.map(value => ({
             id: value.id,
-            // labels: [{text: value.weight}],
+            labels: [{text: value.weight}],
             sources: [value.sourceId],
             targets: [value.targetId],
         }));
@@ -82,10 +85,10 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
             ({
                 children: value.nodes.map(n => ({id: n.id, labels: [{text: n.text}], width: this.NODE_WIDTH, height: this.NODE_HEIGHT})),
                 id: value.id,
-                // layoutOptions: {
-                //     'org.eclipse.elk.layered.edgeLabels.sideSelection': 'ALWAYS_UP',
-                //     'org.eclipse.elk.spacing.edgeLabel': '4',
-                // },
+                layoutOptions: {
+                    'org.eclipse.elk.layered.edgeLabels.sideSelection': 'ALWAYS_UP',
+                    'org.eclipse.elk.spacing.edgeLabel': '4',
+                },
             })
         );
 
@@ -101,7 +104,8 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
                 'org.eclipse.elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
                 'org.eclipse.elk.hierarchyHandling': 'INCLUDE_CHILDREN',
                 // 'org.eclipse.elk.spacing.edgeLabel': '4',
-                // 'org.eclipse.elk.layered.edgeLabels.sideSelection': 'ALWAYS_UP'
+                'org.eclipse.elk.layered.edgeLabels.sideSelection': 'SMART_UP',
+                'org.eclipse.elk.core.options.EdgeLabelPlacement': 'TAIL'
             },
             children: [...arrayOfNodes, ...arrayOfScss],
             edges: arrayOfEdges
@@ -119,7 +123,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
     }
 
     public render() {
-        return <div id="dsm-canvas-container">
+        return <div className="dsm-canvas-container" ref={ref => (this.containerRef = ref)}>
             <canvas id="markedDependencyLayer" ref={ref => (this.markedDependencyLayerCanvasRef = ref)}/>
             <canvas id="main" ref={ref => (this.canvasRef = ref)}/>
         </div>
@@ -131,7 +135,8 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
 
     private draw = () => {
 
-        if (this.canvasRef && this.renderingContext &&
+        if (this.containerRef &&
+            this.canvasRef && this.renderingContext &&
             this.markedDependencyLayerCanvasRef && this.markedDependencyLayerRenderingContext &&
             this.nodeLayout && this.nodeLayout.width && this.nodeLayout.height) {
 

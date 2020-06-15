@@ -20,8 +20,8 @@ import ApolloClient from "apollo-client";
 
 export interface ISlizaaDependencyViewerProps {
     client: ApolloClient<any>,
-    databaseId: string,
-    hierarchicalGraphId: string,
+    databaseId?: string,
+    hierarchicalGraphId?: string,
     sourceNodeId: string,
     targetNodeId: string,
     height: number,

@@ -18,8 +18,8 @@
 
 export interface IDependencyListProp {
     height?: number
-    databaseId: string
-    hierarchicalGraphId: string
+    databaseId?: string
+    hierarchicalGraphId?: string
     dependencySourceNodeId: string
     dependencyTargetNodeId: string
     selectedSourceNodeIds: string[]

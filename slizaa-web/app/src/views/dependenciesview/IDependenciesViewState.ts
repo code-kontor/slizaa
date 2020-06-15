@@ -18,8 +18,8 @@
 import {IDependenciesTreeSelection, IDependencySelection, ITreeNodeSelection} from "./IDependencyViewModel";
 
 export interface IDependenciesViewState {
-    databaseId: string
-    hierarchicalGraphId: string
+    databaseId?: string
+    hierarchicalGraphId?: string
     layout: IIDependenciesViewLayout
     mainTreeNodeSelection: ITreeNodeSelection
     mainDependencySelection?: IDependencySelection
@@ -27,6 +27,7 @@ export interface IDependenciesViewState {
 }
 
 export interface IIDependenciesViewLayout {
+    fullSizeCard?: string
     upperDividerPosition: number
     horizontalRatio: number
     height: number

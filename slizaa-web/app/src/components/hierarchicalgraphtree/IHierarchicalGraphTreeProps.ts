@@ -19,8 +19,8 @@
 import {ISlizaaNode} from "../../model/ISlizaaNode";
 
 export interface IHierarchicalGraphTreeProps {
-  databaseId: string
-  hierarchicalGraphId: string
+  databaseId?: string
+  hierarchicalGraphId?: string
   expandedKeys?: string[]
   checkedKeys?: string[]
   onSelect:  (selectedNodes: ISlizaaNode[]) => void

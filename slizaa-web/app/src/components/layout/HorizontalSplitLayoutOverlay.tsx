@@ -18,38 +18,39 @@
 import * as React from 'react';
 import {DraggableCore, DraggableData, DraggableEvent, DraggableEventHandler} from 'react-draggable';
 
-export interface IHorizontalSplitLayoutOverlayProps {
-    width: number
+export interface IVerticalSplitLayoutOverlayProps {
+    height: number
     gutter: number
-    onWidthChanged: (newWidth: number) => void;
+    initialRatio: number
+    onRatioChanged?: (newRatio: number) => void
 }
 
-export interface IHorizontalSplitLayoutOverlayState {
-    currentWidth: number,
+export interface IVerticalSplitLayoutOverlayState {
+    currentRatio: number
     dragging: boolean
 }
 
-export class HorizontalSplitLayoutOverlay extends React.Component<IHorizontalSplitLayoutOverlayProps, IHorizontalSplitLayoutOverlayState> {
+export class HorizontalSplitLayoutOverlay extends React.Component<IVerticalSplitLayoutOverlayProps, IVerticalSplitLayoutOverlayState> {
 
-    constructor(props: IHorizontalSplitLayoutOverlayProps) {
+    constructor(props: IVerticalSplitLayoutOverlayProps) {
         super(props);
         this.state = {
-            currentWidth: props.width,
+            currentRatio: props.initialRatio,
             dragging: false
         };
     }
 
-    public componentWillReceiveProps(nextProps: IHorizontalSplitLayoutOverlayProps) {
-        this.setState({
-            currentWidth: nextProps.width,
+    public componentWillReceiveProps(nextProps: IVerticalSplitLayoutOverlayProps) {
+        this.state = {
+            currentRatio: nextProps.initialRatio,
             dragging: false
-        })
+        };
     }
 
     public render() {
         return (
             <div style={{
-                height: "100%",
+                height: this.props.height,
                 left: "0",
                 pointerEvents: "none",
                 position: "absolute",
@@ -60,27 +61,24 @@ export class HorizontalSplitLayoutOverlay extends React.Component<IHorizontalSpl
                      style={{
                          backgroundColor: "transparent",
                          display: "flex",
-                         flexFlow: "row",
+                         flexFlow: "column",
                          height: "100%",
-                         overflow: "hidden",
                      }}>
                     <div style={{
                         backgroundColor: "dimgray",
-                        flex: "0 0 " + this.state.currentWidth + "px",
-                        height: "100%",
+                        flex: "0 0 " + (this.state.currentRatio / 1000) * this.props.height + "px",
                         opacity: 0.0,
                         visibility: this.state.dragging ? "visible" : "hidden",
-                        width: this.state.currentWidth + "px",
                     }}/>
                     <DraggableCore
-                        onStop={this.dragHandler()}
-                        onStart={this.dragHandler()}
-                        onDrag={this.dragHandler()}>
+                        onStop={this.handleDragTopHeight()}
+                        onStart={this.handleDragTopHeight()}
+                        onDrag={this.handleDragTopHeight()}>
                         <div style={{
                             backgroundColor: this.state.dragging ? "dimgray" : "transparent",
-                            cursor: "ew-resize",
+                            cursor: "ns-resize",
+                            height: this.props.gutter ? this.props.gutter : 8 + "px",
                             pointerEvents: "auto",
-                            width: this.props.gutter ? this.props.gutter : 8 + "px",
                             zIndex: 1000
                         }}/>
                     </DraggableCore>
@@ -98,24 +96,25 @@ export class HorizontalSplitLayoutOverlay extends React.Component<IHorizontalSpl
         );
     }
 
-    private dragHandler = (): DraggableEventHandler => {
+    private handleDragTopHeight = (): DraggableEventHandler => {
         return (e: DraggableEvent, data: DraggableData): void | false => {
             if (e.type === "mousedown") {
                 this.setState({
                     dragging: true
                 });
             } else {
-                const newWidth = this.state.currentWidth + data.deltaX;
-
+                const newRation = this.state.currentRatio + ((data.deltaY * 1000) / this.props.height);
                 if (e.type === "mouseup") {
                     this.setState({
-                        currentWidth: newWidth,
+                        currentRatio: newRation,
                         dragging: false
                     });
-                    this.props.onWidthChanged(newWidth)
+                    if (this.props.onRatioChanged) {
+                        this.props.onRatioChanged(newRation)
+                    }
                 } else if (e.type === "mousemove") {
                     this.setState({
-                        currentWidth: newWidth
+                        currentRatio: newRation,
                     });
                 }
             }

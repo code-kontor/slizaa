@@ -15,128 +15,113 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { Icon, Layout, Menu } from 'antd';
+import {Icon, Layout, Menu} from 'antd';
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { BrowserRouter, Link, Route } from 'react-router-dom';
-import { Dispatch } from 'redux';
-import { SlizaaHgChooser } from 'src/components/slizaahgchooser';
-import { actionSelectDatabase, actionSelectHierarchicalGraph } from 'src/redux/Actions';
-import { IAppState } from 'src/redux/IAppState';
-import DependenciesView from 'src/views/dependenciesview/DependenciesView';
-
-import { SelectParam } from 'antd/lib/menu';
+import {BrowserRouter, Link, Route, withRouter} from 'react-router-dom';
+import {SlizaaHgChooser} from 'src/components/slizaahgchooser';
+import DatabaseAndHierarchicalGraphContext
+    from "../../../components/slizaahgchooser/DatabaseAndHierarchicalGraphContext";
+import {DependenciesView} from "../../dependenciesview";
+import {QueryView} from "../../queryview/QueryView";
 import './MainView.css';
-import { DependencyVisualisation, SlizaaSvg } from './SlizaaIcons';
+import {DependencyVisualisation, DependencyVisualisationIcon, SlizaaSvg} from './SlizaaIcons';
 
-interface IProps {
-  currentDatabase: string
-  currentHierarchicalGraph: string
-  dispatchSelectDatabase: (selectedDatabaseId: string) => void
-  dispatchSelectHierarchicalGraph: (selectHierarchicalGraphId: string) => void
-}
 interface IState {
-  collapsed: boolean
-  selectedKeys?: string[]
+    collapsed: boolean
 }
-export class MainView extends React.Component<IProps, IState> {
 
-  constructor(props: IProps) {
-    super(props);
+export class MainView extends React.Component<any, IState> {
 
-    this.state = {
-      collapsed: true
+    constructor(props: any) {
+        super(props);
+
+        this.state = {
+            collapsed: true
+        }
     }
 
-    this.onCollapse = this.onCollapse.bind(this);
-  }
+    public render() {
+        return (
+            <BrowserRouter basename="/slizaa">
+                <Layout style={{minHeight: '100vh'}}>
+                    <Layout.Header style={{padding: 0}}>
+                        <Icon
+                            className="trigger"
+                            type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+                            onClick={this.toggleCollapsed}
+                        />
+                        <Link to="/">
+                            <svg height="30px" viewBox="0 0 493.923 175.948" style={{verticalAlign: "middle"}}>
+                                <SlizaaSvg/>
+                            </svg>
+                        </Link>
+                        <SlizaaHgChooser/>
+                    </Layout.Header>
+                    <Layout>
+                        <Layout.Sider
+                            theme="light"
+                            collapsible={true}
+                            collapsed={this.state.collapsed}
+                            onCollapse={this.onCollapse}
+                            trigger={null}
+                            collapsedWidth={0}
+                            width={170}
+                        >
+                            <Linkmenu/>
+                        </Layout.Sider>
+                        <Layout.Content style={{padding: 4, minHeight: 280}}>
+                            <Route key="/query" exact={true} path="/query" component={QueryViewComponent}/>
+                            <Route key="/dependencies" exact={true} path="/dependencies"
+                                   component={DependencyViewComponent}/>
+                        </Layout.Content>
+                    </Layout>
+                </Layout>
+            </BrowserRouter>
+        )
+    }
 
-  public render() {
+    protected onCollapse = (isCollapsed: boolean) => {
+        this.setState({...this.state, collapsed: isCollapsed});
+    }
 
+    protected toggleCollapsed = () => {
+        this.setState({
+            collapsed: !this.state.collapsed,
+        });
+    }
+}
+
+function DependencyViewComponent() {
+    return <DatabaseAndHierarchicalGraphContext.Consumer>
+        {ctx => (
+            <DependenciesView
+                key={ctx.currentDatabase + "-" + ctx.currentHierarchicalGraph}
+                databaseId={ctx.currentDatabase}
+                              hierarchicalGraphId={ctx.currentHierarchicalGraph}/>
+        )}
+    </DatabaseAndHierarchicalGraphContext.Consumer>
+}
+
+function QueryViewComponent() {
+    return <DatabaseAndHierarchicalGraphContext.Consumer>
+        {ctx => (
+            <QueryView/>
+        )}
+    </DatabaseAndHierarchicalGraphContext.Consumer>
+}
+
+const Linkmenu = withRouter(props => {
+    const {location} = props;
     return (
-      <BrowserRouter basename="/slizaa">
-        <Layout
-          style={{ minHeight: '100vh' }}>
-          <Layout.Header style={{ padding: 0 }}>
-            <Icon
-                className="trigger"
-                type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-                onClick={this.toggleCollapsed}
-            />
-            <Link to="/">
-              <svg height="30px" viewBox="0 0 493.923 175.948" style={{ verticalAlign: "middle" }}>
-                <SlizaaSvg />
-              </svg>
-            </Link>
-            <SlizaaHgChooser
-              currentDatabase={this.props.currentDatabase}
-              currentHierarchicalGraph={this.props.currentHierarchicalGraph}
-              onDatabaseSelect={this.props.dispatchSelectDatabase}
-              onHierarchicalGraphSelect={this.props.dispatchSelectHierarchicalGraph}
-            />
-          </Layout.Header>
-          <Layout>
-            <Layout.Sider
-              theme="dark"
-              collapsible={true}
-              collapsed={this.state.collapsed}
-              onCollapse={this.onCollapse}
-              trigger={null}
-              collapsedWidth={0}
-              width={170}
-            >
-              <Menu defaultSelectedKeys={this.state.selectedKeys ? this.state.selectedKeys : ['1']}
-                theme="dark"
-                mode="inline"
-                onSelect={this.onSelect}>
-                <Menu.Item key="1">
-                  <Icon component={DependencyVisualisation} />
-                  <span>Dependencies</span>
-                  <Link to="/" />
-                </Menu.Item>
-              </Menu>
-            </Layout.Sider>
-            <Layout.Content style={{ padding: 4, minHeight: 280 }}>
-              <Route exact={true} path="/" component={DependenciesView} />
-            </Layout.Content>
-          </Layout>
-        </Layout>
-      </BrowserRouter>
-
-    )
-  }
-
-  protected onSelect = (p: SelectParam) => {
-    this.setState({ ...this.state, selectedKeys: p.selectedKeys });
-  }
-
-  protected onCollapse(isCollapsed: boolean) {
-    this.setState({ ...this.state, collapsed: isCollapsed });
-  }
-
-  protected toggleCollapsed = () => {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
-  }
-}
-
-const mapStateToProps = (state: IAppState) => {
-  return {
-    currentDatabase: state.currentDatabase,
-    currentHierarchicalGraph: state.currentHierarchicalGraph,
-  }
-}
-
-const mapDispatchToProps = (dispatch: Dispatch) => { // tslint:disable-line
-  return {
-    dispatchSelectDatabase: (selectedDatabaseId: string) => {
-      dispatch(actionSelectDatabase(selectedDatabaseId));
-    },
-    dispatchSelectHierarchicalGraph: (selectedDatabaseId: string) => {
-      dispatch(actionSelectHierarchicalGraph(selectedDatabaseId));
-    }
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainView);
+        <Menu mode="inline" selectedKeys={[location.pathname]} theme="light">
+            <Menu.Item key="/dependencies">
+                <DependencyVisualisationIcon />
+                <Link to="/dependencies">Dependencies</Link>
+            </Menu.Item>
+            <Menu.Item key="/query">
+                <Icon component={DependencyVisualisation}/>
+                <Link to="/query">Query</Link>
+            </Menu.Item>
+        </Menu>
+    );
+});

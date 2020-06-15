@@ -19,11 +19,6 @@
 
 .ant-menu, .ant-menu-left {
   border-right: none;
-  background-color: #2f353a;
-}
-
-.ant-layout-sider {
-  background-color: #2f353a;
 }
 
 .ant-layout-header {
@@ -40,8 +35,37 @@
   background-color: #e4e5e6;
 }
 
+.ant-layout-sider {
+  background-color: #D4D7D9;
+  border-right: 1px solid #9DA0A2;
+}
+
 .ant-menu {
   margin-top: 10px;
+  background-color: #D4D7D9;
+}
+
+.ant-menu-item {
+  color: rgba(123, 121, 122, 1.00);
+}
+
+.ant-menu-item > a {
+  display: inline;
+  color: rgba(123, 121, 122, 1.00);
+  font-size: 0.85rem;
+}
+
+.ant-menu-item > a:hover {
+  color: rgba(123, 121, 122, 1.00);
+}
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: rgb(228, 229, 230);
+  font-weight: 600;
+}
+
+.ant-menu-item::after {
+  border-right: 3px solid rgba(123, 121, 122, 1.00) !important;
 }
 
 .mr5 {
