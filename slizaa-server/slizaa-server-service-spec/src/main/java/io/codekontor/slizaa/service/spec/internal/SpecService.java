@@ -17,13 +17,12 @@
  */
 package io.codekontor.slizaa.service.spec.internal;
 
+import io.codekontor.slizaa.server.descr.*;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
+import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
-import io.codekontor.slizaa.server.spec.ContentDefinitionSpec;
-import io.codekontor.slizaa.server.spec.GraphDatabaseSpec;
-import io.codekontor.slizaa.server.spec.ServerExtensionSpec;
-import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
+import io.codekontor.slizaa.server.spec.*;
 import io.codekontor.slizaa.service.spec.ISpecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,44 +41,65 @@ public class SpecService implements ISpecService {
     private ISlizaaService _slizaaService;
 
     @Override
-    public void reconfigure(SlizaaServerSpec slizaaServerSpec) {
+    public SlizaaServerDescr fetchDescription() {
 
-    }
-
-    @Override
-    public SlizaaServerSpec fetchSpec() {
-
-        //
-        List<ServerExtensionSpec> extensionSpecs =
+        // extensions
+        List<ServerExtensionDescr> extensionDescriptions =
                 _slizaaService.getBackendService().getInstalledExtensions()
-                        .stream().map(toServerExtensionsSpec()).collect(Collectors.toList());
+                        .stream().map(toServerExtensionsDescr()).collect(Collectors.toList());
 
         // graph databases
-        List<GraphDatabaseSpec> databaseSpecs =
-                _slizaaService.getGraphDatabases().stream().map(toGraphdatabaseSpec())
+        List<GraphDatabaseDescr> databaseDescriptions =
+                _slizaaService.getGraphDatabases().stream().map(toGraphDatabaseDescr())
                         .collect(Collectors.toList());
 
-        return new SlizaaServerSpec(extensionSpecs, databaseSpecs);
+        return new SlizaaServerDescr(extensionDescriptions, databaseDescriptions);
     }
 
-    private Function<IExtension, ServerExtensionSpec> toServerExtensionsSpec() {
-        return extension -> new ServerExtensionSpec(extension.getSymbolicName(),
+    private Function<IExtension, ServerExtensionDescr> toServerExtensionsDescr() {
+        return extension -> new ServerExtensionDescr(extension.getSymbolicName(),
                 extension.getVersion().toString());
     }
 
-    private Function<IGraphDatabase, GraphDatabaseSpec> toGraphdatabaseSpec() {
+    private Function<IGraphDatabase, GraphDatabaseDescr> toGraphDatabaseDescr() {
         return graphDatabase -> {
 
             // map content definition
             String contentDefinitionFactoryId = graphDatabase.getContentDefinition().getContentDefinitionProviderFactory().getFactoryId();
+            String contentDefinitionShortForm = graphDatabase.getContentDefinition().getContentDefinitionProviderFactory().getShortForm();
             String contentDefinition = graphDatabase.getContentDefinition().toExternalRepresentation();
-            ContentDefinitionSpec contentDefinitionSpec = new ContentDefinitionSpec(contentDefinitionFactoryId, contentDefinition);
+            ContentDefinitionDescr contentDefinitionDescr =
+                    new ContentDefinitionDescr(contentDefinitionFactoryId, contentDefinitionShortForm, contentDefinition);
+
+            // map hierarchicalGraphs
+            List<HierarchicalGraphDescr> hierarchicalGraphDescrs = graphDatabase.getHierarchicalGraphs().stream()
+                    .map(toHierarchicalGraphDescr()).collect(Collectors.toList());
+
+            // map available actions
+            List<String> availableActions = graphDatabase.getAvailableActions()
+                    .stream().map(action -> action.getName()).collect(Collectors.toList());
 
             // map database specification
-            GraphDatabaseSpec graphDatabaseSpec = new GraphDatabaseSpec(graphDatabase.getIdentifier(), contentDefinitionSpec);
+            GraphDatabaseDescr graphDatabaseSpec = new GraphDatabaseDescr(graphDatabase.getIdentifier(),
+                    contentDefinitionDescr,
+                    hierarchicalGraphDescrs,
+                    graphDatabase.getState().name(),
+                    graphDatabase.getPort(),
+                    availableActions);
 
             // return the result
             return graphDatabaseSpec;
+        };
+    }
+
+    private Function<IHierarchicalGraph, HierarchicalGraphDescr> toHierarchicalGraphDescr() {
+        return hierarchicalGraph -> {
+
+            // map database specification
+            HierarchicalGraphDescr hierarchicalGraphDescr = new HierarchicalGraphDescr(hierarchicalGraph.getIdentifier());
+
+            // return the result
+            return hierarchicalGraphDescr;
         };
     }
 }

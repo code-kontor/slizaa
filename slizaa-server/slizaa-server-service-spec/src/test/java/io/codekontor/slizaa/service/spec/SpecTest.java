@@ -17,32 +17,25 @@
  */
 package io.codekontor.slizaa.service.spec;
 
-import io.codekontor.slizaa.server.spec.GraphDatabaseSpec;
-import io.codekontor.slizaa.server.spec.ServerExtensionSpec;
-import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
-import io.codekontor.slizaa.server.spec.YamlMapper;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SpecTest {
 
     @Test
     public void testSpec() throws IOException {
         //
-        List<ServerExtensionSpec> serverExtensionSpecs = new ArrayList<>();
-        serverExtensionSpecs.add(new ServerExtensionSpec("symName", "version"));
-
-        List<GraphDatabaseSpec> graphDatabaseSpecs = new ArrayList<>();
-
-        //
-        SlizaaServerSpec slizaaServerSpec = new SlizaaServerSpec(serverExtensionSpecs, graphDatabaseSpecs);
-
-        ByteArrayOutputStream byteArrayOutputStream  = new ByteArrayOutputStream();
-        YamlMapper.INSTANCE.writeYml(byteArrayOutputStream, slizaaServerSpec);
+//        List<ServerExtensionSpec> serverExtensionSpecs = new ArrayList<>();
+//        serverExtensionSpecs.add(new ServerExtensionSpec("symName", "version"));
+//
+//        List<GraphDatabaseSpec> graphDatabaseSpecs = new ArrayList<>();
+//
+//        //
+//        SlizaaServerSpec slizaaServerSpec = new SlizaaServerSpec(serverExtensionSpecs, graphDatabaseSpecs);
+//
+//        ByteArrayOutputStream byteArrayOutputStream  = new ByteArrayOutputStream();
+//        YamlMapper.INSTANCE.writeYml(byteArrayOutputStream, slizaaServerSpec);
 
 //        System.out.println(byteArrayOutputStream);
     }

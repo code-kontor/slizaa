@@ -17,14 +17,16 @@
  */
 package io.codekontor.slizaa.server.rest.impl;
 
-import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
+import io.codekontor.slizaa.server.descr.GraphDatabaseDescr;
+import io.codekontor.slizaa.server.descr.ServerExtensionDescr;
+import io.codekontor.slizaa.server.descr.SlizaaServerDescr;
 import io.codekontor.slizaa.service.spec.ISpecService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
@@ -37,8 +39,18 @@ public class AdminRestController {
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
 
-	@GetMapping("/spec")
-	public SlizaaServerSpec spec() {
-		return specService.fetchSpec();
+	@GetMapping("/")
+	public SlizaaServerDescr description() {
+		return specService.fetchDescription();
+	}
+
+	@GetMapping("/serverExtensions")
+	public List<ServerExtensionDescr> serverExtensions() {
+		return specService.fetchDescription().getServerExtensions();
+	}
+
+	@GetMapping("/graphDatabases")
+	public List<GraphDatabaseDescr> graphDatabases() {
+		return specService.fetchDescription().getGraphDatabases();
 	}
 }

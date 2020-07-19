@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.spec
 
+import jdk.nashorn.internal.objects.Global
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -28,7 +29,7 @@ class TestSource() {
      fun testWriteYaml() {
 
          val contentDefinitionSpec : ContentDefinitionSpec = ContentDefinitionSpec("Type", "Definition")
-         val example = GraphDatabaseSpec("hello", contentDefinitionSpec)
+         val example = GraphDatabaseSpec("hello", contentDefinitionSpec, null)
          val outputStream : OutputStream = ByteArrayOutputStream();
 
          YamlMapper.writeYml(outputStream, example)
@@ -49,7 +50,7 @@ class TestSource() {
     fun testReadYaml() {
 
         val contentDefinitionSpec : ContentDefinitionSpec = ContentDefinitionSpec("Type", "Definition")
-        val example : GraphDatabaseSpec = GraphDatabaseSpec("hello", contentDefinitionSpec)
+        val example : GraphDatabaseSpec = GraphDatabaseSpec("hello", contentDefinitionSpec, null)
         val outputStream : ByteArrayOutputStream = ByteArrayOutputStream();
 
         YamlMapper.writeYml(outputStream, example)

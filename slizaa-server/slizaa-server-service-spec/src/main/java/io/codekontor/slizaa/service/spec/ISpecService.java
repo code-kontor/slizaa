@@ -17,11 +17,9 @@
  */
 package io.codekontor.slizaa.service.spec;
 
-import io.codekontor.slizaa.server.spec.SlizaaServerSpec;
+import io.codekontor.slizaa.server.descr.SlizaaServerDescr;
 
 public interface ISpecService {
 
-  void reconfigure(SlizaaServerSpec slizaaServerSpec);
-  
-  SlizaaServerSpec fetchSpec();
+  SlizaaServerDescr fetchDescription();
 }

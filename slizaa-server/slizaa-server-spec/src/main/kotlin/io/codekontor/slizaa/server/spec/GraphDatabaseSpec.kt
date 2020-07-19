@@ -20,10 +20,8 @@ package io.codekontor.slizaa.server.spec
 data class GraphDatabaseSpec(
         val identifier: String,
         val contentDefinition: ContentDefinitionSpec,
-        val hierarchicalGraphSpec: List<HierarchicalGraphSpec>,
-        val running: Boolean,
-        val forceRebuild : Boolean) {
-
-    constructor(identifier: String,
-                contentDefinition: ContentDefinitionSpec) : this(identifier, contentDefinition, emptyList(), true, true)
+        val hierarchicalGraphSpec: List<HierarchicalGraphSpec>?
+//        val running: Boolean,
+//        val forceRebuild : Boolean
+) {
 }
