@@ -40,14 +40,12 @@
 		<module>slizaa-server-service-backend</module>
 		<module>slizaa-server-service-svg</module>
 		<module>slizaa-server-service-slizaa</module>
-		<module>slizaa-server-service-spec</module>
+		<module>slizaa-server-service-admin</module>
 		<module>slizaa-server-staticcontent</module>
 		<module>slizaa-server-graphql</module>
 		<module>slizaa-server-main</module>
-		<module>slizaa-server-spec</module>
         <module>slizaa-server-command</module>
         <module>slizaa-server-service-selection</module>
-        <module>slizaa-server-admin-rest</module>
     </modules>
 
 </project>

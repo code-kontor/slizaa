@@ -19,18 +19,16 @@ package io.codekontor.slizaa.server;
 
 import io.codekontor.slizaa.server.command.EnableSlizaaServerCommandModule;
 import io.codekontor.slizaa.server.graphql.EnableGraphqlModule;
-import io.codekontor.slizaa.server.rest.EnableAdminRestModule;
 import io.codekontor.slizaa.server.service.backend.EnableBackendServiceModule;
 import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
 import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModule;
 import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
 import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
-import io.codekontor.slizaa.service.spec.EnableSpecServiceModule;
+import io.codekontor.slizaa.service.admin.EnableAdminServiceModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 @SpringBootApplication
@@ -41,15 +39,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableSvgServiceModule
 @EnableSlizaaServerCommandModule
 @EnableSelectionServiceModule
-@EnableAdminRestModule
-@EnableSpecServiceModule
+@EnableAdminServiceModule
 public class SlizaaServerConfiguration {
 
-  /**
-   *
-   * @param args
-   */
-  public static void main(String[] args) {
-    SpringApplication.run(SlizaaServerConfiguration.class, args);
-  }
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(SlizaaServerConfiguration.class, args);
+    }
 }
