@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.service.admin.internal;
+package io.codekontor.slizaa.service.admin;
 
 import io.codekontor.slizaa.server.descr.GraphDatabaseDescr;
 import io.codekontor.slizaa.server.descr.ServerExtensionDescr;
@@ -35,9 +35,6 @@ public class AdminRestController {
 
 	@Autowired
 	private IAdminService specService;
-
-	private static final String template = "Hello, %s!";
-	private final AtomicLong counter = new AtomicLong();
 
 	@GetMapping("/")
 	public SlizaaServerDescr description() {
