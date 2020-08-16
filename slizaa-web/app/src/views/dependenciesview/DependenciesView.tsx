@@ -25,7 +25,7 @@ import {VerticalSplitLayout} from 'src/components/layout';
 import {SlizaaDependencyViewer} from "../../components/slizaadependencyviewer/SlizaaDependencyViewer";
 import {
     DsmForNodeChildren,
-    DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix,
+    DsmForNodeChildren_hierarchicalGraph_node_children_orderedAdjacencyMatrix,
     DsmForNodeChildrenVariables
 } from "../../gqlqueries/__generated__/DsmForNodeChildren";
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../gqlqueries/GqlQueries";
@@ -204,7 +204,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         })
     }
 
-    private queryAndConsume(client: ApolloClient<any>, aDatabaseId: string | undefined, aHierarchicalGraphId: string | undefined, consumer: (matrix: DsmForNodeChildren_hierarchicalGraph_node_children_dependencyMatrix) => React.ReactNode): React.ReactNode {
+    private queryAndConsume(client: ApolloClient<any>, aDatabaseId: string | undefined, aHierarchicalGraphId: string | undefined, consumer: (matrix: DsmForNodeChildren_hierarchicalGraph_node_children_orderedAdjacencyMatrix) => React.ReactNode): React.ReactNode {
 
         if (!aDatabaseId || !aHierarchicalGraphId) {
             return null;
@@ -235,7 +235,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                         return <div>UNDEFINED - TODO</div>
                     }
 
-                    const matrix = data.hierarchicalGraph.node.children.dependencyMatrix;
+                    const matrix = data.hierarchicalGraph.node.children.orderedAdjacencyMatrix;
 
                     // tslint:disable-next-line:no-console
                     console.log(matrix)

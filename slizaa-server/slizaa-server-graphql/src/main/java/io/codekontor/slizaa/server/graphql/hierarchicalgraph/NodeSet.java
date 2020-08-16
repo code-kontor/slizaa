@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IDependencyStructureMatrix;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 
 public class NodeSet extends AbstractNodeSet {
@@ -49,11 +48,10 @@ public class NodeSet extends AbstractNodeSet {
   }
 
   /**
-   * @param ids
    * @return
    */
-  public DependencyMatrix dependencyMatrix() {
+  public OrderedAdjacencyMatrix orderedAdjacencyMatrix() {
     
-    return new DependencyMatrix(GraphUtils.createDependencyStructureMatrix(hgNodeSet()));
+    return new OrderedAdjacencyMatrix(GraphUtils.createOrderedAdjacencyMatrix(hgNodeSet()));
   }
 }

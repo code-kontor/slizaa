@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * @author Gerd W&uuml;therich (gw@code-kontor.io)
  */
-public interface IDependencyStructureMatrix {
+public interface IOrderedAdjacencyMatrix {
 
     List<HGNode> getOrderedNodes();
 

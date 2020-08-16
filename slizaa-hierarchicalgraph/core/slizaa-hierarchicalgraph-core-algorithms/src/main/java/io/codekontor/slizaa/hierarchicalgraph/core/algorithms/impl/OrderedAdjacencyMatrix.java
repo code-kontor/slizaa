@@ -18,7 +18,7 @@
 package io.codekontor.slizaa.hierarchicalgraph.core.algorithms.impl;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IDependencyStructureMatrix;
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IOrderedAdjacencyMatrix;
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.INodeSorter;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.AbstractHGDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class DependencyStructureMatrix implements IDependencyStructureMatrix {
+public class OrderedAdjacencyMatrix implements IOrderedAdjacencyMatrix {
 
     private List<List<HGNode>> cycles;
 
@@ -36,7 +36,7 @@ public class DependencyStructureMatrix implements IDependencyStructureMatrix {
 
     private List<AbstractHGDependency> upwardDependencies;
 
-    public DependencyStructureMatrix(Collection<HGNode> nodes) {
+    public OrderedAdjacencyMatrix(Collection<HGNode> nodes) {
         initialize(nodes);
     }
 

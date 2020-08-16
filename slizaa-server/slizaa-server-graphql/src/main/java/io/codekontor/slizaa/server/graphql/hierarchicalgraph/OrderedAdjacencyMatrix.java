@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IDependencyStructureMatrix;
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IOrderedAdjacencyMatrix;
 
-public class DependencyMatrix {
+public class OrderedAdjacencyMatrix {
 
   private List<Node>                       _orderedNodes;
 
@@ -35,7 +35,7 @@ public class DependencyMatrix {
    * 
    * @param dependencyStructureMatrix
    */
-  public DependencyMatrix(IDependencyStructureMatrix dependencyStructureMatrix) {
+  public OrderedAdjacencyMatrix(IOrderedAdjacencyMatrix dependencyStructureMatrix) {
 
     //
     this._orderedNodes = dependencyStructureMatrix.getOrderedNodes().stream().map(hgNode -> new Node(hgNode))

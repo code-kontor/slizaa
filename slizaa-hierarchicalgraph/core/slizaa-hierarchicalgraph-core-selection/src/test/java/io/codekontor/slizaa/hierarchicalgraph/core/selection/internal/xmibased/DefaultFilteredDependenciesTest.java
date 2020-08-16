@@ -18,7 +18,7 @@
 package io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.xmibased;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IDependencyStructureMatrix;
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IOrderedAdjacencyMatrix;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
@@ -27,7 +27,6 @@ import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependenci
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.NodeSelections;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
-import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultNodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedGraph;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedTestGraphProviderRule;
 import org.junit.Before;
@@ -233,7 +232,7 @@ public class DefaultFilteredDependenciesTest {
     }
 
     private void dumpDependencyMatrix(Collection<HGNode> nodes) {
-        IDependencyStructureMatrix matrix = GraphUtils.createDependencyStructureMatrix(nodes);
+        IOrderedAdjacencyMatrix matrix = GraphUtils.createOrderedAdjacencyMatrix(nodes);
         List<HGNode> orderedNodes = matrix.getOrderedNodes();
         for (int i = 0; i < orderedNodes.size(); i++) {
             for (int j = 0; j < orderedNodes.size(); j++) {

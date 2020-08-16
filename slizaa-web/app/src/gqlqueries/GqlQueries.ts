@@ -54,7 +54,7 @@ export const GQ_DSM_FOR_NODE_CHILDREN = gql`query DsmForNodeChildren($databaseId
         node(id: $nodeId) {
             id
             children {
-                dependencyMatrix {
+                orderedAdjacencyMatrix {
                     orderedNodes {
                         id
                         text

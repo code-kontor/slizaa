@@ -13,10 +13,13 @@ extend type HierarchicalGraph {
     node(id: ID!): Node
 
     # Returns the nodes with the given ids
-    nodes(ids: [ID]!): NodeSet!
+    nodes(ids: [ID!]!): NodeSet!
 
     # Returns the node with the given id
     dependency(id: ID!): Dependency
+
+    # Returns the node with the given id
+    # dependencies(ids: [ID!]!): DependencySet
 
     # Returns a dependency set based on an aggregated dependency
     dependencySetForAggregatedDependency(sourceNodeId: ID!, targetNodeId: ID!): DependencySet
@@ -35,10 +38,11 @@ type NodeSet {
 	# the node ids as an array
 	nodeIds: [ID!]!
 	
-	# the dependency matrix
-	dependencyMatrix: DependencyMatrix!  
+	# the adjacency matrix
+    orderedAdjacencyMatrix: OrderedAdjacencyMatrix!
 	
 	#
+    # WARUN HIER NUR DIE REFERENCED NODES?
 	referencedNodes(includePredecessors: Boolean): NodeSet!
 }
 
@@ -49,10 +53,14 @@ type Node {
 
     # The text label
     text: String!
+
+    # the icon identifier
     iconIdentifier: String!
 
     # The parent node
     parent: Node
+
+    # The predecessors
     predecessors: [Node!]!
 
     #
@@ -81,7 +89,7 @@ type Dependency {
     resolvedDependencies: [Dependency!]!
 }
 
-type DependencyMatrix {
+type OrderedAdjacencyMatrix {
     orderedNodes: [Node!]!
     cells: [Cell!]!
     stronglyConnectedComponents: [StronglyConnectedComponent!]!

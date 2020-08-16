@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IDependencyStructureMatrix;
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IOrderedAdjacencyMatrix;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
@@ -83,7 +83,7 @@ public class HierarchicalGraphTest extends AbstractSlizaaServiceTest {
     List<HGNode> nodes = rootNode.getChildren().get(0).getChildren().get(0).getChildren().get(0).getChildren().get(0)
         .getChildren();
 
-    IDependencyStructureMatrix dependencyStructureMatrix = GraphUtils.createDependencyStructureMatrix(nodes);
+    IOrderedAdjacencyMatrix dependencyStructureMatrix = GraphUtils.createOrderedAdjacencyMatrix(nodes);
     for (int i = 0; i < nodes.size(); i++) {
       for (int j = 0; j < nodes.size(); j++) {
         System.out.println(i + " -> " + j + " :" + dependencyStructureMatrix.getWeight(i, j));

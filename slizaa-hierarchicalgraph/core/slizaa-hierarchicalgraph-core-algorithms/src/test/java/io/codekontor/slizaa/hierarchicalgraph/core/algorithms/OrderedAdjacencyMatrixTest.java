@@ -28,7 +28,7 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
  * 
  * @author Gerd W&uuml;therich (gw@code-kontor.io)
  */
-public class DependencyStructureMatrixTest extends AbstractAlgorithmTest {
+public class OrderedAdjacencyMatrixTest extends AbstractAlgorithmTest {
 
 	@Test
 	public void detectCycle() {
@@ -37,14 +37,14 @@ public class DependencyStructureMatrixTest extends AbstractAlgorithmTest {
 		List<HGNode> nodes = _graphProvider.node(577L).getChildren();
 
 		//
-		IDependencyStructureMatrix dsm = GraphUtils.createDependencyStructureMatrix(nodes);
+		IOrderedAdjacencyMatrix am = GraphUtils.createOrderedAdjacencyMatrix(nodes);
 
 		// assert ordered nodes
-		assertThat(dsm.getOrderedNodes()).hasSize(34);
+		assertThat(am.getOrderedNodes()).hasSize(34);
 
 		// assert upward dependencies
 		// @formatter:off
-        assertThat(dsm.getUpwardDependencies()).hasSize(14)
+        assertThat(am.getUpwardDependencies()).hasSize(14)
             .containsExactlyInAnyOrder( 
         		dependency(16667, 7676),
         		dependency(7155, 7676),
@@ -63,9 +63,9 @@ public class DependencyStructureMatrixTest extends AbstractAlgorithmTest {
         		);
 
         // assert cycles
-        assertThat(dsm.getCycles()).hasSize(1);
-        assertThat(dsm.getCycles().get(0)).hasSize(10);
-        assertThat(dsm.getCycles().get(0))
+        assertThat(am.getCycles()).hasSize(1);
+        assertThat(am.getCycles().get(0)).hasSize(10);
+        assertThat(am.getCycles().get(0))
         	.containsExactlyInAnyOrder(
         		node(19564),
         		node(7155),

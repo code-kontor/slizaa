@@ -26,12 +26,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.impl.DependencyStructureMatrix;
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.impl.OrderedAdjacencyMatrix;
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.impl.FastFasSorter;
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.impl.Tarjan;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 
 /**
@@ -69,9 +68,9 @@ public class GraphUtils {
      * @param nodes the collection of nodes
      * @return
      */
-    public static IDependencyStructureMatrix createDependencyStructureMatrix(
+    public static IOrderedAdjacencyMatrix createOrderedAdjacencyMatrix(
             Collection<HGNode> nodes) {
-        return new DependencyStructureMatrix(nodes);
+        return new OrderedAdjacencyMatrix(nodes);
     }
 
     /**
