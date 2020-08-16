@@ -111,6 +111,9 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
             edges: arrayOfEdges
         }
 
+        // TODO: Split in two components / delegate the graph rendering entirely to the sub-component
+        // show the sandnox in this component here...
+
         // @ts-ignore
         elk.layout(graph)
             // @ts-ignore
@@ -349,9 +352,6 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
 
             let lastPoint: ElkPoint = section.startPoint;
 
-            context.beginPath();
-            context.moveTo(lastPoint.x, lastPoint.y);
-
             //
             if (section.bendPoints) {
 
@@ -366,21 +366,29 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
                     const nextDeltaX = nextPoint.x - currentPoint.x;
                     const nextDeltaY = nextPoint.y - currentPoint.y;
 
+                    context.beginPath();
+                    context.moveTo(lastPoint.x, lastPoint.y);
+                    lastPoint = {x : currentPoint.x, y : currentPoint.y};
                     if (lastDeltaX !== 0) {
                         context.lineTo(lastDeltaX > 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS, currentPoint.y);
                         context.quadraticCurveTo(currentPoint.x, currentPoint.y, currentPoint.x, nextDeltaY < 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS);
+                        lastPoint.y = nextDeltaY < 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS;
                     } else if (lastDeltaY !== 0) {
                         context.lineTo(currentPoint.x, lastDeltaY > 0 ? currentPoint.y - this.CORNER_RADIUS : currentPoint.y + this.CORNER_RADIUS);
                         context.quadraticCurveTo(currentPoint.x, currentPoint.y, nextDeltaX < 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS, currentPoint.y);
+                        lastPoint.x = nextDeltaX < 0 ? currentPoint.x - this.CORNER_RADIUS : currentPoint.x + this.CORNER_RADIUS;
                     }
-
-                    lastPoint = currentPoint;
+                    context.stroke();
                 }
             }
 
             const endpointYOffset = section.endPoint.y > section.startPoint.y ? -5 : +5;
+            context.beginPath();
+            context.moveTo(lastPoint.x, lastPoint.y);
             context.lineTo(section.endPoint.x, section.endPoint.y + endpointYOffset);
+            // context.closePath();
             context.stroke();
+
 
             this.drawArrowhead(context, lastPoint, section.endPoint, 4);
         })
