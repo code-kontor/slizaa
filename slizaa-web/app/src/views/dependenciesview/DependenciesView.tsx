@@ -19,9 +19,7 @@ import {Spin} from 'antd';
 import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
-import {Card} from 'src/components/card';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
-import {VerticalSplitLayout} from 'src/components/layout';
 import {SlizaaDependencyViewer} from "../../components/slizaadependencyviewer/SlizaaDependencyViewer";
 import {
     DsmForNodeChildren,
@@ -31,9 +29,8 @@ import {
 import {GQ_DSM_FOR_NODE_CHILDREN} from "../../gqlqueries/GqlQueries";
 import {ISlizaaNode} from "../../model/ISlizaaNode";
 import {NodeType} from "../../model/NodeType";
-import {SlizaaHorizontalSplitView} from "../fwk/SlizaaHorizontalSplitView";
+import {Slizaa21SplitView} from "../fwk/Slizaa21SplitView";
 import './DependenciesView.css';
-import {DependenciesViewProps} from "./DependenciesViewLayoutConstants";
 import {DependencyGraphPart} from "./dependencyGraphPart";
 import {DsmPart} from "./dsmPart/DsmPart";
 import {IDependenciesViewProps} from "./IDependenciesViewProps";
@@ -42,21 +39,6 @@ import {IDependencySelection} from "./IDependencyViewModel";
 
 
 export class DependenciesView extends React.Component<IDependenciesViewProps, IDependenciesViewState> {
-
-    // public static getDerivedStateFromProps(props: IDependenciesViewProps, state: IDependenciesViewState) {
-    //     if (props.databaseId !== state.databaseId ||
-    //         props.hierarchicalGraphId !== state.hierarchicalGraphId) {
-    //         return {
-    //             databaseId: props.databaseId,
-    //             hierarchicalGraphId: props.hierarchicalGraphId,
-    //             mainTreeNodeSelection: {
-    //                 expandedNodeIds: ["-1"],
-    //                 selectedNodeIds: [],
-    //             }
-    //         };
-    //     }
-    //     return null;
-    // }
 
     constructor(props: IDependenciesViewProps) {
         super(props);
@@ -69,9 +51,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     horizontalSideMarkerHeight: 10,
                     verticalSideMarkerWidth: 150
                 },
-                height: 600,
-                horizontalRatio: 500,
-                upperDividerPosition: 450,
             },
             mainTreeNodeSelection: {
                 expandedNodeIds: ["-1"],
@@ -84,23 +63,22 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         return (
             <ApolloConsumer>
                 {cl => (
-                    <SlizaaHorizontalSplitView
+                    <Slizaa21SplitView
                         id="dependencyViewMain"
-                        top={
-                            <VerticalSplitLayout
-                                id="upper"
-                                gutter={DependenciesViewProps.GUTTER_SIZE}
-                                initialWidth={this.state.layout.upperDividerPosition}
-                                onWidthChanged={this.onUpperSplitLayoutWidthChanged}
-                                left={
-                                    this.hierarchicalGraphCard(cl)
-                                }
-                                right={
-                                    this.dependenciesOverviewCard(cl)
-                                }
-                            />
-                        }
-                        bottom={this.dependencyDetailsCard(cl)}
+                        topLeft={{
+                            allowOverflow: true,
+                            element: this.hierarchicalGraphCard(cl),
+                            title: "Hierarchical Graph",
+                        }}
+                        topRight={{
+                            allowOverflow: true,
+                            element: this.dependenciesOverviewCard(cl),
+                            title: "Hierarchical Graph",
+                        }}
+                        bottom={{
+                            element: this.dependencyDetailsCard(cl),
+                            title: "Dependencies Details",
+                        }}
                     />)
                 }
             </ApolloConsumer>
@@ -108,33 +86,24 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
     }
 
     private hierarchicalGraphCard(cl: ApolloClient<any>): React.ReactElement {
-        return <Card title="Hierarchical Graph"
-                     id="hierarchicalGraph"
-                     padding={0}>
-            <HierarchicalGraphTree
-                key={this.state.databaseId + "-" + this.state.hierarchicalGraphId}
-                client={cl}
-                databaseId={this.state.databaseId}
-                hierarchicalGraphId={this.state.hierarchicalGraphId}
-                onSelect={this.onMainTreeSelect}
-                onExpand={this.onMainTreeExpand}
-                expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
-                checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
-        </Card>;
+        return <HierarchicalGraphTree
+            key={this.state.databaseId + "-" + this.state.hierarchicalGraphId}
+            client={cl}
+            databaseId={this.state.databaseId}
+            hierarchicalGraphId={this.state.hierarchicalGraphId}
+            onSelect={this.onMainTreeSelect}
+            onExpand={this.onMainTreeExpand}
+            expandedKeys={this.state.mainTreeNodeSelection.expandedNodeIds}
+            checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
     }
 
-    private dependenciesOverviewCard(cl: ApolloClient<any>): React.ReactElement {
-        return <Card title="Dependencies Overview"
-                     id="dependenciesOverview"
-                     allowOverflow={true}
-                     padding={0}>
-            {this.dependencyGraph(cl)}
-        </Card>;
+    private dependenciesOverviewCard(cl: ApolloClient<any>): React.ReactNode {
+        return this.dependencyGraph(cl);
     }
 
     private dependencyDetailsCard(client: ApolloClient<any>): React.ReactElement {
 
-        const node: React.ReactElement = this.state.mainDependencySelection === undefined ?
+        return this.state.mainDependencySelection === undefined ?
 
             // return empty div if selected dependency is undefined
             <div/> :
@@ -143,18 +112,12 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             <SlizaaDependencyViewer
                 key={this.state.mainDependencySelection.sourceNode.id + "-" + this.state.mainDependencySelection.targetNode.id}
                 client={client}
-                height={((this.state.layout.height * (1000 - this.state.layout.horizontalRatio)) / 1000) - 135}
+                height={600 - 135}
                 databaseId={this.state.databaseId}
                 hierarchicalGraphId={this.state.hierarchicalGraphId}
                 sourceNodeId={this.state.mainDependencySelection.sourceNode.id}
                 targetNodeId={this.state.mainDependencySelection.targetNode.id}
             />
-
-        return <Card
-            id="dependenciesDetails"
-            title="Dependencies Details" allowOverflow={false} padding={0}>
-            {node}
-        </Card>;
     }
 
     // @ts-ignore
@@ -275,17 +238,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             });
         }
     }
-
-
-    private onUpperSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
-        this.setState({
-            layout: {
-                ...this.state.layout,
-                upperDividerPosition: newWidth,
-            }
-        });
-    }
-
 
     private onMainTreeExpand = (aExpandedNodeIds: string[]): void => {
         this.setState(

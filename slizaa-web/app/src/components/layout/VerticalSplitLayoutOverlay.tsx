@@ -47,6 +47,7 @@ export class VerticalSplitLayoutOverlay extends React.Component<IHorizontalSplit
     }
 
     public render() {
+        const dividerSize = this.props.width > 0 ? this.props.gutter : 0;
         return (
             <div style={{
                 height: "100%",
@@ -80,7 +81,8 @@ export class VerticalSplitLayoutOverlay extends React.Component<IHorizontalSplit
                             backgroundColor: this.state.dragging ? "dimgray" : "transparent",
                             cursor: "ew-resize",
                             pointerEvents: "auto",
-                            width: this.props.gutter ? this.props.gutter : 8 + "px",
+                            // width: this.props.gutter ? this.props.gutter : 8 + "px",
+                            width: dividerSize + "px",
                             zIndex: 1000
                         }}/>
                     </DraggableCore>

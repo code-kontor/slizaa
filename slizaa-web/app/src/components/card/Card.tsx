@@ -20,13 +20,13 @@ import {ClickParam} from "antd/lib/menu";
 import * as React from 'react';
 import './Card.css';
 import {EmptyIcon, FullScreenIcon, MenuIcon} from "./CardIcons";
-import MaximizedCardSupportContext, {IMaximizedCardSupportContext} from "./MaximizedCardSupportContext";
 
 export interface ICardProps {
     id: string
     title: string
     allowOverflow?: boolean
     padding?: number
+    handleMaximize?: (id: string) => void
 }
 
 export class Card extends React.Component<ICardProps, any> {
@@ -55,28 +55,18 @@ export class Card extends React.Component<ICardProps, any> {
             padding: this.props.padding !== undefined ? this.props.padding + 'px ' + this.props.padding + 'px' : '10px 10px',
         }
 
-        const body = this.props.allowOverflow !== undefined && !this.props.allowOverflow ?
-            <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div> :
-            <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div>;
-
-        return (
-            <MaximizedCardSupportContext.Consumer>
-                {ctx => (
-                    <div className="slizaa-card">
-                        <div className="slizaa-card-title">
-                            <div style={{float: "left", width: "50%"}}>{this.props.title}</div>
-                            <div style={{display: "inline-block", float: "right"}}>
-                                <Dropdown overlay={menu} placement="bottomRight">
-                                    <MenuIcon/>
-                                </Dropdown>
-                                <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleIconClick(ctx)}/>
-                            </div>
-                        </div>
-                        {body}
-                    </div>
-                )}
-            </MaximizedCardSupportContext.Consumer>
-        );
+        return <div className="slizaa-card">
+            <div className="slizaa-card-title">
+                <div style={{float: "left", width: "50%"}}>{this.props.title}</div>
+                <div style={{display: "inline-block", float: "right"}}>
+                    <Dropdown overlay={menu} placement="bottomRight">
+                        <MenuIcon/>
+                    </Dropdown>
+                    <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick} />
+                </div>
+            </div>
+            <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div>
+        </div>;
     }
 
     private handleMenuClick = (param: ClickParam): void => {
@@ -84,11 +74,19 @@ export class Card extends React.Component<ICardProps, any> {
         console.log('click left button', param);
     }
 
-    private handleIconClick = (ctx: IMaximizedCardSupportContext): ((event: React.MouseEvent<HTMLElement, MouseEvent>) => void) => {
-        return (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
-            if (ctx.handleOnMaximize) {
-                ctx.handleOnMaximize(this);
-            }
+    private handleMaximizeClick = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+        // tslint:disable-next-line:no-console
+        console.log('click left button', event);
+        if (this.props.handleMaximize) {
+            this.props.handleMaximize(this.props.id);
         }
     }
+
+    /*    private handleIconClick = (ctx: IMaximizedCardSupportContext): ((event: React.MouseEvent<HTMLElement, MouseEvent>) => void) => {
+            return (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
+                if (ctx.handleOnMaximize) {
+                    ctx.handleOnMaximize(this);
+                }
+            }
+        }*/
 }

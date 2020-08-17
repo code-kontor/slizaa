@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react';
-import {Card, ICardProps} from "./Card";
 
-export interface IMaximizedCardSupportContext {
-    handleOnMaximize: ((card: Card) => void) | undefined
-    maximizedCardProps: ICardProps | undefined
+import {Slizaa21SplitViewPositions} from "./Slizaa21SplitViewPositions";
+
+export interface ISlizaa21SplitViewProps {
+    id: string,
+    topLeft: ISlizaa21SplitViewComponent,
+    topRight: ISlizaa21SplitViewComponent,
+    bottom: ISlizaa21SplitViewComponent,
+    maximizedElement?: Slizaa21SplitViewPositions
 }
 
-const defaultCtx : IMaximizedCardSupportContext =  {
-    handleOnMaximize: undefined,
-    maximizedCardProps: undefined,
+export interface ISlizaa21SplitViewComponent {
+    title: string,
+    allowOverflow?: boolean,
+    element: React.ReactNode,
 }
-
-const MaximizedCardSupportContext = React.createContext(defaultCtx);
-export default MaximizedCardSupportContext;

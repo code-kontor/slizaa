@@ -27,10 +27,10 @@ export interface IDependenciesViewState {
 }
 
 export interface IIDependenciesViewLayout {
-    fullSizeCard?: string
-    upperDividerPosition: number
-    horizontalRatio: number
-    height: number
+//    fullSizeCard?: string
+//    upperDividerPosition: number
+//    horizontalRatio: number
+//    height: number
     dsmSetting: IDsmSettings
 }
 

@@ -17,9 +17,7 @@
  */
 import React from "react";
 import {Card} from "../../components/card";
-import {VerticalSplitLayout} from "../../components/layout";
-import {DependenciesViewProps} from "../dependenciesview/DependenciesViewLayoutConstants";
-import {SlizaaHorizontalSplitView} from "../fwk/SlizaaHorizontalSplitView";
+import {Slizaa21SplitView} from "../fwk/Slizaa21SplitView";
 import {IQueryViewProps} from "./IQueryViewProps";
 import {IQueryViewState} from "./IQueryViewState";
 
@@ -32,24 +30,20 @@ export class QueryView extends React.Component<IQueryViewProps, IQueryViewState>
 
     public render() {
         return (
-            <SlizaaHorizontalSplitView
+            <Slizaa21SplitView
                 id="QueryView"
-                top={<VerticalSplitLayout
-                    id="upper"
-                    gutter={DependenciesViewProps.GUTTER_SIZE}
-                    initialWidth={340}
-                    left={
-                        <Card
-                            id="top1"
-                            title="Top 1"/>
-                    }
-                    right={
-                        <Card
-                            id="top2"
-                            title="Top 2"/>
-                    }
-                />}
-                bottom={this.bottomElement()}
+                topRight={{
+                    element: this.bottomElement(),
+                    title: "Dependencies Details",
+                }}
+                topLeft={{
+                    element: this.bottomElement(),
+                    title: "Dependencies Details",
+                }}
+                bottom={{
+                    element: this.bottomElement(),
+                    title: "Dependencies Details",
+                }}
             />
         );
     }

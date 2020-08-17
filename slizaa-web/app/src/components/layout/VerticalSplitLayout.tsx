@@ -53,6 +53,8 @@ export class VerticalSplitLayout extends React.Component<IProps, IState> {
     }
 
     public render() {
+        const dividerSize = this.state.width > 0 ? this.props.gutter : 0;
+
         return (
             <div style={{height: "100%", position: "relative"}}>
 
@@ -78,7 +80,7 @@ export class VerticalSplitLayout extends React.Component<IProps, IState> {
                     </div>
                     <div className="verticalDivider" style={{
                         backgroundColor: "transparent",
-                        width: this.props.gutter + "px"
+                        width: dividerSize + "px"
                     }}/>
                     <div className="item item2" style={{
                         flex: "1 0 0px",
