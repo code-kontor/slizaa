@@ -16,15 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import * as React from 'react';
-import {Card} from "../../components/card";
 import {HorizontalSplitLayout, VerticalSplitLayout} from "../../components/layout";
 import DatabaseAndHierarchicalGraphContext from "../../components/slizaahgchooser/DatabaseAndHierarchicalGraphContext";
 import {DependenciesViewProps} from "../dependenciesview/DependenciesViewLayoutConstants";
-import {ISlizaa21SplitViewComponent, ISlizaa21SplitViewProps} from "./ISlizaa21SplitViewProps";
-import {ISlizaa21SplitViewState} from "./ISlizaa21SplitViewState";
-import {Slizaa21SplitViewPositions} from "./Slizaa21SplitViewPositions";
+import {
+    AbstractSlizaaSplitView,
+    ISlizaaSplitViewComponent,
+    ISlizaaSplitViewProps,
+    ISlizaaSplitViewState
+} from "./AbstractSlizaaSplitView";
 
-export class Slizaa21SplitView extends React.Component<ISlizaa21SplitViewProps, ISlizaa21SplitViewState> {
+export interface ISlizaa21SplitViewState extends ISlizaaSplitViewState {
+    upperVerticalSplitPosition: number
+}
+
+export interface ISlizaa21SplitViewProps extends ISlizaaSplitViewProps {
+    topLeft: ISlizaaSplitViewComponent,
+    topRight: ISlizaaSplitViewComponent,
+    bottom: ISlizaaSplitViewComponent,
+}
+
+export enum Slizaa21SplitViewPositions {
+    TOP_LEFT, TOP_RIGHT, BOTTOM
+}
+
+export class Slizaa21SplitView extends AbstractSlizaaSplitView<ISlizaa21SplitViewProps, ISlizaa21SplitViewState> {
 
     public static GUTTER_SIZE = 4
 
@@ -39,19 +55,7 @@ export class Slizaa21SplitView extends React.Component<ISlizaa21SplitViewProps, 
         }
     }
 
-    public componentDidMount(): void {
-        this.updateWindowDimensions();
-        window.addEventListener('resize', this.updateWindowDimensions);
-    }
-
-    public componentWillUnmount(): void {
-        window.removeEventListener('resize', this.updateWindowDimensions);
-    }
-
     public render() {
-
-
-
         let horizontalSplitRatio = this.state.horizontalSplitRatio;
         let upperVerticalSplitPosition = this.state.upperVerticalSplitPosition;
 
@@ -83,53 +87,17 @@ export class Slizaa21SplitView extends React.Component<ISlizaa21SplitViewProps, 
                                         gutter={DependenciesViewProps.GUTTER_SIZE}
                                         initialWidth={upperVerticalSplitPosition}
                                         onWidthChanged={this.onUpperSplitLayoutWidthChanged}
-                                        left={this.createCard(this.props.topLeft, Slizaa21SplitViewPositions.TOP_LEFT)}
-                                        right={this.createCard(this.props.topRight, Slizaa21SplitViewPositions.TOP_RIGHT)}
+                                        left={this.createCard(this.props.topLeft, Slizaa21SplitViewPositions.TOP_LEFT.toString())}
+                                        right={this.createCard(this.props.topRight, Slizaa21SplitViewPositions.TOP_RIGHT.toString())}
                                     />
                                 }
-                                bottom={this.createCard(this.props.bottom, Slizaa21SplitViewPositions.BOTTOM)}
+                                bottom={this.createCard(this.props.bottom, Slizaa21SplitViewPositions.BOTTOM.toString())}
                             />
                         )
                 )}
             </DatabaseAndHierarchicalGraphContext.Consumer>
         );
     }
-
-    private createCard = (component: ISlizaa21SplitViewComponent, position: Slizaa21SplitViewPositions): JSX.Element => {
-
-        const allowOverflow: boolean = component.allowOverflow ? true : false;
-
-        return <Card title={component.title}
-                     id={position.toString()}
-                     padding={0}
-                     allowOverflow={allowOverflow}
-                     handleMaximize={this.handleMaximize}
-                     menuProviderFunc={component.overlayMenuFunc}
-        >
-            {component.element}
-        </Card>;
-    }
-
-    private updateWindowDimensions = (): void => {
-        const newHeight = window.innerHeight - 55;
-        const newWidth = window.innerWidth - 9;
-        this.setState(
-            {
-                viewHeight: newHeight,
-                viewWidth: newWidth
-            });
-    }
-
-    private handleMaximize = (id?: string): void => {
-        const newMaximizedCardId = this.state.maximizedCardId !== undefined && this.state.maximizedCardId === id ? undefined : id;
-        this.setState({maximizedCardId: newMaximizedCardId})
-    }
-
-
-    private onHorizontalRatioChanged = (id: string, newRation: number): void => {
-        this.setState({horizontalSplitRatio: newRation})
-    }
-
 
     private onUpperSplitLayoutWidthChanged = (id: string, newWidth: number): void => {
         this.setState({upperVerticalSplitPosition: newWidth});
