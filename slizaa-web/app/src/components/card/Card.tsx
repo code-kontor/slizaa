@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Dropdown, Menu} from 'antd';
-import {ClickParam} from "antd/lib/menu";
+import {Dropdown} from 'antd';
 import * as React from 'react';
 import './Card.css';
-import {EmptyIcon, FullScreenIcon, MenuIcon} from "./CardIcons";
+import {FullScreenIcon, MenuIcon} from "./CardIcons";
 
 export interface ICardProps {
     id: string
@@ -27,51 +26,41 @@ export interface ICardProps {
     allowOverflow?: boolean
     padding?: number
     handleMaximize?: (id: string) => void
+    menuProviderFunc?: () => React.ReactNode
 }
 
 export class Card extends React.Component<ICardProps, any> {
 
     public render() {
 
-        const menu = (
-            <Menu onClick={this.handleMenuClick} selectedKeys={["1"]}>
-                <Menu.Item key="1">
-                    <EmptyIcon/>
-                    1st menu item
-                </Menu.Item>
-                <Menu.Item key="2">
-                    <MenuIcon/>
-                    2nd menu item
-                </Menu.Item>
-                <Menu.Item key="3">
-                    <EmptyIcon/>
-                    3rd item
-                </Menu.Item>
-            </Menu>
-        );
-
         const styleProperties = {
             overflow: this.props.allowOverflow !== undefined && !this.props.allowOverflow ? 'hidden' : 'auto',
             padding: this.props.padding !== undefined ? this.props.padding + 'px ' + this.props.padding + 'px' : '10px 10px',
         }
 
+        const inlineBlock = this.props.menuProviderFunc ?
+            (
+                <div style={{display: "inline-block", float: "right"}}>
+                    <Dropdown overlay={this.props.menuProviderFunc} placement="bottomRight">
+                        <MenuIcon/>
+                    </Dropdown>
+                    <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick}/>
+                </div>
+            )
+            :
+            (
+                <div style={{display: "inline-block", float: "right"}}>
+                    <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick}/>
+                </div>
+            );
+
         return <div className="slizaa-card">
             <div className="slizaa-card-title">
                 <div style={{float: "left", width: "50%"}}>{this.props.title}</div>
-                <div style={{display: "inline-block", float: "right"}}>
-                    <Dropdown overlay={menu} placement="bottomRight">
-                        <MenuIcon/>
-                    </Dropdown>
-                    <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick} />
-                </div>
+                {inlineBlock}
             </div>
             <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div>
         </div>;
-    }
-
-    private handleMenuClick = (param: ClickParam): void => {
-        // tslint:disable-next-line:no-console
-        console.log('click left button', param);
     }
 
     private handleMaximizeClick = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {

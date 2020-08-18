@@ -15,11 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Spin} from 'antd';
+import {Menu, Spin} from 'antd';
+import {ClickParam} from "antd/lib/menu";
 import ApolloClient from 'apollo-client';
 import * as React from 'react';
 import {ApolloConsumer, Query} from 'react-apollo';
 import {HierarchicalGraphTree} from 'src/components/hierarchicalgraphtree';
+import {EmptyIcon} from "../../components/card/CardIcons";
 import {SlizaaDependencyViewer} from "../../components/slizaadependencyviewer/SlizaaDependencyViewer";
 import {
     DsmForNodeChildren,
@@ -51,6 +53,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     horizontalSideMarkerHeight: 10,
                     verticalSideMarkerWidth: 150
                 },
+                selectedDependencyVisualization: DependencyVisualization.DependencyStructureMatrix
             },
             mainTreeNodeSelection: {
                 expandedNodeIds: ["-1"],
@@ -60,6 +63,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
     }
 
     public render() {
+
         return (
             <ApolloConsumer>
                 {cl => (
@@ -69,11 +73,13 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                             allowOverflow: true,
                             element: this.hierarchicalGraphCard(cl),
                             title: "Hierarchical Graph",
+
                         }}
                         topRight={{
                             allowOverflow: true,
                             element: this.dependenciesOverviewCard(cl),
-                            title: "Hierarchical Graph",
+                            overlayMenuFunc: this.dependenciesOverviewMenu,
+                            title: "Dependency Overview",
                         }}
                         bottom={{
                             element: this.dependencyDetailsCard(cl),
@@ -85,7 +91,23 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
         );
     }
 
+    private dependenciesOverviewMenu = (): React.ReactElement => {
+        return (
+            <Menu onClick={this.handleMenuClick}>
+                <Menu.Item key={DependencyVisualization.DependencyStructureMatrix.toString()}>
+                    <EmptyIcon/>
+                    Dependency Structure Matrix
+                </Menu.Item>
+                <Menu.Item key={DependencyVisualization.DependencyGraph.toString()}>
+                    <EmptyIcon/>
+                    Dependency Graph
+                </Menu.Item>
+            </Menu>
+        );
+    }
+
     private hierarchicalGraphCard(cl: ApolloClient<any>): React.ReactElement {
+
         return <HierarchicalGraphTree
             key={this.state.databaseId + "-" + this.state.hierarchicalGraphId}
             client={cl}
@@ -97,8 +119,36 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             checkedKeys={this.state.mainTreeNodeSelection.selectedNodeIds}/>
     }
 
+    private handleMenuClick = (param: ClickParam): void => {
+
+        if (param.key === DependencyVisualization.DependencyStructureMatrix.toString()) {
+            this.setState({
+                layout: {
+                    ...this.state.layout,
+                    selectedDependencyVisualization: DependencyVisualization.DependencyStructureMatrix
+                }
+            })
+        } else if (param.key === DependencyVisualization.DependencyGraph.toString()) {
+            this.setState({
+                layout: {
+                    ...this.state.layout,
+                    selectedDependencyVisualization: DependencyVisualization.DependencyGraph
+                }
+            })
+        }
+    }
+
     private dependenciesOverviewCard(cl: ApolloClient<any>): React.ReactNode {
-        return this.dependencyGraph(cl);
+
+        if (this.state.layout.selectedDependencyVisualization === DependencyVisualization.DependencyGraph) {
+            return this.dependencyGraph(cl);
+        }
+
+        if (this.state.layout.selectedDependencyVisualization === DependencyVisualization.DependencyStructureMatrix) {
+            return this.dependencyStructureMatrixPart(cl);
+        }
+
+        return null;
     }
 
     private dependencyDetailsCard(client: ApolloClient<any>): React.ReactElement {
@@ -187,7 +237,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                 {({loading, data, error}) => {
 
                     if (loading) {
-                        return <Spin size="large"/>;
+                        return <Spin className={"slizaaSpinner"} size="large"/>;
                     }
 
                     if (error) {
@@ -275,4 +325,8 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             }
         );
     }
+}
+
+export enum DependencyVisualization {
+    DependencyStructureMatrix, DependencyGraph
 }

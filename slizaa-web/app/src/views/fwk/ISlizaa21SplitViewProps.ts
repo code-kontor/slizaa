@@ -30,4 +30,5 @@ export interface ISlizaa21SplitViewComponent {
     title: string,
     allowOverflow?: boolean,
     element: React.ReactNode,
+    overlayMenuFunc?: () => React.ReactNode,
 }

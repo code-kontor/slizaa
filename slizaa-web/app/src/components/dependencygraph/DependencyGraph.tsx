@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import {Spin} from "antd";
 import ELK, {ElkNode} from 'elkjs/lib/elk.bundled.js'
 import * as React from "react";
 import './DependencyGraph.css';
@@ -84,9 +85,6 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
             edges: arrayOfEdges
         }
 
-        // TODO: Split in two components / delegate the graph rendering entirely to the sub-component
-        // show the sandnox in this component here...
-
         // @ts-ignore
         elk.layout(graph)
             // @ts-ignore
@@ -101,7 +99,7 @@ export class DependencyGraph extends React.Component<IDependencyGraphProps, IDep
     public render() {
 
         if (!this.state.rootNode) {
-            return <h1>Wait!</h1>
+            return <Spin className="slizaaSpinner" size="large" />
         }
 
         return <DependencyGraphCanvas rootNode={this.state.rootNode} />

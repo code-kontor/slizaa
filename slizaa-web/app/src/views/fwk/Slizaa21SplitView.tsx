@@ -104,6 +104,7 @@ export class Slizaa21SplitView extends React.Component<ISlizaa21SplitViewProps, 
                      padding={0}
                      allowOverflow={allowOverflow}
                      handleMaximize={this.handleMaximize}
+                     menuProviderFunc={component.overlayMenuFunc}
         >
             {component.element}
         </Card>;
