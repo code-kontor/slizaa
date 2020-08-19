@@ -19,4 +19,5 @@
 export interface IDependencyListState {
     currentPage: number
     expandedRows: string[]
+    pageSize: number
 }

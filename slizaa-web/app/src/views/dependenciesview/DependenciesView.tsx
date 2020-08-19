@@ -53,7 +53,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     horizontalSideMarkerHeight: 10,
                     verticalSideMarkerWidth: 150
                 },
-                selectedDependencyVisualization: DependencyVisualization.DependencyStructureMatrix
+                selectedDependencyVisualization: DependencyVisualization.DependencyStructureMatrix,
             },
             mainTreeNodeSelection: {
                 expandedNodeIds: ["-1"],
@@ -162,7 +162,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
             <SlizaaDependencyViewer
                 key={this.state.mainDependencySelection.sourceNode.id + "-" + this.state.mainDependencySelection.targetNode.id}
                 client={client}
-                height={600 - 135}
                 databaseId={this.state.databaseId}
                 hierarchicalGraphId={this.state.hierarchicalGraphId}
                 sourceNodeId={this.state.mainDependencySelection.sourceNode.id}
@@ -249,10 +248,6 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                     }
 
                     const matrix = data.hierarchicalGraph.node.children.orderedAdjacencyMatrix;
-
-                    // tslint:disable-next-line:no-console
-                    console.log(matrix)
-
                     return consumer(matrix);
                 }}
             </Query>

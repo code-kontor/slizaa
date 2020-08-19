@@ -123,7 +123,6 @@ export class SlizaaDependencyViewer extends React.Component<ISlizaaDependencyVie
                         dependencyTargetNodeId={this.props.targetNodeId}
                         selectedSourceNodeIds={this.state.selectedSourceNodeIds}
                         selectedTargetNodeIds={this.state.selectedTargetNodeIds}
-                        height={this.props.height}
                     /> :
                     <div/>
 

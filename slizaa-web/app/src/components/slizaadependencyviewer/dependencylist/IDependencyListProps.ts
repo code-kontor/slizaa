@@ -17,7 +17,6 @@
  */
 
 export interface IDependencyListProp {
-    height?: number
     databaseId?: string
     hierarchicalGraphId?: string
     dependencySourceNodeId: string

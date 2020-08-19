@@ -24,5 +24,4 @@ export interface ISlizaaDependencyViewerProps {
     hierarchicalGraphId?: string,
     sourceNodeId: string,
     targetNodeId: string,
-    height: number,
 }

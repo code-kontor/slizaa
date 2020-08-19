@@ -33,13 +33,25 @@
     color: #2f353a;
 }
 
+.ant-select-dropdown-menu-item {
+    font-size: 12px;
+}
+
+.ant-pagination-options-quick-jumper input {
+    font-size: 12px;
+}
+
+.ant-select-selection-selected-value {
+    font-size: 12px;
+}
+
 .ant-pagination-item-active {
     font-weight: 700;
     border-color: #2f353a;
 }
 
-.ant-table-pagination.ant-pagination {
-    float: left;
+.ant-table {
+    border: none;
 }
 
 .ant-table-column-title {

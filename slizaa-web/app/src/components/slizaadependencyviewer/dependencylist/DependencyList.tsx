@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Table} from 'antd';
+import {Pagination, Table} from 'antd';
 import * as React from 'react';
 import {Query} from "react-apollo";
 import {
@@ -39,7 +39,7 @@ import {IDependencyListState} from "./IDependencyListState";
 
 export class DependencyList extends React.Component<IDependencyListProp, IDependencyListState> {
 
-    private readonly PAGE_SIZE = 20;
+    private readonly PAGE_SIZE = 25;
 
     private readonly COLUMNS = [
         {
@@ -51,7 +51,7 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
         {
             dataIndex: 'type',
             key: 'type',
-            title: 'Address',
+            title: 'Type',
             width: 120
         },
         {
@@ -66,7 +66,8 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
         super(props);
         this.state = {
             currentPage: 1,
-            expandedRows: []
+            expandedRows: [],
+            pageSize: this.PAGE_SIZE
         }
     }
 
@@ -81,7 +82,7 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
             hierarchicalGraphId: this.props.hierarchicalGraphId,
             nodeSelections: [{selectedNodeIds: this.props.selectedSourceNodeIds, selectedNodesType:NodeType.SOURCE}, {selectedNodeIds:this.props.selectedTargetNodeIds, selectedNodesType:NodeType.TARGET}],
             pageNumber: this.state.currentPage,
-            pageSize: this.PAGE_SIZE,
+            pageSize: this.state.pageSize,
         }
 
         return <Query<CoreDependenciesForAggregatedDependencies, CoreDependenciesForAggregatedDependenciesVariables>
@@ -96,7 +97,7 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
                     return <h1>{error.message}</h1>
                 }
 
-                const pageInfo =
+               const pageInfo =
                     data &&
                     data.hierarchicalGraph &&
                     data.hierarchicalGraph.dependencySetForAggregatedDependency &&
@@ -114,25 +115,49 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
                         data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredDependencies.dependencyPage.dependencies :
                         [];
 
-                return <Table
-                    className={"fixedWidthTable"}
-                    loading={loading}
-                    columns={this.COLUMNS}
-                    dataSource={dependencies}
-                    size={"small"}
-                    onExpandedRowsChange={this.handleExpandedRowsChange}
-                    expandedRowKeys={this.state.expandedRows}
-                    expandedRowRender={this.expandedRowRender}
-                    scroll={{y: this.props.height}}
-                    pagination={{
-                        current: this.state.currentPage,
-                        defaultPageSize: this.PAGE_SIZE,
-                        hideOnSinglePage: false,
-                        onChange: this.handlePaginationChange,
-                        position: "top",
-                        total: pageInfo.totalCount,
-                    }}/>
+                return <div style={ { display: "flex", flexDirection: "column", height: "100%"}}>
+                    <div style={ { overflow: "auto", height: "100%" }} >
+                        <Table
+                            className={"fixedWidthTable"}
+                            loading={loading}
+                            columns={this.COLUMNS}
+                            dataSource={dependencies}
+                            size={"small"}
+                            onExpandedRowsChange={this.handleExpandedRowsChange}
+                            expandedRowKeys={this.state.expandedRows}
+                            expandedRowRender={this.expandedRowRender}
+                            scroll={{x:false, y:false}}
+                            pagination={false}
+                            /*pagination={{
+                                current: this.state.currentPage,
+                                defaultPageSize: this.PAGE_SIZE,
+                                hideOnSinglePage: false,
+                                onChange: this.handlePaginationChange,
+                                position: "top",
+                                total: pageInfo.totalCount,
+                            }}*/
+                        />
+                    </div>
+                    <div style={ { overflow: "auto", padding: "15px 0px 15px 0px" }} >
+                        <Pagination
+                            showQuickJumper={true}
+                            showSizeChanger={true}
+                            total={pageInfo.totalCount}
+                            pageSizeOptions={["10","25","50","100"]}
+                            showTotal={showTotal}
+                            defaultPageSize={this.state.pageSize}
+                            defaultCurrent={1}
+                            current={this.state.currentPage}
+                            hideOnSinglePage={false}
+                            onChange={this.handlePaginationChange}
+                            onShowSizeChange={this.handlePaginationSizeChange}
+                        />
+                    </div>
+                </div>
 
+                function showTotal(total: number, range: [number, number]) {
+                    return `${range[0]}-${range[1]} of ${total} items`;
+                }
             }}
         </Query>
     }
@@ -181,10 +206,16 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
         </Query>
     };
 
-    private handlePaginationChange = (page: number) => {
+   private handlePaginationChange = (page: number) => {
         this.setState({
             currentPage: page,
             expandedRows: []
+        });
+    }
+
+    private handlePaginationSizeChange = (current: number, size: number) => {
+        this.setState({
+            pageSize: size
         });
     }
 
