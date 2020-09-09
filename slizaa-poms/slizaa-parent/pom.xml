@@ -76,7 +76,7 @@
 		<version-spring-statemachine>2.0.2.RELEASE</version-spring-statemachine>
 		<version-classgraph>4.1.7</version-classgraph>
 		<version-spring-boot>2.1.4.RELEASE</version-spring-boot>
-		<version-hibernate-validator>5.4.1.Final</version-hibernate-validator>
+		<version-hibernate-validator>5.4.2.Final</version-hibernate-validator>
 		<version-gson>2.8.5</version-gson>
 		<version-mvnresolver-uber>1.0.0.RC1</version-mvnresolver-uber>
 	</properties>
