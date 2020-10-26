@@ -16,13 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import ApolloClient from 'apollo-client';
-import * as React from "react";
 import {CSSProperties} from "react";
+import * as React from "react";
 import {Query} from "react-apollo";
 import {SlizaaIcon} from 'src/components/slizaaicon';
 import {ISlizaaNode} from "../../model/ISlizaaNode";
 import {NodeType} from "../../model/NodeType";
-import {SlizaaNode} from "../../model/SlizaaNode";
 import {fetchChildrenFilterByDependencySet} from "../../model/SlizaaNodeChildrenResolver";
 import STree from "../stree/STree";
 import {ISlizaaDependencyTreeProps} from "./ISlizaaDependencyTreeProps";
@@ -33,6 +32,7 @@ import {
     ReferencedNodesForAggregatedDependenciesVariables
 } from "../../gqlqueries/__generated__/ReferencedNodesForAggregatedDependencies";
 import {GQ_REFERENCED_NODES_FOR_AGGREGATED_DEPENDENCY} from "../../gqlqueries/GqlQueries";
+import {SlizaaNodeFactory} from "../../model/SlizaaNodeFactory";
 import './SlizaaDependencyTree.css';
 
 export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeProps, ISlizaaDependencyTreeState> {
@@ -45,8 +45,8 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
             expandedTargetNodeIds: [],
             selectedSourceNodeIds: props.selectedSourceNodeIds,
             selectedTargetNodeIds: props.selectedTargetNodeIds,
-            sourceNode: SlizaaNode.createRoot("Root", "default"),
-            targetNode: SlizaaNode.createRoot("Root", "default"),
+            sourceNode: SlizaaNodeFactory.createRoot(props.databaseId + "-" + props.hierarchicalGraphId),
+            targetNode: SlizaaNodeFactory.createRoot(props.databaseId + "-" + props.hierarchicalGraphId),
         };
     }
 
@@ -131,12 +131,12 @@ export class SlizaaDependencyTree extends React.Component<ISlizaaDependencyTreeP
         return <SlizaaIcon iconId={item.iconId}/>
     }
 
-    private loadChildrenFilteredByDependencySource = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
+    private loadChildrenFilteredByDependencySource = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: ISlizaaNode, callback: () => void) => Promise<{}> => {
+        return (p: ISlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.SOURCE, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
     }
 
-    private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: SlizaaNode, callback: () => void) => Promise<{}> => {
-        return (p: SlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
+    private loadChildrenFilteredByDependencyTarget = (client: ApolloClient<any>, dependencySourceNodeId: string, dependencyTargetNodeId: string): (parent: ISlizaaNode, callback: () => void) => Promise<{}> => {
+        return (p: ISlizaaNode, c: () => void) => fetchChildrenFilterByDependencySet(client, p, NodeType.TARGET, dependencySourceNodeId, dependencyTargetNodeId, this.props.databaseId, this.props.hierarchicalGraphId, c);
     }
 
     private onSourceSelect = (selectedNodes: ISlizaaNode[]): void => {

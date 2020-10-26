@@ -1,4 +1,4 @@
-/*
+/**
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,29 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+.crossReferenceViewerContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
 
-import { ISlizaaNode } from './ISlizaaNode';
+.crossReferenceViewerContainer-Left {
+    flex: 0 1 auto;
+    width: 33%;
+    overflow: auto;
+}
 
-/**
- * Represents a tree node.
- */
-export class SlizaaNode implements ISlizaaNode {
+.crossReferenceViewerContainer-Center {
+    flex: 0 1 auto;
+    width: 34%;
+    height: 100%;
+    overflow: auto;
+}
 
-    public static createRoot(title: string, iconId: string): SlizaaNode {
-        return new SlizaaNode("-1", title, iconId, true);
-    }
-
-    public static createNode(id: string, title: string, iconId: string, hasChildren: boolean): SlizaaNode {
-        return new SlizaaNode(id, title, iconId, hasChildren);
-    }
-
-    public expanded?: boolean;
-
-    public internalChildren: SlizaaNode[] | undefined;
-
-    private constructor(public key: string, public title: string, public iconId: string, public hasChildren: boolean) { }
-
-    public children(): SlizaaNode[] {
-        return this.internalChildren ? this.internalChildren : [];
-    }
+.crossReferenceViewerContainer-Right {
+    flex: 0 1 auto;
+    width: 33%;
+    overflow: auto;
 }

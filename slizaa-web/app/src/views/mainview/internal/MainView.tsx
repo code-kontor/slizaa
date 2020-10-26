@@ -15,41 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {Icon, Layout, Menu} from 'antd';
+import {Layout, Tooltip} from 'antd';
 import * as React from 'react';
 import {BrowserRouter, Link, Route, withRouter} from 'react-router-dom';
 import {SlizaaHgChooser} from 'src/components/slizaahgchooser';
 import DatabaseAndHierarchicalGraphContext
     from "../../../components/slizaahgchooser/DatabaseAndHierarchicalGraphContext";
 import {DependenciesView} from "../../dependenciesview";
-import {QueryView} from "../../queryview/QueryView";
+import {XrefView} from "../../xrefview/XrefView";
 import './MainView.css';
-import {DependencyVisualisation, DependencyVisualisationIcon, SlizaaSvg} from './SlizaaIcons';
+import {CrossReferencerIcon, DependencyVisualisationIcon, SlizaaSvg} from './SlizaaIcons';
 
-interface IState {
-    collapsed: boolean
-}
+export class MainView extends React.Component<any, any> {
 
-export class MainView extends React.Component<any, IState> {
+    public static readonly SIDER_WIDTH = 40;
 
     constructor(props: any) {
         super(props);
-
-        this.state = {
-            collapsed: true
-        }
     }
 
     public render() {
+
         return (
             <BrowserRouter basename="/slizaa">
                 <Layout style={{minHeight: '100vh'}}>
-                    <Layout.Header style={{padding: 0}}>
-                        <Icon
-                            className="trigger"
-                            type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
-                            onClick={this.toggleCollapsed}
-                        />
+                    <Layout.Header style={{padding: "0px 15px"}}>
                         <Link to="/">
                             <svg height="30px" viewBox="0 0 493.923 175.948" style={{verticalAlign: "middle"}}>
                                 <SlizaaSvg/>
@@ -60,17 +50,17 @@ export class MainView extends React.Component<any, IState> {
                     <Layout>
                         <Layout.Sider
                             theme="light"
-                            collapsible={true}
-                            collapsed={this.state.collapsed}
-                            onCollapse={this.onCollapse}
+                            collapsible={false}
+                            collapsed={true}
                             trigger={null}
-                            collapsedWidth={0}
-                            width={170}
+                            collapsedWidth={MainView.SIDER_WIDTH}
+                            width={MainView.SIDER_WIDTH}
                         >
                             <Linkmenu/>
                         </Layout.Sider>
+
                         <Layout.Content style={{padding: 4, minHeight: 280}}>
-                            <Route key="/query" exact={true} path="/query" component={QueryViewComponent}/>
+                            <Route key="/xref" exact={true} path="/xref" component={XrefViewComponent}/>
                             <Route key="/dependencies" exact={true} path="/dependencies"
                                    component={DependencyViewComponent}/>
                         </Layout.Content>
@@ -78,16 +68,6 @@ export class MainView extends React.Component<any, IState> {
                 </Layout>
             </BrowserRouter>
         )
-    }
-
-    protected onCollapse = (isCollapsed: boolean) => {
-        this.setState({...this.state, collapsed: isCollapsed});
-    }
-
-    protected toggleCollapsed = () => {
-        this.setState({
-            collapsed: !this.state.collapsed,
-        });
     }
 }
 
@@ -97,31 +77,42 @@ function DependencyViewComponent() {
             <DependenciesView
                 key={ctx.currentDatabase + "-" + ctx.currentHierarchicalGraph}
                 databaseId={ctx.currentDatabase}
-                              hierarchicalGraphId={ctx.currentHierarchicalGraph}/>
+                hierarchicalGraphId={ctx.currentHierarchicalGraph}/>
         )}
     </DatabaseAndHierarchicalGraphContext.Consumer>
 }
 
-function QueryViewComponent() {
+function XrefViewComponent() {
     return <DatabaseAndHierarchicalGraphContext.Consumer>
         {ctx => (
-            <QueryView/>
+            <XrefView
+                key={ctx.currentDatabase + "-" + ctx.currentHierarchicalGraph}
+                databaseId={ctx.currentDatabase}
+                hierarchicalGraphId={ctx.currentHierarchicalGraph}/>
         )}
     </DatabaseAndHierarchicalGraphContext.Consumer>
 }
 
 const Linkmenu = withRouter(props => {
-    const {location} = props;
     return (
-        <Menu mode="inline" selectedKeys={[location.pathname]} theme="light">
-            <Menu.Item key="/dependencies">
-                <DependencyVisualisationIcon />
-                <Link to="/dependencies">Dependencies</Link>
-            </Menu.Item>
-            <Menu.Item key="/query">
-                <Icon component={DependencyVisualisation}/>
-                <Link to="/query">Query</Link>
-            </Menu.Item>
-        </Menu>
+        <div className="ant-layout-sider-children">
+            <ul className="ant-menu ant-menu-vertical" role="menu">
+                <Tooltip title={"Dependencies"} placement={"right"}>
+                    <li className="ant-menu-item" role="menuitem"><i className="anticon">
+                        <DependencyVisualisationIcon/>
+                    </i>
+                        <Link to="/dependencies"/>
+                    </li>
+                </Tooltip>
+                <Tooltip title={"Cross-Referencer"} placement={"right"}>
+                    <li className="ant-menu-item" role="menuitem">
+                        <i className="anticon">
+                            <CrossReferencerIcon/>
+                        </i>
+                        <Link to="/xref"/>
+                    </li>
+                </Tooltip>
+            </ul>
+        </div>
     );
 });

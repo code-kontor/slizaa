@@ -1,4 +1,4 @@
-/**
+/*
  * slizaa-web - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
@@ -15,29 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-.slizaa-card {
-    background-color: transparent;
-    align-items: stretch;
-    display: flex;
-    flex-flow: column;
-    height: 100%;
-    width: 100%;
-}
 
-.slizaa-card-title {
-    font-size: 0.85rem;
-    padding: 5px 8px;
-    background-color: #FAFAFA;
-    border: 1px solid #C8CEd3;
-    border-radius: 5px 5px 0px 0px;
-    font-weight: 600;
-    flex: 0 0 0px;
-}
+import {ISlizaaNode} from "./ISlizaaNode";
 
-.slizaa-card-body {
-    border: 1px solid #C8CEd3;
-    border-radius: 0px 0px 5px 5px;
-    border-top: none;
-    background-color: white;
-    flex: 1 0 0px;
+/**
+ * Represents a tree node.
+ */
+export interface ISlizaaRootNode extends ISlizaaNode {
+   lookupNode(id: string): ISlizaaNode | undefined
 }

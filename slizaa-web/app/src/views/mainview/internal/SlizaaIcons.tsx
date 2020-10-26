@@ -29,8 +29,21 @@ export const DependencyVisualisation = () => (
   </svg>
 );
 
+export const CrossReferencer = () => (
+    <svg x="0px" y="0px" width="16.422px" height="16.297px" viewBox="0 0 16.422 16.297" enable-background="new 0 0 16.422 16.297">
+        <polygon fill="none" stroke="#FFFFFF" stroke-miterlimit="10" points="14.838,4.039 11.151,1 11.151,2.542 1.857,2.542
+	1.857,5.535 11.151,5.535 11.151,7.076 "/>
+        <polygon fill="none" stroke="#FFFFFF" stroke-miterlimit="10" points="1.857,12.259 5.544,15.297 5.544,13.755 14.838,13.755
+	14.838,10.762 5.544,10.762 5.544,9.22 "/>
+    </svg>
+);
+
+export const CrossReferencerIcon = (props: any) => (
+  <Icon component={CrossReferencer} {...props} />
+);
+
 export const DependencyVisualisationIcon = (props: any) => (
-  <Icon component={DependencyVisualisation} {...props} />
+    <Icon component={DependencyVisualisation} {...props} />
 );
 
 export const SlizaaSvg = () => (

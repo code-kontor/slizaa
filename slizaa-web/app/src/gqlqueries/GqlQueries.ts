@@ -165,63 +165,6 @@ export const GQ_CORE_DEPENDENCIES_FOR_AGGREGATED_DEPENDENCY = gql`
         }
     }`
 
-/* export const GQ_AGGREGATED_DEPENDENCY_DETAILS = gql`
-    query AggregatedDependencyDetails(
-        $databaseId: ID!,
-        $hierarchicalGraphId: ID!,
-        $dependencySourceNodeId: ID!,
-        $dependencyTargetNodeId: ID!,
-        $selectedNodeIds: [ID!]!,
-        $selectedNodesType: NodeType!
-        $pageSize: Int!,
-        $pageNumber: Int!,
-    ) {
-        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
-            dependencySetForAggregatedDependency(sourceNodeId: $dependencySourceNodeId, targetNodeId: $dependencyTargetNodeId) {
-                size
-                filteredDependencies(nodeSelection: [ {selectedNodeIds: $selectedNodeIds, selectedNodesType: $selectedNodesType}]) {
-                    sourceNodeIds: nodeIds(nodeType: SOURCE, includedPredecessors: true)
-                    targetNodeIds: nodeIds(nodeType: TARGET, includedPredecessors: true)
-                }
-                dependencyPage(pageNumber: $pageNumber, pageSize: $pageSize) {
-                    pageInfo {
-                        pageNumber
-                        maxPages
-                        pageSize
-                        totalCount
-                    }
-                    dependencies {
-                        id
-                        type
-                        weight
-                        sourceNode {
-                            id
-                            text
-                            iconIdentifier
-                        }
-                        targetNode {
-                            id
-                            text
-                            iconIdentifier
-                        }
-                    }
-                }
-            }
-            sourcePredecessors: node(id: $dependencySourceNodeId) {
-                id
-                predecessors {
-                    id
-                }
-            }
-            targetPredecessors: node(id: $dependencyTargetNodeId) {
-                id
-                predecessors {
-                    id
-                }
-            }
-        }
-    }`
-*/
 export const GQ_RESOLVED_PROXY_DEPENDENCY = gql`
     query ResolvedProxyDependency(
         $databaseId: ID!,
@@ -249,3 +192,90 @@ export const GQ_RESOLVED_PROXY_DEPENDENCY = gql`
             }
         }
     }`
+
+export const GQ_FILTER_REFERENCED_NODES = gql`
+    query FilterReferencedNodes (
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $nodeIds: [ID!]!,
+        $nodeIdsToFilter: [ID!]!,
+        $nodesToConsider: NodesToConsider!,
+        $includePredecessorsInResult: Boolean!
+    ) {
+  hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+    nodes(ids: $nodeIds) {
+      filterReferencedNodes(nodeIds: $nodeIdsToFilter, nodesToConsider: $nodesToConsider, includePredecessorsInResult: $includePredecessorsInResult) {
+        nodeIds
+      }
+      filterReferencingNodes(nodeIds: ["126628", "126629"], nodesToConsider: SELF_AND_CHILDREN, includePredecessorsInResult: true) {
+        nodeIds
+      }
+    }
+  }
+}
+`
+
+export const GQ_FILTER_REFERENCING_NODES = gql`
+    query FilterReferencingNodes (
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $nodeIds: [ID!]!,
+        $nodeIdsToFilter: [ID!]!,
+        $nodesToConsider: NodesToConsider!,
+        $includePredecessorsInResult: Boolean!
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            nodes(ids: $nodeIds) {
+                filterReferencingNodes(nodeIds: $nodeIdsToFilter, nodesToConsider: $nodesToConsider, includePredecessorsInResult: $includePredecessorsInResult) {
+                    nodeIds
+                }
+            }
+        }
+    }
+`
+
+export const GQ_CHILDREN_FILTERED_BY_REFERENCED_NODES = gql`
+    query ChildrenFilteredByReferencedNodes (
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $parentNodeId: ID!,
+        $selectedReferencedNodeIds: [ID!]!,
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            node(id: $parentNodeId) {
+                id
+                childrenFilteredByReferencedNodes(referencedNodeIds: $selectedReferencedNodeIds) {
+                    nodes {
+                        id
+                        text
+                        iconIdentifier
+                        hasChildren
+                    }
+                }
+            }
+        }
+    }
+`
+
+export const GQ_CHILDREN_FILTERED_BY_REFERENCING_NODES = gql`
+    query ChildrenFilteredByReferencingNodes (
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $parentNodeId: ID!,
+        $selectedReferencingNodeIds: [ID!]!,
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            node(id: $parentNodeId) {
+                id
+                childrenFilteredByReferencingNodes(referencingNodeIds: $selectedReferencingNodeIds) {
+                    nodes {
+                        id
+                        text
+                        iconIdentifier
+                        hasChildren
+                    }
+                }
+            }
+        }
+    }
+`

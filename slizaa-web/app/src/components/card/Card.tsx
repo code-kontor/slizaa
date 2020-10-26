@@ -64,8 +64,6 @@ export class Card extends React.Component<ICardProps, any> {
     }
 
     private handleMaximizeClick = (event: React.MouseEvent<HTMLElement, MouseEvent>): void => {
-        // tslint:disable-next-line:no-console
-        console.log('click left button', event);
         if (this.props.handleMaximize) {
             this.props.handleMaximize(this.props.id);
         }

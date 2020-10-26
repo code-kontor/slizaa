@@ -16,13 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ISlizaaRootNode} from "./ISlizaaRootNode";
+
 /**
  * Represents a tree node.
  */
  export interface ISlizaaNode {
-    readonly key: string;
-    readonly title: string;
-    readonly iconId: string;
-    readonly hasChildren: boolean;
-    children(): ISlizaaNode[];
+   readonly key: string;
+   readonly title: string;
+   readonly iconId: string;
+   readonly hasChildren: boolean;
+   root(): ISlizaaRootNode;
+   children(): ISlizaaNode[];
 }

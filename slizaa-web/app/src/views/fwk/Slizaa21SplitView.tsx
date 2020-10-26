@@ -19,6 +19,7 @@ import * as React from 'react';
 import {HorizontalSplitLayout, VerticalSplitLayout} from "../../components/layout";
 import DatabaseAndHierarchicalGraphContext from "../../components/slizaahgchooser/DatabaseAndHierarchicalGraphContext";
 import {DependenciesViewProps} from "../dependenciesview/DependenciesViewLayoutConstants";
+import {MainView} from "../mainview";
 import {
     AbstractSlizaaSplitView,
     ISlizaaSplitViewComponent,
@@ -63,7 +64,7 @@ export class Slizaa21SplitView extends AbstractSlizaaSplitView<ISlizaa21SplitVie
             const isTopElementSelected = this.state.maximizedCardId === Slizaa21SplitViewPositions.TOP_RIGHT.toString() ||  this.state.maximizedCardId === Slizaa21SplitViewPositions.TOP_LEFT.toString();
             horizontalSplitRatio = isTopElementSelected ? 1000 : 0;
             if (isTopElementSelected) {
-                upperVerticalSplitPosition = this.state.maximizedCardId === Slizaa21SplitViewPositions.TOP_RIGHT.toString() ? 0 : this.state.viewWidth;
+                upperVerticalSplitPosition = this.state.maximizedCardId === Slizaa21SplitViewPositions.TOP_RIGHT.toString() ? 0 : this.state.viewWidth - MainView.SIDER_WIDTH;
             }
         }
 

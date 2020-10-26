@@ -19,3 +19,14 @@ img.slizaa-logo {
     padding-left: 24px;
     vertical-align: middle;
 }
+
+ul.ant-menu {
+    width: 40px;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -webkit-transition: background 0.3s, width 0.2s;
+}
+
+li.ant-menu-item {
+    padding: 0px 12px !important;
+}

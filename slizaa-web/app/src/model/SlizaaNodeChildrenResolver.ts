@@ -17,147 +17,240 @@
  */
 
 import ApolloClient from 'apollo-client';
-import { NodeType } from 'src/gqlqueries/query-types';
+import {NodeType} from 'src/gqlqueries/query-types';
+import {
+    ChildrenFilteredByReferencedNodes,
+    ChildrenFilteredByReferencedNodesVariables
+} from "../gqlqueries/__generated__/ChildrenFilteredByReferencedNodes";
+import {
+    ChildrenFilteredByReferencingNodes,
+    ChildrenFilteredByReferencingNodesVariables
+} from "../gqlqueries/__generated__/ChildrenFilteredByReferencingNodes";
 import {NodeChildren, NodeChildrenVariables} from "../gqlqueries/__generated__/NodeChildren";
 import {
     NodeChildrenFilteredByDependencySet,
     NodeChildrenFilteredByDependencySetVariables
 } from "../gqlqueries/__generated__/NodeChildrenFilteredByDependencySet";
-import {NodeChildrenFilteredByDependencySetQuery, NodeChildrenQuery} from "../gqlqueries/GqlQueries";
-import { SlizaaNode } from "./SlizaaNode";
+import {
+    GQ_CHILDREN_FILTERED_BY_REFERENCED_NODES,
+    GQ_CHILDREN_FILTERED_BY_REFERENCING_NODES,
+    NodeChildrenFilteredByDependencySetQuery,
+    NodeChildrenQuery
+} from "../gqlqueries/GqlQueries";
+import {SlizaaNode} from "./internal/SlizaaNode";
+import {SlizaaRootNode} from "./internal/SlizaaRootNode";
+import {ISlizaaNode} from "./ISlizaaNode";
+import {ISlizaaRootNode} from "./ISlizaaRootNode";
 
-export function fetchChildren( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
-
-    // create new result promise
-    return new Promise(async (resolve, reject) => {
-
-        // return if children already have been resolved...
-        if (aParentNode.internalChildren) {
-            resolve();
-            return;
-        }
-
-        // otherwise try to resolve the children...
-        await aApolloClient.query<NodeChildren, NodeChildrenVariables>({
-            query: NodeChildrenQuery,
-            variables: {
-                databaseId: aDatabaseId,
-                hierarchicalGraphId: aHierarchicalGraphId,
-                nodeId: aParentNode.key
-            }
-        })
-        .then(result => {
-            // create children 
-            if (result.data.hierarchicalGraph && result.data.hierarchicalGraph.node) {
-                const resultChildren = result.data.hierarchicalGraph.node.children.nodes;
-                aParentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
-                for (let i = 0; i < resultChildren.length; i++) {
-                    aParentNode.internalChildren[i] = SlizaaNode.createNode(resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
-                }
-            }
-            callback();
-            resolve();
-        })
-        .catch(reason => {
-            reject();
-        });
-    });
-}
-
-export function fetchChildrenFilterByDependencySet( aApolloClient: ApolloClient<NodeChildren>, aParentNode: SlizaaNode, aNodeType: NodeType, dependencySourceNodeId: string, dependencyTargetNodeId: string, aDatabaseId: string | undefined, aHierarchicalGraphId: string | undefined, callback: () => void): Promise<{}> {
+export function fetchChildren(aApolloClient: ApolloClient<NodeChildren>, aParentNode: ISlizaaNode, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
 
     // create new result promise
     return new Promise(async (resolve, reject) => {
 
-        if (!aDatabaseId || !aHierarchicalGraphId) {
-            resolve();
-            return;
-        }
+        if (aParentNode instanceof SlizaaNode) {
 
-        // return if children already have been resolved...
-        if (aParentNode.internalChildren) {
-            resolve();
-            return;
-        }
-
-        // otherwise try to resolve the children...
-        await aApolloClient.query<NodeChildrenFilteredByDependencySet, NodeChildrenFilteredByDependencySetVariables>({
-            query: NodeChildrenFilteredByDependencySetQuery,
-            variables: {
-                databaseId: aDatabaseId,
-                hierarchicalGraphId: aHierarchicalGraphId,
-                nodeId: aParentNode.key,
-                nodeType: aNodeType,
-                sourceNodeId: dependencySourceNodeId,
-                targetNodeId: dependencyTargetNodeId
+            // return if children already have been resolved...
+            if (aParentNode.internalChildren) {
+                resolve();
+                return;
             }
-        })
-        .then(result => {
-            // create children 
-            if (result.data.hierarchicalGraph && 
-                result.data.hierarchicalGraph.dependencySetForAggregatedDependency && 
-                result.data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredChildren) {
-                const resultChildren = result.data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredChildren;
-                aParentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
-                for (let i = 0; i < resultChildren.length; i++) {
-                    aParentNode.internalChildren[i] = SlizaaNode.createNode(resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
+
+            // otherwise try to resolve the children...
+            await aApolloClient.query<NodeChildren, NodeChildrenVariables>({
+                query: NodeChildrenQuery,
+                variables: {
+                    databaseId: aDatabaseId,
+                    hierarchicalGraphId: aHierarchicalGraphId,
+                    nodeId: aParentNode.key
                 }
-            }
-            callback();
-            resolve();
-        })
-        .catch(reason => {
-            reject();
-        });
+            })
+                .then(result => {
+                    // create children
+                    if (result.data.hierarchicalGraph && result.data.hierarchicalGraph.node) {
+                        const resultChildren = result.data.hierarchicalGraph.node.children.nodes;
+                        aParentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
+                        for (let i = 0; i < resultChildren.length; i++) {
+                            aParentNode.internalChildren[i] = createNode(aParentNode.root(), resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
+                        }
+                    }
+                    callback();
+                    resolve();
+                })
+                .catch(reason => {
+                    reject();
+                });
+        }
     });
 }
 
-// export function fetchChildrenFilterByDependencySet( apolloClient: ApolloClient<any>, aParentNode: SlizaaNode, aDatabaseId: string, aHierarchicalGraphId: string, callback: () => void): Promise<{}> {
-//     return queryChildren(aParentNode, (slizaaNode) => apolloClient.query<NodeChildrenFilteredByDependencySet, NodeChildrenFilteredByDependencySetVariables>({
-//         query: NodeChildrenFilteredByDependencySetQuery,
-//         variables: {
-//             databaseId: aDatabaseId,
-//             hierarchicalGraphId: aHierarchicalGraphId,
-//             nodeId: aParentNode.key,
-//             nodeType: NodeType.SOURCE,
-//             sourceNodeId: "1361",
-//             targetNodeId: "19440"
-//         }
-//     }), callback);
-// }
+export function fetchChildrenFilterByDependencySet(aApolloClient: ApolloClient<NodeChildren>, aParentNode: ISlizaaNode, aNodeType: NodeType, dependencySourceNodeId: string, dependencyTargetNodeId: string, aDatabaseId: string | undefined, aHierarchicalGraphId: string | undefined, callback: () => void): Promise<{}> {
 
-// /**
-//  * 
-//  * @param parentNode the parent node to request the children for
-//  * @param query the query used to request the children
-//  * @param callback a callback to execute
-//  */
-// function queryChildren(parentNode: SlizaaNode, query: (parentNode: SlizaaNode) => Promise<ApolloQueryResult<any>>, callback: () => void): Promise<{}> {
+    // create new result promise
+    return new Promise(async (resolve, reject) => {
+        if (aParentNode instanceof SlizaaNode) {
+            if (!aDatabaseId || !aHierarchicalGraphId) {
+                resolve();
+                return;
+            }
 
-//     return new Promise(async (resolve, reject) => {
+            // return if children already have been resolved...
+            if (aParentNode.internalChildren) {
+                resolve();
+                return;
+            }
 
-//         // return if children already have been resolved...
-//         if (parentNode.internalChildren) {
-//             resolve();
-//             return;
-//         }
+            // otherwise try to resolve the children...
+            await aApolloClient.query<NodeChildrenFilteredByDependencySet, NodeChildrenFilteredByDependencySetVariables>({
+                query: NodeChildrenFilteredByDependencySetQuery,
+                variables: {
+                    databaseId: aDatabaseId,
+                    hierarchicalGraphId: aHierarchicalGraphId,
+                    nodeId: aParentNode.key,
+                    nodeType: aNodeType,
+                    sourceNodeId: dependencySourceNodeId,
+                    targetNodeId: dependencyTargetNodeId
+                }
+            })
+                .then(result => {
+                    // create children
+                    if (result.data.hierarchicalGraph &&
+                        result.data.hierarchicalGraph.dependencySetForAggregatedDependency &&
+                        result.data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredChildren) {
+                        const resultChildren = result.data.hierarchicalGraph.dependencySetForAggregatedDependency.filteredChildren;
+                        aParentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
+                        for (let i = 0; i < resultChildren.length; i++) {
+                            aParentNode.internalChildren[i] = createNode(aParentNode.root(), resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
+                        }
+                    }
+                    callback();
+                    resolve();
+                })
+                .catch(reason => {
+                    reject();
+                });
+        }
+    });
+}
 
-//         // otherwise try to resolve the children...
-//         await query(parentNode)
-//             .then(result => {
-//                 if (result.data.hierarchicalGraph && result.data.hierarchicalGraph.node) {
-//                     const resultChildren = result.data.hierarchicalGraph.node.children.nodes;
-//                     parentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
-//                     for (let i = 0; i < resultChildren.length; i++) {
-//                         parentNode.internalChildren[i] = SlizaaNode.createNode(resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
-//                     }
-//                 }
-//                 callback();
-//                 resolve();
-//             })
-//             .catch(reason => {
-//                 reject();
-//             });
-//     });
-// }
+export function fetchChildrenFilteredByReferencedNodes(
+    aApolloClient: ApolloClient<NodeChildren>,
+    aDatabaseId: string | undefined,
+    aHierarchicalGraphId: string | undefined,
+    aParentNode: ISlizaaNode,
+    aSelectedReferencedNodeIds: string[],
+    callback: () => void): Promise<{}> {
+
+    // create new result promise
+    return new Promise(async (resolve, reject) => {
+
+        if (aParentNode instanceof SlizaaNode) {
+
+            //
+            if (!aDatabaseId || !aHierarchicalGraphId) {
+                resolve();
+                return;
+            }
+
+            // return if children already have been resolved...
+            if (aParentNode.internalChildren) {
+                resolve();
+                return;
+            }
+
+            // otherwise try to resolve the children...
+            await aApolloClient.query<ChildrenFilteredByReferencedNodes, ChildrenFilteredByReferencedNodesVariables>({
+                query: GQ_CHILDREN_FILTERED_BY_REFERENCED_NODES,
+                variables: {
+                    databaseId: aDatabaseId,
+                    hierarchicalGraphId: aHierarchicalGraphId,
+                    parentNodeId: aParentNode.key,
+                    selectedReferencedNodeIds: aSelectedReferencedNodeIds
+                }
+            })
+                .then(result => {
+                    // create children
+                    if (result.data.hierarchicalGraph &&
+                        result.data.hierarchicalGraph.node &&
+                        result.data.hierarchicalGraph.node.childrenFilteredByReferencedNodes &&
+                        result.data.hierarchicalGraph.node.childrenFilteredByReferencedNodes.nodes) {
+                        const resultChildren = result.data.hierarchicalGraph.node.childrenFilteredByReferencedNodes.nodes;
+                        aParentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
+                        for (let i = 0; i < resultChildren.length; i++) {
+                            aParentNode.internalChildren[i] = createNode(aParentNode.root(), resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
+                        }
+                    }
+                    callback();
+                    resolve();
+                })
+                .catch(reason => {
+                    reject();
+                });
+        }
+    });
+}
+
+export function fetchChildrenFilteredByReferencingNodes(
+    aApolloClient: ApolloClient<NodeChildren>,
+    aDatabaseId: string | undefined,
+    aHierarchicalGraphId: string | undefined,
+    aParentNode: ISlizaaNode,
+    aSelectedReferencingNodeIds: string[],
+    callback: () => void): Promise<{}> {
+
+    // create new result promise
+    return new Promise(async (resolve, reject) => {
+
+        if (aParentNode instanceof SlizaaNode) {
+
+            //
+            if (!aDatabaseId || !aHierarchicalGraphId) {
+                resolve();
+                return;
+            }
+
+            // return if children already have been resolved...
+            if (aParentNode.internalChildren) {
+                resolve();
+                return;
+            }
+
+            // otherwise try to resolve the children...
+            await aApolloClient.query<ChildrenFilteredByReferencingNodes, ChildrenFilteredByReferencingNodesVariables>({
+                query: GQ_CHILDREN_FILTERED_BY_REFERENCING_NODES,
+                variables: {
+                    databaseId: aDatabaseId,
+                    hierarchicalGraphId: aHierarchicalGraphId,
+                    parentNodeId: aParentNode.key,
+                    selectedReferencingNodeIds: aSelectedReferencingNodeIds
+                }
+            })
+                .then(result => {
+                    // create children
+                    if (result.data.hierarchicalGraph &&
+                        result.data.hierarchicalGraph.node &&
+                        result.data.hierarchicalGraph.node.childrenFilteredByReferencingNodes &&
+                        result.data.hierarchicalGraph.node.childrenFilteredByReferencingNodes.nodes) {
+                        const resultChildren = result.data.hierarchicalGraph.node.childrenFilteredByReferencingNodes.nodes;
+                        aParentNode.internalChildren = new Array<SlizaaNode>(resultChildren.length);
+                        for (let i = 0; i < resultChildren.length; i++) {
+                            aParentNode.internalChildren[i] = createNode(aParentNode.root(), resultChildren[i].id, resultChildren[i].text, resultChildren[i].iconIdentifier, resultChildren[i].hasChildren);
+                        }
+                    }
+                    callback();
+                    resolve();
+                })
+                .catch(reason => {
+                    reject();
+                });
+        }
+    });
+}
+
+function createNode(root: ISlizaaRootNode, id: string, title: string, iconId: string, hasChildren: boolean): SlizaaNode {
+    const result = new SlizaaNode(id, title, iconId, hasChildren);
+    if (root instanceof SlizaaRootNode) {
+        result.setRoot(root);
+    }
+    return result;
+}
 

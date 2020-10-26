@@ -16,7 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// tslint:disable-next-line:no-empty-interface
-export interface IQueryViewProps {
+import {ISlizaaNode} from '../ISlizaaNode';
+import {ISlizaaRootNode} from "../ISlizaaRootNode";
+import {SlizaaRootNode} from "./SlizaaRootNode";
 
+/**
+ * Represents a tree node.
+ */
+export class SlizaaNode implements ISlizaaNode {
+
+    public internalChildren: SlizaaNode[] | undefined;
+
+    private mRoot : ISlizaaRootNode
+
+    constructor(public key: string, public title: string, public iconId: string, public hasChildren: boolean) { }
+
+    public root() : ISlizaaRootNode {
+        return this.mRoot;
+    }
+
+    public setRoot(root: SlizaaRootNode) : void {
+        this.mRoot = root;
+        root.register(this)
+    }
+
+    public children(): SlizaaNode[] {
+        return this.internalChildren ? this.internalChildren : [];
+    }
 }

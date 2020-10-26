@@ -20,9 +20,10 @@ import * as React from 'react';
 import { WithApolloClient } from 'react-apollo';
 import { SlizaaIcon } from 'src/components/slizaaicon';
 import STree from 'src/components/stree/STree';
+import { SlizaaNode } from 'src/model/internal/SlizaaNode';
 import { ISlizaaNode } from 'src/model/ISlizaaNode';
-import { SlizaaNode } from 'src/model/SlizaaNode';
 import { fetchChildren } from 'src/model/SlizaaNodeChildrenResolver';
+import {SlizaaNodeFactory} from "../../model/SlizaaNodeFactory";
 import { IHierarchicalGraphTreeProps } from './IHierarchicalGraphTreeProps';
 import { IHierarchicalGraphTreeState } from './IHierarchicalGraphTreeState';
 
@@ -32,7 +33,7 @@ export class HierarchicalGraphTree extends React.Component<WithApolloClient<IHie
     super(props);
 
     this.state = {
-      rootNode : SlizaaNode.createNode("-1", props.databaseId + "-" + props.hierarchicalGraphId, "default", true)
+      rootNode : SlizaaNodeFactory.createRoot(props.databaseId + "-" + props.hierarchicalGraphId)
     };
   }
 

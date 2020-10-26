@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import {SlizaaNode} from "../../model/SlizaaNode";
+import {ISlizaaNode} from "../../model/ISlizaaNode";
 
 export interface ISlizaaDependencyTreeState {
-    sourceNode: SlizaaNode,
-    targetNode: SlizaaNode,
+    sourceNode: ISlizaaNode,
+    targetNode: ISlizaaNode,
     selectedSourceNodeIds: string[],
     selectedTargetNodeIds: string[],
     expandedSourceNodeIds: string[],

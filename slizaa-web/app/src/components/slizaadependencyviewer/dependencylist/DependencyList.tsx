@@ -138,7 +138,7 @@ export class DependencyList extends React.Component<IDependencyListProp, IDepend
                             }}*/
                         />
                     </div>
-                    <div style={ { overflow: "auto", padding: "15px 0px 15px 0px" }} >
+                    <div style={ { overflow: "none", padding: "15px 0px 15px 0px" }} >
                         <Pagination
                             showQuickJumper={true}
                             showSizeChanger={true}
