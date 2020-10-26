@@ -17,6 +17,8 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
+
 import java.util.Collections;
 import java.util.List;
 

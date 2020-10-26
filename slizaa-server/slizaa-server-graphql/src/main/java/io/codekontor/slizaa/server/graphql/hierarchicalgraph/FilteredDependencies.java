@@ -17,15 +17,14 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
-import com.google.common.math.IntMath;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependencies;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphUtil;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.NodeUtils;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
 
-import java.math.RoundingMode;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 

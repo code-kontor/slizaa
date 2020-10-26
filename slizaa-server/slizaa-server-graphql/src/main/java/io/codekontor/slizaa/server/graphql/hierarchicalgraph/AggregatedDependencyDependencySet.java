@@ -25,6 +25,8 @@ import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependenci
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphUtil;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.NodeUtils;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
 import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

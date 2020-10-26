@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.NodeUtils;
 
 public abstract class AbstractNodeSet {
 

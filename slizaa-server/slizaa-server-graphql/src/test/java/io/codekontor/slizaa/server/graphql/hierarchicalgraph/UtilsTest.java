@@ -24,7 +24,7 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingSe
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.GraphDatabaseSetupRule;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.mapping.SimpleJTypeMappingProvider;
-import org.assertj.core.api.Assertions;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;

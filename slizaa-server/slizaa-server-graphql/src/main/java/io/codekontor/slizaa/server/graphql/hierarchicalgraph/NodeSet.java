@@ -17,15 +17,11 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.ReferencedNodesResolver;
 
 public class NodeSet extends AbstractNodeSet {
 
@@ -34,24 +30,24 @@ public class NodeSet extends AbstractNodeSet {
   }
 
   public NodeSet referencedNodes(boolean includePredecessors) {
-
-    Stream<HGNode> nodeStream = hgNodeSet().stream()
-        .flatMap(hgNode -> hgNode.getAccumulatedOutgoingCoreDependencies().stream()).map(dep -> dep.getTo());
-
-    if (includePredecessors) {
-      nodeStream = nodeStream.flatMap(node -> Stream.concat(node.getPredecessors().stream(), Stream.of(node)));
-    }
-
-    List<HGNode> nodes = nodeStream.distinct().collect(Collectors.toList());
-
-    return new NodeSet(nodes);
+    return new NodeSet(ReferencedNodesResolver.getReferencedNodes(hgNodeSet(), includePredecessors));
   }
 
+  public NodeSet referencingNodes(boolean includePredecessors) {
+    return new NodeSet(ReferencedNodesResolver.getReferencingNodes(hgNodeSet(), includePredecessors));
+  }
+
+  public NodeSet filterReferencedNodes(Collection<String> nodeIds, NodesToConsider nodesToConsider, boolean includePredecessorsInResult) {
+    return new NodeSet(ReferencedNodesResolver.filterReferencedNodes(hgNodeSet(), nodeIds, nodesToConsider, includePredecessorsInResult));
+  }
+
+  public NodeSet filterReferencingNodes(Collection<String> nodeIds, NodesToConsider nodesToConsider, boolean includePredecessorsInResult) {
+    return new NodeSet(ReferencedNodesResolver.filterReferencingNodes(hgNodeSet(), nodeIds, nodesToConsider, includePredecessorsInResult));
+  }
   /**
    * @return
    */
   public OrderedAdjacencyMatrix orderedAdjacencyMatrix() {
-    
     return new OrderedAdjacencyMatrix(GraphUtils.createOrderedAdjacencyMatrix(hgNodeSet()));
   }
 }

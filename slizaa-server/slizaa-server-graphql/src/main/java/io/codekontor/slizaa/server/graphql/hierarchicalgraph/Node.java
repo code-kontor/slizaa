@@ -17,29 +17,38 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.ReferencedNodesResolver;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  *
  */
 public class Node {
 
-    // the node identifier
-    private String id;
-
     // the text of the node
     private String text;
 
     //
-    private transient HGNode hgNode;
+    private final transient HGNode hgNode;
 
     //
-    private transient ILabelDefinitionProvider labelDefinitionProvider;
+    private final transient ILabelDefinitionProvider labelDefinitionProvider;
 
     /**
+     *
      */
     public Node(HGNode hgNode) {
         this.hgNode = checkNotNull(hgNode);
@@ -59,17 +68,128 @@ public class Node {
      * @return
      */
     public String getText() {
-        // TODO cache
-        return labelDefinitionProvider.getLabelDefinition(hgNode).getText();
+        if (text == null) {
+            text = labelDefinitionProvider.getLabelDefinition(hgNode).getText();
+        }
+        return text;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Node> getParent() {
+        return getHgNode().getParent() != null
+                ? Optional.of(new Node(getHgNode().getParent()))
+                : Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public NodeSet getChildren() {
+        return new NodeSet(getHgNode().getChildren());
+    }
+
+    public boolean hasChildren() {
+        return !getHgNode().getChildren().isEmpty();
+    }
+
+    public NodeSet getChildrenFilteredByReferencedNodes(List<String> referencedNodeIds) {
+
+        Set<HGNode> referencedNodes = checkNotNull(referencedNodeIds).stream()
+                .map(id -> getHgNode().getRootNode().lookupNode(Long.parseLong(id)))
+                .filter(n -> n != null)
+                .collect(Collectors.toSet());
+
+        List<HGNode> filteredChildren = getHgNode().getChildren().stream()
+                .filter(child -> child.getAccumulatedOutgoingCoreDependencies().stream().parallel()
+                        .map(dep -> dep.getTo())
+                        .filter(node -> referencedNodes.contains(node) || node.getPredecessors().stream().anyMatch(referencedNodes::contains))
+                        .findAny().isPresent())
+                .collect(Collectors.toList());
+
+        return new NodeSet(filteredChildren);
+    }
+
+    public NodeSet getChildrenFilteredByReferencingNodes(List<String> referencingNodeIds) {
+
+        Set<HGNode> referencingNodes = checkNotNull(referencingNodeIds).stream()
+                .map(id -> getHgNode().getRootNode().lookupNode(Long.parseLong(id)))
+                .filter(n -> n != null)
+                .collect(Collectors.toSet());
+
+        List<HGNode> filteredChildren = getHgNode().getChildren().stream()
+                .filter(child -> child.getAccumulatedIncomingCoreDependencies().stream().parallel()
+                        .map(dep -> dep.getFrom())
+                        .filter(node -> referencingNodes.contains(node) || node.getPredecessors().stream().anyMatch(referencingNodes::contains))
+                        .findAny().isPresent())
+                .collect(Collectors.toList());
+
+        return new NodeSet(filteredChildren);
+    }
+
+    /**
+     * @return
+     */
+    public List<Node> getPredecessors() {
+        return getHgNode().getPredecessors().stream().map(hgNode -> new Node(hgNode)).collect(Collectors.toList());
+    }
+
+    /**
+     * @return
+     */
+    public List<MapEntry> getProperties() {
+        GraphDbNodeSource nodeSource = getHgNode().getNodeSource(GraphDbNodeSource.class).get();
+        return nodeSource.getProperties().stream().map(entry -> new MapEntry(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Dependency> getDependenciesTo(List<String> targetNodeIds) {
+
+        //
+        HGRootNode rootNode = getHgNode().getRootNode();
+        List<HGNode> targetNodes = targetNodeIds.stream().map(id -> rootNode.lookupNode(Long.parseLong(id))).filter(n -> n != null).collect(Collectors.toList());
+        List<HGAggregatedDependency> dependenciesTo = getHgNode().getOutgoingDependenciesTo(targetNodes);
+
+        //
+        return dependenciesTo.stream().map(dep -> new Dependency(dep)).collect(Collectors.toList());
+    }
+
+    public List<Dependency> getDependenciesFrom(List<String> sourceNodeIds) {
+
+        //
+        HGRootNode rootNode = getHgNode().getRootNode();
+        List<HGNode> sourceNodes = sourceNodeIds.stream().map(id -> rootNode.lookupNode(Long.parseLong(id))).filter(n -> n != null).collect(Collectors.toList());
+        List<HGAggregatedDependency> dependenciesFrom = getHgNode().getIncomingDependenciesFrom(sourceNodes);
+
+        //
+        return dependenciesFrom
+                .stream().map(dep -> new Dependency(dep)).collect(Collectors.toList());
+    }
+
+    public NodeSet referencedNodes(boolean includePredecessors) {
+        return new NodeSet(ReferencedNodesResolver.getReferencedNodes(getHgNode(), includePredecessors));
+    }
+
+    public NodeSet referencingNodes(boolean includePredecessors) {
+        return new NodeSet(ReferencedNodesResolver.getReferencingNodes(getHgNode(), includePredecessors));
+    }
+
+    public NodeSet filterReferencedNodes(Collection<String> nodeIds, NodesToConsider nodesToConsider, boolean includePredecessorsInResult) {
+        return new NodeSet(ReferencedNodesResolver.filterReferencedNodes(getHgNode(), nodeIds, nodesToConsider, includePredecessorsInResult));
+    }
+
+    public NodeSet filterReferencingNodes(Collection<String> nodeIds, NodesToConsider nodesToConsider, boolean includePredecessorsInResult) {
+        return new NodeSet(ReferencedNodesResolver.filterReferencingNodes(getHgNode(), nodeIds, nodesToConsider, includePredecessorsInResult));
     }
 
     /**
      * @return
      */
     ILabelDefinitionProvider labelDefinitionProvider() {
-      return labelDefinitionProvider;
+        return labelDefinitionProvider;
     }
-    
+
     /**
      * @return
      */
