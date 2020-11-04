@@ -17,21 +17,18 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.internal;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeLabelProvider;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.core.progressmonitor.IProgressMonitor;
 import io.codekontor.slizaa.core.progressmonitor.NullProgressMonitor;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactory;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.ExtendedHGRootNodeImpl;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IAutoExpandInterceptor;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeComparator;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IProxyDependencyResolver;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.cypher.IBoltClientAware;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingParticipator;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingService;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingException;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IDependencyDefinitionProvider;
@@ -59,12 +56,7 @@ import static io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.int
  */
 @Component
 public class DefaultMappingService implements IMappingService {
-
-    /**
-     * -
-     */
-    private List<IMappingParticipator> _mappingParticipators = new CopyOnWriteArrayList<>();
-
+  
     /**
      * create the node source creator function
      */
@@ -78,15 +70,6 @@ public class DefaultMappingService implements IMappingService {
         // return the result
         return nodeSource;
     };
-
-    @Reference()
-    public void addMappingParticipator(IMappingParticipator mappingParticipator) {
-        this._mappingParticipators.add(mappingParticipator);
-    }
-
-    public void removeMappingParticipator(IMappingParticipator mappingParticipator) {
-        this._mappingParticipators.remove(mappingParticipator);
-    }
 
     /**
      * {@inheritDoc}
@@ -172,10 +155,10 @@ public class DefaultMappingService implements IMappingService {
                 return false;
             });
 
-            //
-            for (IMappingParticipator mappingParticipator : this._mappingParticipators) {
-                mappingParticipator.postCreate(rootNode, mappingDescriptor, boltClient);
-            }
+            /**************************************************/
+//            IGraphModifier graphModifier = new GraphModifier();
+//            graphModifier.modify(rootNode);
+            /****************************************************/
 
             //
             return rootNode;
@@ -224,18 +207,5 @@ public class DefaultMappingService implements IMappingService {
 
         //
         nodeKeys2Remove.forEach(k -> ((ExtendedHGRootNodeImpl) rootNode).getIdToNodeMap().remove(k));
-    }
-
-    /**
-     * <p>
-     * </p>
-     *
-     * @param iterationMonitor
-     * @param taskName
-     */
-    private void report(IProgressMonitor iterationMonitor, String taskName) {
-        if (iterationMonitor != null) {
-            iterationMonitor.step(taskName);
-        }
     }
 }

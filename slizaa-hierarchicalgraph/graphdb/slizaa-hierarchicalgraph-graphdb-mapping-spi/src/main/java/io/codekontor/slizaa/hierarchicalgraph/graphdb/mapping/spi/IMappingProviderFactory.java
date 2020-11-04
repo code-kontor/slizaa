@@ -1,5 +1,5 @@
 /**
- * slizaa-hierarchicalgraph-graphdb-mapping-service - Slizaa Static Software Analysis Tools
+ * slizaa-hierarchicalgraph-graphdb-mapping-spi - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- *
- */
-package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service;
+package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi;
 
-import io.codekontor.slizaa.core.boltclient.IBoltClient;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
+public interface IMappingProviderFactory {
 
-/**
- * <p>
- * </p>
- *
- * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
- *
- */
-public interface IMappingParticipator {
-
-  void postCreate(HGRootNode rootNode, IMappingProvider mappingDescriptor, IBoltClient boltClient);
+  IMappingProvider createNewMappingProvider();
 }

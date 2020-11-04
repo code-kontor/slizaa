@@ -184,6 +184,11 @@ public class GraphFactoryFunctions {
                 Function<HGProxyDependency, List<Future<List<IDependencyDefinition>>>> resolveFunction = checkNotNull(
                         proxyDependencyDefinition.getResolveFunction());
 
+//                // TODO!
+//                if (proxyDependencyDefinition.getIdRel() == 1595205l) {
+//                  System.out.println("HAE!? : " + proxyDependencyDefinition);
+//                }
+                
                 //
                 HGCoreDependency slizaaProxyDependency = createDependency(proxyDependencyDefinition.getIdStart(),
                         proxyDependencyDefinition.getIdTarget(), proxyDependencyDefinition.getIdRel(), proxyDependencyDefinition.getType(), rootElement,
@@ -251,8 +256,8 @@ public class GraphFactoryFunctions {
     public static HGCoreDependency createDependency(Long from, Long to, Long idRel, String type, HGRootNode rootElement,
                                                     BiFunction<Long, String, IDependencySource> dependencySourceCreator,
                                                     Function<HGProxyDependency, List<Future<List<IDependencyDefinition>>>> resolveFunction,
-                                                    boolean reinitializeCaches) {
-
+                                                    boolean reinitializeCaches) {    
+      
         // get the from...
         HGNode fromElement = ((ExtendedHGRootNodeImpl) rootElement).getIdToNodeMap().get(from);
         if (fromElement == null) {

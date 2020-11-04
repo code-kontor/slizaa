@@ -17,12 +17,16 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.labelprovider.dsl;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.DefaultNodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider.OverlayPosition;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -57,12 +61,28 @@ public class LabelMappingDsl {
 
           @Override
           public Map<String, String> getProperties() {
-            return hgNode.getNodeSource(GraphDbNodeSource.class).get().getProperties().map();
+            INodeSource nodeSource = hgNode.getNodeSource();
+            if (nodeSource instanceof GraphDbNodeSource) {
+              return ((GraphDbNodeSource)nodeSource).getProperties().map();
+            }
+            else if (nodeSource instanceof DefaultNodeSource) {
+              return ((DefaultNodeSource)nodeSource).getProperties();
+            }
+            else {
+              return Collections.emptyMap();
+            }
           }
 
           @Override
           public Collection<String> getLabels() {
-            return hgNode.getNodeSource(GraphDbNodeSource.class).get().getLabels();
+            INodeSource nodeSource = hgNode.getNodeSource();
+            if (nodeSource instanceof GraphDbNodeSource) {
+              return ((GraphDbNodeSource)nodeSource).getLabels();
+            }
+            else if (nodeSource instanceof DefaultNodeSource) {
+              return  ((DefaultNodeSource)nodeSource).getLabels();
+            }
+            return Collections.emptyList();
           }
         };
   }
