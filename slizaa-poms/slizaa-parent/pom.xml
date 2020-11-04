@@ -74,7 +74,7 @@
 		<version-guava>21.0</version-guava>
 		<version-graphql-java-kickstart>6.0.1</version-graphql-java-kickstart>
 		<version-spring-statemachine>2.0.2.RELEASE</version-spring-statemachine>
-		<version-classgraph>4.1.7</version-classgraph>
+		<version-classgraph>4.8.90</version-classgraph>
 		<version-spring-boot>2.1.4.RELEASE</version-spring-boot>
 		<version-hibernate-validator>5.4.1.Final</version-hibernate-validator>
 		<version-gson>2.8.5</version-gson>
@@ -224,6 +224,13 @@
 						<phase>validate</phase>
 						<goals>
 							<goal>check</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>formatLicenseHeader</id>
+						<phase>none</phase>
+						<goals>
+							<goal>format</goal>
 						</goals>
 					</execution>
 				</executions>

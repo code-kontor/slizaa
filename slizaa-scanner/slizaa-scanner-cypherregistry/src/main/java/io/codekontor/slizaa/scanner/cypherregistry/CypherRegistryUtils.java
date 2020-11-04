@@ -22,8 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 
 import io.github.classgraph.ClassGraph;
