@@ -84,6 +84,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="HGRootNode" eSuperTypes="#//HGNode">
     <eOperations name="invalidateAllCaches"/>
+    <eOperations name="invalidateNodeIdCache"/>
     <eOperations name="invalidateCaches">
       <eParameters name="modifiedNodes" upperBound="-1" eType="#//HGNode"/>
     </eOperations>
@@ -154,6 +155,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="DefaultNodeSource" eSuperTypes="#//INodeSource">
     <eStructuralFeatures xsi:type="ecore:EReference" name="properties" upperBound="-1"
         eType="#//StringToStringMap" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="labels" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false"/>    
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DefaultDependencySource" eSuperTypes="#//IDependencySource">
     <eStructuralFeatures xsi:type="ecore:EReference" name="properties" upperBound="-1"

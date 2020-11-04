@@ -79,6 +79,7 @@
       <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//HGRootNode/name"/>
       <genFeatures property="None" createChild="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//HGRootNode/extensionRegistry"/>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/invalidateAllCaches"/>
+      <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/invalidateNodeIdCache"/>
       <genOperations ecoreOperation="hierarchicalgraph.ecore#//HGRootNode/invalidateCaches">
         <genParameters ecoreParameter="hierarchicalgraph.ecore#//HGRootNode/invalidateCaches/modifiedNodes"/>
       </genOperations>
@@ -121,6 +122,7 @@
     </genClasses>
     <genClasses ecoreClass="hierarchicalgraph.ecore#//DefaultNodeSource">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//DefaultNodeSource/properties"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//DefaultNodeSource/labels"/>
     </genClasses>
     <genClasses ecoreClass="hierarchicalgraph.ecore#//DefaultDependencySource">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//DefaultDependencySource/properties"/>

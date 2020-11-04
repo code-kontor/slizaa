@@ -45,10 +45,10 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphPackag
 public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
 
   /** - */
-  protected ExtendedHGNodeTrait _trait;
+  protected ExtendedHGNodeTrait           _trait;
 
   /** - */
-  protected Map<Object, HGNode> _idToNodeMap;
+  protected Map<Object, HGNode>           _idToNodeMap;
 
   /** - */
   protected Map<Object, HGCoreDependency> _idToCoreDependencyMap;
@@ -126,6 +126,12 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
     return ECollections.emptyEList();
   }
 
+  @Override
+  public void invalidateNodeIdCache() {
+    this._idToNodeMap.clear();
+    this._idToNodeMap = null;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -183,7 +189,8 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
 
     if (this._idToCoreDependencyMap == null) {
       Map<Object, HGCoreDependency> hgCoreDependencyMap = idToCoreDependencyMap();
-      this.getAccumulatedOutgoingCoreDependencies().forEach(coreDependency -> hgCoreDependencyMap.put(coreDependency.getIdentifier(), coreDependency));
+      this.getAccumulatedOutgoingCoreDependencies()
+          .forEach(coreDependency -> hgCoreDependencyMap.put(coreDependency.getIdentifier(), coreDependency));
     }
 
     return this._idToCoreDependencyMap.get(identifier);

@@ -51,7 +51,6 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>21.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
@@ -63,7 +62,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -75,7 +73,6 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.9.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
