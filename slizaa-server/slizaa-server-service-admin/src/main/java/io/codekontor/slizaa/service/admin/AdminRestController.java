@@ -17,36 +17,37 @@
  */
 package io.codekontor.slizaa.service.admin;
 
-import io.codekontor.slizaa.server.descr.GraphDatabaseDescr;
-import io.codekontor.slizaa.server.descr.ServerExtensionDescr;
-import io.codekontor.slizaa.server.descr.SlizaaServerDescr;
-import io.codekontor.slizaa.service.admin.IAdminService;
+import io.codekontor.slizaa.service.admin.descr.GraphDatabaseDescr;
+import io.codekontor.slizaa.service.admin.descr.ServerExtensionDescr;
+import io.codekontor.slizaa.service.admin.descr.SlizaaServerDescr;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
-@RequestMapping("slizaa-admin-rest")
 public class AdminRestController {
 
-	@Autowired
+	private static final String PREFIX_SLIZAA_ADMIN_REST = "/slizaa-admin-rest/";
+	
+  @Autowired
 	private IAdminService specService;
 
-	@GetMapping("/")
+  @RequestMapping(value = PREFIX_SLIZAA_ADMIN_REST, method = RequestMethod.GET)
 	public SlizaaServerDescr description() {
 		return specService.fetchDescription();
 	}
 
-	@GetMapping("/serverExtensions")
+	@GetMapping(PREFIX_SLIZAA_ADMIN_REST + "serverExtensions")
 	public List<ServerExtensionDescr> serverExtensions() {
 		return specService.fetchDescription().getServerExtensions();
 	}
 
-	@GetMapping("/graphDatabases")
+	@GetMapping(PREFIX_SLIZAA_ADMIN_REST + "graphDatabases")
 	public List<GraphDatabaseDescr> graphDatabases() {
 		return specService.fetchDescription().getGraphDatabases();
 	}

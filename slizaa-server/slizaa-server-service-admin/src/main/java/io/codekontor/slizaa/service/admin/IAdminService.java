@@ -17,7 +17,7 @@
  */
 package io.codekontor.slizaa.service.admin;
 
-import io.codekontor.slizaa.server.descr.SlizaaServerDescr;
+import io.codekontor.slizaa.service.admin.descr.SlizaaServerDescr;
 
 public interface IAdminService {
 

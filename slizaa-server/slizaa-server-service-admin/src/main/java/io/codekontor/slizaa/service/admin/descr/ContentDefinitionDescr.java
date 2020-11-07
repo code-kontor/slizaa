@@ -15,14 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.service.admin;
+package io.codekontor.slizaa.service.admin.descr;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import io.codekontor.slizaa.service.admin.internal.AdminService;
+public class ContentDefinitionDescr {
 
-@Configuration
-@ComponentScan(basePackageClasses = { AdminServiceModuleConfiguration.class })
-public class AdminServiceModuleConfiguration {
+  /** - */
+  private String factoryId;
+
+  /** - */
+  private String factoryIdShortForm;
+
+  /** - */
+  private String definition;
+
+  public String getFactoryId() {
+    return factoryId;
+  }
+
+  public String getFactoryIdShortForm() {
+    return factoryIdShortForm;
+  }
+
+  public String getDefinition() {
+    return definition;
+  }
+
+  public ContentDefinitionDescr(String factoryId, String factoryIdShortForm, String definition) {
+    this.factoryId = checkNotNull(factoryId);
+    this.factoryIdShortForm = checkNotNull(factoryIdShortForm);
+    this.definition = checkNotNull(definition);
+  }
 }

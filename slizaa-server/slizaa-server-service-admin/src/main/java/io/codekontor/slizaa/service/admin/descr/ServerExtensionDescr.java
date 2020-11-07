@@ -15,14 +15,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.service.admin;
+package io.codekontor.slizaa.service.admin.descr;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import io.codekontor.slizaa.service.admin.internal.AdminService;
+public class ServerExtensionDescr {
 
-@Configuration
-@ComponentScan(basePackageClasses = { AdminServiceModuleConfiguration.class })
-public class AdminServiceModuleConfiguration {
+  /** - */
+  private String symbolicName;
+  
+  /** - */
+  private String version;
+  
+  /**
+   * <p>
+   * Creates a new instance of type {@link ServerExtensionDescr}.
+   * </p>
+   *
+   * @param symbolicName
+   * @param version
+   */
+  public ServerExtensionDescr(String symbolicName, String version) {
+    this.symbolicName = checkNotNull(symbolicName);
+    this.version = checkNotNull(version);
+  }
+
+  public String getSymbolicName() {
+    return symbolicName;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+  
+  
 }

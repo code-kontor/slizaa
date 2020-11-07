@@ -17,13 +17,17 @@
  */
 package io.codekontor.slizaa.service.admin.internal;
 
-import io.codekontor.slizaa.server.descr.*;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
-import io.codekontor.slizaa.server.spec.*;
 import io.codekontor.slizaa.service.admin.IAdminService;
+import io.codekontor.slizaa.service.admin.descr.ContentDefinitionDescr;
+import io.codekontor.slizaa.service.admin.descr.GraphDatabaseDescr;
+import io.codekontor.slizaa.service.admin.descr.HierarchicalGraphDescr;
+import io.codekontor.slizaa.service.admin.descr.ServerExtensionDescr;
+import io.codekontor.slizaa.service.admin.descr.SlizaaServerDescr;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +57,7 @@ public class AdminService implements IAdminService {
                 _slizaaService.getGraphDatabases().stream().map(toGraphDatabaseDescr())
                         .collect(Collectors.toList());
 
+        // return the server description
         return new SlizaaServerDescr(extensionDescriptions, databaseDescriptions);
     }
 

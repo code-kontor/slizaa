@@ -15,14 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.service.admin;
+package io.codekontor.slizaa.service.admin.descr;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import io.codekontor.slizaa.service.admin.internal.AdminService;
+public class HierarchicalGraphDescr {
 
-@Configuration
-@ComponentScan(basePackageClasses = { AdminServiceModuleConfiguration.class })
-public class AdminServiceModuleConfiguration {
+  /** - */
+  private String identifier;
+
+  /**
+   * <p>
+   * Creates a new instance of type {@link HierarchicalGraphDescr}.
+   * </p>
+   *
+   * @param identifier
+   */
+  public HierarchicalGraphDescr(String identifier) {
+    this.identifier = checkNotNull(identifier);
+  }
+
+  /**
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  public String getIdentifier() {
+    return identifier;
+  }
 }
