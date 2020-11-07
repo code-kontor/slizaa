@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProviderFactory;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatement;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
@@ -45,7 +45,7 @@ public class DynamicallyLoadedExtensions {
 
   private List<IParserFactory> _parserFactories;
 
-  private List<IMappingProvider> _mappingProviders;
+  private List<IMappingProviderFactory> _mappingProviders;
 
   private ICypherStatementRegistry _cypherStatementRegistry;
 
@@ -111,7 +111,7 @@ public class DynamicallyLoadedExtensions {
     return _parserFactories;
   }
 
-  public List<IMappingProvider> getMappingProviders() {
+  public List<IMappingProviderFactory> getMappingProviders() {
     return _mappingProviders;
   }
 
@@ -130,7 +130,7 @@ public class DynamicallyLoadedExtensions {
     this._parserFactories = loadAllInstances(IParserFactory.class);
 
     // load all IMappingProvider instances
-    this._mappingProviders  = loadAllInstances(IMappingProvider.class);
+    this._mappingProviders  = loadAllInstances(IMappingProviderFactory.class);
 
     // reload the cypher registry
     _cypherStatements.clear();

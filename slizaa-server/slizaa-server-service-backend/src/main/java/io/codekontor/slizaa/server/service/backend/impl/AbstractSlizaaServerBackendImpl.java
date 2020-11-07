@@ -18,7 +18,7 @@
 package io.codekontor.slizaa.server.service.backend.impl;
 
 import com.google.common.io.ByteStreams;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProviderFactory;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
@@ -99,7 +99,7 @@ public abstract class AbstractSlizaaServerBackendImpl implements IBackendService
     }
 
     @Override
-    public final List<IMappingProvider> getMappingProviders() {
+    public final List<IMappingProviderFactory> getMappingProviderFactories() {
         checkState(hasInstalledExtensions(), "SlizaaServerBackend has no installed extensions.");
         return _dynamicallyLoadedExtensions.getMappingProviders();
     }

@@ -27,7 +27,7 @@ import org.springframework.core.io.FileSystemResource;
 
 import com.google.common.io.ByteStreams;
 
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProviderFactory;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
@@ -108,7 +108,7 @@ public class DummyBackendService implements IModifiableBackendService, IBackendS
   }
 
   @Override
-  public List<IMappingProvider> getMappingProviders() {
+  public List<IMappingProviderFactory> getMappingProviderFactories() {
     return null;
   }
 

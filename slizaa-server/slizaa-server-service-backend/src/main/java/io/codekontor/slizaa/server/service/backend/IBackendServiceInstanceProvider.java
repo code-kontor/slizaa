@@ -20,6 +20,7 @@ package io.codekontor.slizaa.server.service.backend;
 import java.util.List;
 
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvider;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProviderFactory;
 import io.codekontor.slizaa.scanner.api.cypherregistry.ICypherStatementRegistry;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporterFactory;
@@ -67,5 +68,5 @@ public interface IBackendServiceInstanceProvider extends IBackendService {
 	 *
 	 * @return
 	 */
-	List<IMappingProvider> getMappingProviders();
+	List<IMappingProviderFactory> getMappingProviderFactories();
 }

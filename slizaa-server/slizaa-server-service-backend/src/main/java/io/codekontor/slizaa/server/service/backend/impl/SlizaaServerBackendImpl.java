@@ -18,7 +18,6 @@
 package io.codekontor.slizaa.server.service.backend.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import java.util.List;
 

@@ -142,7 +142,8 @@ public class GraphDatabaseStateMachineContext extends AbstractGraphDatabaseState
     HierarchicalGraph hierarchicalGraph = new HierarchicalGraph(new HierarchicalGraphDefinition(identifier),
         getGraphDatabase(), (def) -> {
 
-          IMappingProvider mappingProvider = slizaaService().getInstanceProvider().getMappingProviders().get(0);
+          // TODO
+          IMappingProvider mappingProvider = slizaaService().getInstanceProvider().getMappingProviderFactories().get(0).createNewMappingProvider();
 
           return slizaaService().getMappingService().convert(mappingProvider, this._boltClient,
               new DefaultProgressMonitor("Mapping", 100, DefaultProgressMonitor.consoleLogger()));
