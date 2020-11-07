@@ -22,7 +22,6 @@ import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.table.*;
 
@@ -57,7 +56,6 @@ public abstract class AbstractGraphDatabaseCommandComponent {
     return _backendService;
   }
 
-  @NotNull
   protected Object dumpGraphDatabases() {
 
     List<Object[]> rows = new ArrayList<>();
@@ -95,7 +93,6 @@ public abstract class AbstractGraphDatabaseCommandComponent {
     }
   }
 
-  @NotNull
   protected String dumpContentDefinitionProviderFactories() {
 
     StringBuffer stringBuffer = new StringBuffer("Content Definition Provider Factories:\n");
