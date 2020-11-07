@@ -17,16 +17,16 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.internal;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeLabelProvider;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.core.progressmonitor.IProgressMonitor;
 import io.codekontor.slizaa.core.progressmonitor.NullProgressMonitor;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactory;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.ExtendedHGRootNodeImpl;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IAutoExpandInterceptor;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeComparator;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeLabelProvider;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.IProxyDependencyResolver;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.cypher.IBoltClientAware;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingService;
@@ -38,10 +38,10 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvid
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbHierarchicalgraphFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbRootNodeSource;
+import org.osgi.service.component.annotations.Component;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -156,8 +156,8 @@ public class DefaultMappingService implements IMappingService {
             });
 
             /**************************************************/
-//            IGraphModifier graphModifier = new GraphModifier();
-//            graphModifier.modify(rootNode);
+            IGraphModifier graphModifier = new GraphModifier();
+            graphModifier.modify(rootNode);
             /****************************************************/
 
             //

@@ -54,71 +54,8 @@ public class GraphModifier implements IGraphModifier {
     rootNode.invalidateAllCaches();
     
     ILabelDefinitionProvider labelDefinitionProvider = rootNode.getExtension(ILabelDefinitionProvider.class);
-    
-    List<HGNode> children = new ArrayList<>(rootNode.getChildren());
-    
-    HGNode reportingsGroup = createGroup("reporting");
-    HGNode tradeimportGroup = createGroup("tradeimport");
-    HGNode processingGroup = createGroup("processing");
-    HGNode commonPersistenceGroup = createGroup("commonPersistence");
-    HGNode uiGroup = createGroup("uiGroup");
-    HGNode externalGroup = createGroup("external");
-    HGNode applicationGroup = createGroup("application");
-    
-    rootNode.getChildren().clear();
-    rootNode.getChildren().add(reportingsGroup);
-    rootNode.getChildren().add(tradeimportGroup);
-    rootNode.getChildren().add(processingGroup);
-    rootNode.getChildren().add(commonPersistenceGroup);
-    rootNode.getChildren().add(commonPersistenceGroup);
-    rootNode.getChildren().add(externalGroup);
-    rootNode.getChildren().add(uiGroup);
-    rootNode.getChildren().add(applicationGroup);
-    
-    children.forEach(node -> {
-      
-      ILabelDefinition labelDefinition = labelDefinitionProvider.getLabelDefinition(node);
-      String label = labelDefinition.getText();
-      
-      if (label.contains("reporting")) {
-        reportingsGroup.getChildren().add(node);
-      } 
-      else if (label.startsWith("trade")) {
-        tradeimportGroup.getChildren().add(node);
-      }
-      else if (label.equals("<<Missing Types>>")) {
-        externalGroup.getChildren().add(node);
-      }
-      else if (
-          label.equals("common-DEVELOP-SNAPSHOT") ||
-          label.equals("common-persistence-base-DEVELOP-SNAPSHOT") ||
-          label.equals("common-persistence-DEVELOP-SNAPSHOT") ||
-          label.equals("hibernate-querybuilder-DEVELOP-SNAPSHOT") ||
-          label.equals("main-persistence-DEVELOP-SNAPSHOT") ||
-          label.equals("main-persistence-accounting-DEVELOP-SNAPSHOT") ||
-          label.equals("engine-DEVELOP-SNAPSHOT")) {
-        commonPersistenceGroup.getChildren().add(node);
-      }  
-      else if (
-          label.equals("intern-gui-wicket-DEVELOP-SNAPSHOT") ||
-          label.equals("gui-wicket-DEVELOP-SNAPSHOT") ||
-          label.equals("intern-gui-common-DEVELOP-SNAPSHOT") ||
-          label.equals("main-gui-DEVELOP-SNAPSHOT")) {
-        uiGroup.getChildren().add(node);
-      }  
-      else if (
-          label.equals("extern-gui-DEVELOP-SNAPSHOT") ||
-          label.equals("main-webapplication-DEVELOP-SNAPSHOT") ||
-          label.equals("extern-remote-application-DEVELOP-SNAPSHOT") ||
-          label.equals("application-common-DEVELOP-SNAPSHOT")) {
-        applicationGroup.getChildren().add(node);
-      }  
-      else {
-        processingGroup.getChildren().add(node);
-      }
-    });
 
-
+    // TODO: do something here
     
     // return 
     return rootNode;
