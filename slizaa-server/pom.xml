@@ -46,6 +46,7 @@
 		<module>slizaa-server-main</module>
         <module>slizaa-server-command</module>
         <module>slizaa-server-service-selection</module>
+        <module>slizaa-server-service-transformation</module>
     </modules>
 
 </project>
