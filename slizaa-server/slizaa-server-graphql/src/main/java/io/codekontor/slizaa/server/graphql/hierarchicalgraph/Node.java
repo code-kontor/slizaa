@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.TransitiveDependencyResolver;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
@@ -103,6 +104,7 @@ public class Node {
 
         List<HGNode> filteredChildren = getHgNode().getChildren().stream()
                 .filter(child -> child.getAccumulatedOutgoingCoreDependencies().stream().parallel()
+                // .filter(child -> TransitiveDependencyResolver.getTransitiveAccumulatedOutgoingCoreDependencies(child).stream().parallel()
                         .map(dep -> dep.getTo())
                         .filter(node -> referencedNodes.contains(node) || node.getPredecessors().stream().anyMatch(referencedNodes::contains))
                         .findAny().isPresent())
@@ -119,7 +121,8 @@ public class Node {
                 .collect(Collectors.toSet());
 
         List<HGNode> filteredChildren = getHgNode().getChildren().stream()
-                .filter(child -> child.getAccumulatedIncomingCoreDependencies().stream().parallel()
+                  .filter(child -> child.getAccumulatedIncomingCoreDependencies().stream().parallel()
+                  // .filter(child -> TransitiveDependencyResolver.getTransitiveAccumulatedIncomingCoreDependencies(child).stream().parallel()
                         .map(dep -> dep.getFrom())
                         .filter(node -> referencingNodes.contains(node) || node.getPredecessors().stream().anyMatch(referencingNodes::contains))
                         .findAny().isPresent())

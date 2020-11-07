@@ -23,6 +23,8 @@ extend type HierarchicalGraph {
 
     # Returns a dependency set based on an aggregated dependency
     dependencySetForAggregatedDependency(sourceNodeId: ID!, targetNodeId: ID!): DependencySet
+
+    # TODO: dependencySetForAggregatedDependency(sourceNodeId: [ID!]!, targetNodeId: [ID!]!): DependencySet
 }
 
 enum NodeType {
@@ -50,6 +52,7 @@ type NodeSet {
 	#
 	referencedNodes(includePredecessors: Boolean): NodeSet!
 
+	#
 	referencingNodes(includePredecessors: Boolean): NodeSet!
 
     #
