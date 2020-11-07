@@ -15,29 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import { Button, Empty } from 'antd';
 import ApolloClient from "apollo-client";
 import React from "react";
 import {ApolloConsumer} from "react-apollo";
+import { SlizaaDependencyViewer } from 'src/components/slizaadependencyviewer/SlizaaDependencyViewer';
 import {SlizaaCrossReferenceViewer} from "../../components/slizaacrossreferenceviewer/SlizaaCrossReferenceViewer";
-import {SlizaaDependencyViewer} from "../../components/slizaadependencyviewer/SlizaaDependencyViewer";
 import {Slizaa11SplitView} from "../fwk/Slizaa11SplitView";
 import {IXrefViewProps} from "./IXrefViewProps";
 import {IXrefViewState} from "./IXrefViewState";
 
 export class XrefView extends React.Component<IXrefViewProps, IXrefViewState> {
 
-    constructor(props: IXrefViewProps) {
+    public constructor(props: IXrefViewProps) {
         super(props);
         this.state = {}
     }
 
     public render() {
+        // 
+
         return (
             <ApolloConsumer>
                 {cl => (
                     <Slizaa11SplitView
                         id="XrefView"
                         top={{
+                            buttonProviderFunc: this.buttonProvider,
                             element: this.xrefViewElement(cl),
                             title: "Cross-Reference View",
                         }}
@@ -53,28 +57,48 @@ export class XrefView extends React.Component<IXrefViewProps, IXrefViewState> {
 
     private xrefViewElement(client: ApolloClient<any>): React.ReactElement {
         return (
-            <SlizaaCrossReferenceViewer client={client} databaseId={this.props.databaseId} hierarchicalGraphId={this.props.hierarchicalGraphId}/>
+            <SlizaaCrossReferenceViewer
+                client={client}
+                databaseId={this.props.databaseId}
+                hierarchicalGraphId={this.props.hierarchicalGraphId}
+                onSelect={this.handleSelect}
+            />
         );
     }
 
     private dependencyDetails(client: ApolloClient<any>): React.ReactElement {
 
-        // return this.state.mainDependencySelection === undefined ?
-
-            // return empty div if selected dependency is undefined
-           // <div/> :
-
-        const sourceNodeId = "263956";
-        const targetNodeId = "7221";
-
-        // else retunr the dependency viewer
-            return <SlizaaDependencyViewer
-                key={sourceNodeId + "-" + targetNodeId}
+        return  this.state.inspectSourceNodeIds && this.state.inspectSourceNodeIds.length > 0 && this.state.inspectTargetNodeIds && this.state.inspectTargetNodeIds.length > 0 ? 
+            <SlizaaDependencyViewer
+                key={this.state.inspectSourceNodeIds[0] + "-" + this.state.inspectTargetNodeIds[0]}
                 client={client}
                 databaseId={this.props.databaseId}
                 hierarchicalGraphId={this.props.hierarchicalGraphId}
-                sourceNodeId={sourceNodeId}
-                targetNodeId={targetNodeId}
+                sourceNodeId={this.state.inspectSourceNodeIds[0]}
+                targetNodeId={this.state.inspectTargetNodeIds[0]}
             />
+            :
+            <Empty style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%", flexDirection:"column" }} image={Empty.PRESENTED_IMAGE_SIMPLE} />        
+    }
+
+    private handleSelect = (aSelectedSourceNodeIds?:string[], aSelectedTargetNodeIds?:string[]) : void => {
+        this.setState({
+            selectedSourceNodeIds: aSelectedSourceNodeIds,
+            selectedTargetNodeIds: aSelectedTargetNodeIds
+        });
+    }
+
+    private handleInspect = () : void => {
+        this.setState({
+            inspectSourceNodeIds: this.state.selectedSourceNodeIds,
+            inspectTargetNodeIds: this.state.selectedTargetNodeIds
+        });
+    }
+    
+    private buttonProvider = () : React.ReactNode => {
+        
+        const enabled = this.state.selectedSourceNodeIds && this.state.selectedSourceNodeIds.length > 0 && this.state.selectedTargetNodeIds && this.state.selectedTargetNodeIds.length > 0 
+
+        return <Button disabled={!enabled} className="slizaa-card-header-button" size={"small"} onClick={this.handleInspect}>Inspect</Button>
     }
 }

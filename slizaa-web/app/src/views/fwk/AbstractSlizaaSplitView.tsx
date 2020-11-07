@@ -34,7 +34,8 @@ export interface ISlizaaSplitViewComponent {
     title: string,
     allowOverflow?: boolean,
     element: React.ReactNode,
-    overlayMenuFunc?: () => React.ReactNode,
+    menuProviderFunc?: () => React.ReactNode,
+    buttonProviderFunc?: () => React.ReactNode,
 }
 
 export abstract class AbstractSlizaaSplitView<P extends ISlizaaSplitViewProps, S extends ISlizaaSplitViewState> extends React.Component<P, S> {
@@ -63,7 +64,8 @@ export abstract class AbstractSlizaaSplitView<P extends ISlizaaSplitViewProps, S
                      padding={0}
                      allowOverflow={allowOverflow}
                      handleMaximize={this.handleMaximize}
-                     menuProviderFunc={component.overlayMenuFunc}
+                     menuProviderFunc={component.menuProviderFunc}
+                     buttonProviderFunc={component.buttonProviderFunc}
         >
             {component.element}
         </Card>;

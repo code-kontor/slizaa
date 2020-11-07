@@ -32,7 +32,7 @@ li.slizaa-tree-node-marked > span > span.ant-tree-title{
   font-weight: bold;
 }
 
-li.slizaa-tree-node-unmarked:not(.ant-tree-treenode-selected) > span > span.ant-tree-title{
+/*li.slizaa-tree-node-unmarked:not(.ant-tree-treenode-selected) > span > span.ant-tree-title{
   color: #C8CEd3;
-}
+}*/
 

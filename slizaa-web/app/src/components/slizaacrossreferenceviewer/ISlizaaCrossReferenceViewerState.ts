@@ -24,10 +24,10 @@ export interface ISlizaaCrossReferenceViewerState {
     expandedLeftNodeIds: string[],
     selectedCenterNodeIds: string[],
     expandedCenterNodeIds: string[],
+    markedCenterNodeIds: string[],
     selectedRightNodeIds: string[],
     expandedRightNodeIds: string[],
     leftNode: ISlizaaNode,
     centerNode: ISlizaaNode,
-    rightNode: ISlizaaNode,
-    key: number
+    rightNode: ISlizaaNode
 }

@@ -24,7 +24,9 @@
 .crossReferenceViewerContainer-Left {
     flex: 0 1 auto;
     width: 33%;
-    overflow: auto;
+    position: relative;
+    float: left;
+    display: inline;
 }
 
 .crossReferenceViewerContainer-Center {
@@ -37,5 +39,7 @@
 .crossReferenceViewerContainer-Right {
     flex: 0 1 auto;
     width: 33%;
-    overflow: auto;
+    position: relative;
+    float: left;
+    display: inline;
 }

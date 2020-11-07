@@ -193,8 +193,8 @@ export const GQ_RESOLVED_PROXY_DEPENDENCY = gql`
         }
     }`
 
-export const GQ_FILTER_REFERENCED_NODES = gql`
-    query FilterReferencedNodes (
+export const GQ_FILTER_REFERENCED_NODE_IDS = gql`
+    query FilterReferencedNodeIds (
         $databaseId: ID!,
         $hierarchicalGraphId: ID!,
         $nodeIds: [ID!]!,
@@ -207,12 +207,54 @@ export const GQ_FILTER_REFERENCED_NODES = gql`
       filterReferencedNodes(nodeIds: $nodeIdsToFilter, nodesToConsider: $nodesToConsider, includePredecessorsInResult: $includePredecessorsInResult) {
         nodeIds
       }
-      filterReferencingNodes(nodeIds: ["126628", "126629"], nodesToConsider: SELF_AND_CHILDREN, includePredecessorsInResult: true) {
-        nodeIds
-      }
     }
   }
 }
+`
+
+export const GQ_FILTER_REFERENCING_NODE_IDS = gql`
+    query FilterReferencingNodeIds (
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $nodeIds: [ID!]!,
+        $nodeIdsToFilter: [ID!]!,
+        $nodesToConsider: NodesToConsider!,
+        $includePredecessorsInResult: Boolean!
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            nodes(ids: $nodeIds) {
+                filterReferencingNodes(nodeIds: $nodeIdsToFilter, nodesToConsider: $nodesToConsider, includePredecessorsInResult: $includePredecessorsInResult) {
+                    nodeIds
+                }
+            }
+        }
+    }
+`
+
+export const GQ_FILTER_REFERENCED_NODES = gql`
+    query FilterReferencedNodes (
+        $databaseId: ID!,
+        $hierarchicalGraphId: ID!,
+        $nodeIds: [ID!]!,
+        $nodeIdsToFilter: [ID!]!,
+        $nodesToConsider: NodesToConsider!,
+        $includePredecessorsInResult: Boolean!
+    ) {
+        hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
+            nodes(ids: $nodeIds) {
+                filterReferencedNodes(nodeIds: $nodeIdsToFilter, nodesToConsider: $nodesToConsider, includePredecessorsInResult: $includePredecessorsInResult) {
+                    nodes {
+                        id
+                        text
+                        iconIdentifier
+                        parent {
+                            id
+                        }
+                    }
+                }
+            }
+        }
+    }
 `
 
 export const GQ_FILTER_REFERENCING_NODES = gql`
@@ -227,7 +269,14 @@ export const GQ_FILTER_REFERENCING_NODES = gql`
         hierarchicalGraph(databaseIdentifier: $databaseId, hierarchicalGraphIdentifier: $hierarchicalGraphId) {
             nodes(ids: $nodeIds) {
                 filterReferencingNodes(nodeIds: $nodeIdsToFilter, nodesToConsider: $nodesToConsider, includePredecessorsInResult: $includePredecessorsInResult) {
-                    nodeIds
+                    nodes {
+                        id
+                        text
+                        iconIdentifier
+                        parent {
+                            id
+                        }
+                    }
                 }
             }
         }

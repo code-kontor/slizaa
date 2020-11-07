@@ -23,63 +23,35 @@
 import { NodesToConsider } from "./../query-types";
 
 // ====================================================
-// GraphQL query operation: FilterReferencingNodes
+// GraphQL query operation: FilterReferencingNodeIds
 // ====================================================
 
-export interface FilterReferencingNodes_hierarchicalGraph_nodes_filterReferencingNodes_nodes_parent {
-  __typename: "Node";
-  /**
-   * The symbolicName for this node
-   */
-  id: string;
-}
-
-export interface FilterReferencingNodes_hierarchicalGraph_nodes_filterReferencingNodes_nodes {
-  __typename: "Node";
-  /**
-   * The symbolicName for this node
-   */
-  id: string;
-  /**
-   * The text label
-   */
-  text: string;
-  /**
-   * the icon identifier
-   */
-  iconIdentifier: string;
-  /**
-   * The parent node
-   */
-  parent: FilterReferencingNodes_hierarchicalGraph_nodes_filterReferencingNodes_nodes_parent | null;
-}
-
-export interface FilterReferencingNodes_hierarchicalGraph_nodes_filterReferencingNodes {
+export interface FilterReferencingNodeIds_hierarchicalGraph_nodes_filterReferencingNodes {
   __typename: "NodeSet";
   /**
-   * contained nodes as node array
+   * the node ids as an array
    */
-  nodes: FilterReferencingNodes_hierarchicalGraph_nodes_filterReferencingNodes_nodes[];
+  nodeIds: string[];
 }
 
-export interface FilterReferencingNodes_hierarchicalGraph_nodes {
+export interface FilterReferencingNodeIds_hierarchicalGraph_nodes {
   __typename: "NodeSet";
-  filterReferencingNodes: FilterReferencingNodes_hierarchicalGraph_nodes_filterReferencingNodes;
+  filterReferencingNodes: FilterReferencingNodeIds_hierarchicalGraph_nodes_filterReferencingNodes;
 }
 
-export interface FilterReferencingNodes_hierarchicalGraph {
+export interface FilterReferencingNodeIds_hierarchicalGraph {
   __typename: "HierarchicalGraph";
   /**
    * Returns the nodes with the given ids
    */
-  nodes: FilterReferencingNodes_hierarchicalGraph_nodes;
+  nodes: FilterReferencingNodeIds_hierarchicalGraph_nodes;
 }
 
-export interface FilterReferencingNodes {
-  hierarchicalGraph: FilterReferencingNodes_hierarchicalGraph | null;
+export interface FilterReferencingNodeIds {
+  hierarchicalGraph: FilterReferencingNodeIds_hierarchicalGraph | null;
 }
 
-export interface FilterReferencingNodesVariables {
+export interface FilterReferencingNodeIdsVariables {
   databaseId: string;
   hierarchicalGraphId: string;
   nodeIds: string[];

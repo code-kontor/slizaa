@@ -24,14 +24,31 @@
     width: 100%;
 }
 
-.slizaa-card-title {
+.slizaa-card-header {
     font-size: 0.85rem;
-    padding: 5px 8px;
     background-color: #FAFAFA;
     border: 1px solid #C8CEd3;
     border-radius: 5px 5px 0px 0px;
     font-weight: 600;
-    flex: 0 0 0px;
+    flex: 0 0 30px;
+}
+
+.slizaa-card-header-title {
+    float: left; 
+    width: 50%;
+    padding: 5px 8px 5px 8px; 
+}
+
+.slizaa-card-header-icons {
+    float: right; 
+    padding: 5px 8px 5px 8px; 
+}
+
+.slizaa-card-header-button {
+    height: 20px;
+    margin-top: 4px;
+    font-size: 12px;
+    border-radius: 2px;
 }
 
 .slizaa-card-body {

@@ -22,5 +22,6 @@ import {ISlizaaNode} from "./ISlizaaNode";
  * Represents a tree node.
  */
 export interface ISlizaaRootNode extends ISlizaaNode {
+
    lookupNode(id: string): ISlizaaNode | undefined
 }

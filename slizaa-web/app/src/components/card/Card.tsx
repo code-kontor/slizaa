@@ -27,6 +27,7 @@ export interface ICardProps {
     padding?: number
     handleMaximize?: (id: string) => void
     menuProviderFunc?: () => React.ReactNode
+    buttonProviderFunc?: () => React.ReactNode
 }
 
 export class Card extends React.Component<ICardProps, any> {
@@ -38,26 +39,30 @@ export class Card extends React.Component<ICardProps, any> {
             padding: this.props.padding !== undefined ? this.props.padding + 'px ' + this.props.padding + 'px' : '10px 10px',
         }
 
-        const inlineBlock = this.props.menuProviderFunc ?
+        const menuBlock = this.props.menuProviderFunc ?
             (
-                <div style={{display: "inline-block", float: "right"}}>
-                    <Dropdown overlay={this.props.menuProviderFunc} placement="bottomRight">
-                        <MenuIcon/>
-                    </Dropdown>
-                    <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick}/>
-                </div>
+                <Dropdown overlay={this.props.menuProviderFunc} placement="bottomRight">
+                    <MenuIcon/>
+                </Dropdown> 
             )
             :
-            (
-                <div style={{display: "inline-block", float: "right"}}>
-                    <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick}/>
-                </div>
-            );
+            null;
+
+        const buttonBlock = this.props.buttonProviderFunc ?
+            this.props.buttonProviderFunc()
+        :
+        null;
 
         return <div className="slizaa-card">
-            <div className="slizaa-card-title">
-                <div style={{float: "left", width: "50%"}}>{this.props.title}</div>
-                {inlineBlock}
+            <div className="slizaa-card-header">
+                <div className="slizaa-card-header-title">{this.props.title}</div>
+                <div style={{display: "inline-block", float: "right"}}>
+                    {buttonBlock}
+                    <div className="slizaa-card-header-icons">
+                        {menuBlock}
+                        <FullScreenIcon style={{paddingLeft: "5px"}} onClick={this.handleMaximizeClick}/>
+                    </div>
+                </div>
             </div>
             <div className="slizaa-card-body" style={styleProperties}>{this.props.children}</div>
         </div>;

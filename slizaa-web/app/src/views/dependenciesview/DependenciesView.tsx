@@ -78,7 +78,7 @@ export class DependenciesView extends React.Component<IDependenciesViewProps, ID
                         topRight={{
                             allowOverflow: true,
                             element: this.dependenciesOverviewCard(cl),
-                            overlayMenuFunc: this.dependenciesOverviewMenu,
+                            menuProviderFunc: this.dependenciesOverviewMenu,
                             title: "Dependency Overview",
                         }}
                         bottom={{
