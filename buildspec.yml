@@ -8,6 +8,8 @@ phases:
     commands:
       - echo Build started on `date`
       - mvn clean install
+      - cd $CODEBUILD_SRC_DIR_sliaa_extensions
+      - mvn clean install
   post_build:
     commands:
       - echo Build completed on `date`
