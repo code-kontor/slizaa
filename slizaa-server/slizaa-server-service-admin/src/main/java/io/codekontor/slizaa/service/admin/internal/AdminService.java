@@ -17,9 +17,9 @@
  */
 package io.codekontor.slizaa.service.admin.internal;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import io.codekontor.slizaa.service.admin.IAdminService;
 import io.codekontor.slizaa.service.admin.descr.ContentDefinitionDescr;
@@ -66,7 +66,7 @@ public class AdminService implements IAdminService {
                 extension.getVersion().toString());
     }
 
-    private Function<IGraphDatabase, GraphDatabaseDescr> toGraphDatabaseDescr() {
+    private Function<ISlizaaDatabase, GraphDatabaseDescr> toGraphDatabaseDescr() {
         return graphDatabase -> {
 
             // map content definition

@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.List;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
-import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
 import io.codekontor.slizaa.server.service.svg.ISvgService;
 
 /**
@@ -33,7 +33,7 @@ import io.codekontor.slizaa.server.service.svg.ISvgService;
  */
 public interface ISlizaaService {
 
-	IAggregatedDependencySelectionService getSelectionService();
+//	IAggregatedDependencySelectionService getSelectionService();
 
 	IBackendService getBackendService();
 	
@@ -43,9 +43,9 @@ public interface ISlizaaService {
 
 	boolean hasGraphDatabases();
 
-	List<? extends IGraphDatabase> getGraphDatabases();
+	List<? extends ISlizaaDatabase> getGraphDatabases();
 
-	IGraphDatabase getGraphDatabase(String identifier);
+	ISlizaaDatabase getGraphDatabase(String identifier);
 	
-	IGraphDatabase newGraphDatabase(String identifier);
+	ISlizaaDatabase newGraphDatabase(String identifier);
 }

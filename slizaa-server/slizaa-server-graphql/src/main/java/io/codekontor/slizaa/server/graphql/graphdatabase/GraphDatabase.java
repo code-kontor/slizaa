@@ -18,7 +18,7 @@
 package io.codekontor.slizaa.server.graphql.graphdatabase;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 
 public class GraphDatabase {
 
@@ -64,7 +64,7 @@ public class GraphDatabase {
    * @param database
    * @return
    */
-  public static GraphDatabase convert(IGraphDatabase database) {
+  public static GraphDatabase convert(ISlizaaDatabase database) {
 
     // get the content definition provider
     IContentDefinitionProvider<?> contentDefinitionProvider = database.getContentDefinition();

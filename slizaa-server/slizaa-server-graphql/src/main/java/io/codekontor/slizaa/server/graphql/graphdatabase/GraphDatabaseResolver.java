@@ -21,9 +21,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.graphql.hierarchicalgraph.HierarchicalGraph;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class GraphDatabaseResolver implements GraphQLResolver<GraphDatabase> {
 
 	public List<HierarchicalGraph> getHierarchicalGraphs(GraphDatabase graphDatabase) {
 		
-		IGraphDatabase db = slizaaService.getGraphDatabase(graphDatabase.getIdentifier());
+		ISlizaaDatabase db = slizaaService.getGraphDatabase(graphDatabase.getIdentifier());
 		
 		if (db != null) {
 			return db.getHierarchicalGraphs().stream()
@@ -55,7 +55,7 @@ public class GraphDatabaseResolver implements GraphQLResolver<GraphDatabase> {
 
 	public HierarchicalGraph hierarchicalGraph(GraphDatabase graphDatabase, String identifier) {
 		
-		IGraphDatabase db = slizaaService.getGraphDatabase(graphDatabase.getIdentifier());
+		ISlizaaDatabase db = slizaaService.getGraphDatabase(graphDatabase.getIdentifier());
 		
 		if (db != null) {
 			IHierarchicalGraph hg = db.getHierarchicalGraph(identifier);

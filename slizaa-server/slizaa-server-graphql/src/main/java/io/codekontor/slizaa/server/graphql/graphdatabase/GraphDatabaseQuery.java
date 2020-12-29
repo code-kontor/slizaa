@@ -20,9 +20,9 @@ package io.codekontor.slizaa.server.graphql.graphdatabase;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.graphql.hierarchicalgraph.HierarchicalGraph;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import org.springframework.stereotype.Component;
 
 import com.coxautodev.graphql.tools.GraphQLQueryResolver;
@@ -54,13 +54,13 @@ public class GraphDatabaseQuery extends AbstractDatabaseAwareComponent implement
 
   public GraphDatabase graphDatabase(String identifier) {
 
-    IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(identifier);
+    ISlizaaDatabase graphDatabase = slizaaService().getGraphDatabase(identifier);
     return graphDatabase != null ? GraphDatabase.convert(graphDatabase) : null;
   }
 
   public HierarchicalGraph hierarchicalGraph(String databaseIdentifier, String hierarchicalGraphIdentifier) {
 
-    IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
+    ISlizaaDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
 
     if (graphDatabase != null) {
 

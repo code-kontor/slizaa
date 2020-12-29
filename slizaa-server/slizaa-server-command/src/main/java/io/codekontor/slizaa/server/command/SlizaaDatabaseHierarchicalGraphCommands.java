@@ -17,8 +17,8 @@
  */
 package io.codekontor.slizaa.server.command;
 
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -38,7 +38,7 @@ public class SlizaaDatabaseHierarchicalGraphCommands extends AbstractGraphDataba
         }
 
         // check that the requested database exists
-        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
+        ISlizaaDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
         if (graphDatabase == null) {
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }
@@ -66,7 +66,7 @@ public class SlizaaDatabaseHierarchicalGraphCommands extends AbstractGraphDataba
         }
 
         // check that the requested database exists
-        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
+        ISlizaaDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
         if (graphDatabase == null) {
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }

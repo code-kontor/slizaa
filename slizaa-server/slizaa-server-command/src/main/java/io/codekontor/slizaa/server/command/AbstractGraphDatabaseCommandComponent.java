@@ -17,10 +17,10 @@
  */
 package io.codekontor.slizaa.server.command;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.table.*;
@@ -121,7 +121,7 @@ public abstract class AbstractGraphDatabaseCommandComponent {
   }
 
   protected String checkDatabaseExists(String identifier) {
-    IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
+    ISlizaaDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
     if (graphDatabase == null) {
       return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", identifier));
     }
@@ -129,7 +129,7 @@ public abstract class AbstractGraphDatabaseCommandComponent {
   }
 
   protected String checkDatabaseDoesNotExist(String identifier) {
-    IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
+    ISlizaaDatabase graphDatabase = _slizaaService.getGraphDatabase(identifier);
     if (graphDatabase != null) {
       return cannotExecuteCommand(String.format("The specified database '%s' already exists.\n", identifier));
     }

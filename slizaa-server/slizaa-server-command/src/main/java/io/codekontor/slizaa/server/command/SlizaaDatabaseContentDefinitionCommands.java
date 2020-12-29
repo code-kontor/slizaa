@@ -19,7 +19,7 @@ package io.codekontor.slizaa.server.command;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.filebased.IFileBasedContentDefinition;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -44,7 +44,7 @@ public class SlizaaDatabaseContentDefinitionCommands extends AbstractGraphDataba
         }
 
         // check that the requested database exists
-        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
+        ISlizaaDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
         if (graphDatabase == null) {
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }
@@ -66,7 +66,7 @@ public class SlizaaDatabaseContentDefinitionCommands extends AbstractGraphDataba
         }
 
         // check that the requested database exists
-        IGraphDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
+        ISlizaaDatabase graphDatabase = slizaaService().getGraphDatabase(databaseIdentifier);
         if (graphDatabase == null) {
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }

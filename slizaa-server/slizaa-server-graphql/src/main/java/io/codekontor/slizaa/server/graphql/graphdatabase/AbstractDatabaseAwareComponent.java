@@ -17,9 +17,8 @@
  */
 package io.codekontor.slizaa.server.graphql.graphdatabase;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.graphql.ErrorMessages;
-import io.codekontor.slizaa.server.graphql.SlizaaGraphQLError;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,7 +47,7 @@ public abstract class AbstractDatabaseAwareComponent {
   protected GraphDatabase executeOnDatabase(DataFetchingEnvironment environment, String databaseId, DatabaseConsumer consumer) {
   
     // get the database
-    IGraphDatabase database = _slizaaService.getGraphDatabase(databaseId);
+    ISlizaaDatabase database = _slizaaService.getGraphDatabase(databaseId);
 
     // check exists
     if (database == null) {
@@ -69,6 +68,6 @@ public abstract class AbstractDatabaseAwareComponent {
   @FunctionalInterface
   public interface DatabaseConsumer {
 
-    void accept(IGraphDatabase database) throws Exception;
+    void accept(ISlizaaDatabase database) throws Exception;
   }
 }

@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SlizaaServer" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="io.codekontor.slizaa.server.SlizaaServer" />
+    <module name="slizaa-server-main" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="io.codekontor.slizaa.server.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

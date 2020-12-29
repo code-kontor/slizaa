@@ -25,9 +25,9 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -106,7 +106,7 @@ public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGr
     private <T> T nullSafe(HierarchicalGraph hierarchicalGraph, Function<HGRootNode, T> function) {
 
         // lookup the root node
-        IGraphDatabase graphDatabase = _slizaaService.getGraphDatabase(hierarchicalGraph.getDatabaseIdentifier());
+        ISlizaaDatabase graphDatabase = _slizaaService.getGraphDatabase(hierarchicalGraph.getDatabaseIdentifier());
         if (graphDatabase != null) {
             IHierarchicalGraph hg = graphDatabase.getHierarchicalGraph(hierarchicalGraph.getIdentifier());
             if (hg != null) {

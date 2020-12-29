@@ -21,10 +21,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.internal.AbstractSlizaaServiceTest;
 
 /**
@@ -35,7 +35,7 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
 
   public static final String STRUCTURE_DATABASE_NAME = "TEST_STRUCTURE_DATABASE";
 
-  private IGraphDatabase     structureDatabase;
+  private ISlizaaDatabase structureDatabase;
 
   @Before
   public void before() {

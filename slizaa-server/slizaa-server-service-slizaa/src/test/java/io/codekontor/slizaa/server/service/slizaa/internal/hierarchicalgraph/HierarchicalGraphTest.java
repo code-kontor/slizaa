@@ -17,6 +17,8 @@
  */
 package io.codekontor.slizaa.server.service.slizaa.internal.hierarchicalgraph;
 
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -26,8 +28,6 @@ import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.IOrderedAdjacencyM
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
-import io.codekontor.slizaa.server.service.slizaa.IHierarchicalGraph;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.internal.AbstractSlizaaServiceTest;
 import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class HierarchicalGraphTest extends AbstractSlizaaServiceTest {
   @Autowired
   private SlizaaServiceImpl _slizaaService;
 
-  private IGraphDatabase    _structureDatabase;
+  private ISlizaaDatabase _structureDatabase;
 
   @Before
   public void setUp() throws Exception {

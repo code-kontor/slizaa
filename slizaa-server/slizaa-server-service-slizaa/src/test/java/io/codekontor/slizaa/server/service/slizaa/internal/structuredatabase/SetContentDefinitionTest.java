@@ -17,13 +17,12 @@
  */
 package io.codekontor.slizaa.server.service.slizaa.internal.structuredatabase;
 
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.service.slizaa.internal.AbstractSlizaaServiceTest;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import io.codekontor.slizaa.server.service.slizaa.GraphDatabaseState;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
-import io.codekontor.slizaa.server.service.slizaa.internal.AbstractSlizaaServiceTest;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +37,7 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
 
     public static final String STRUCTURE_DATABASE_NAME = "TEST_STRUCTURE_DATABASE";
 
-    private IGraphDatabase database;
+    private ISlizaaDatabase database;
 
     @Before
     public void before() {
@@ -49,14 +48,14 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
     @After
     public void after() {
 
-        if (!GraphDatabaseState.TERMINATED.equals(database.getState())) {
+        if (!SlizaaDatabaseState.TERMINATED.equals(database.getState())) {
             database.terminate();
         }
 
         assertThat(slizaaService().hasStructureDatabase(STRUCTURE_DATABASE_NAME)).isFalse();
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void test_SET_CONTENT_DEFINITION() throws IOException {
 
         // create a new database and parse with start
@@ -67,7 +66,7 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
                 "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
         database.parse(false);
-        await().atMost(60, TimeUnit.SECONDS).until(() -> GraphDatabaseState.NOT_RUNNING.equals(database.getState()));
+        await().atMost(60, TimeUnit.SECONDS).until(() -> SlizaaDatabaseState.NOT_RUNNING.equals(database.getState()));
 
         // reset the content is allowed
         database.setContentDefinitionProvider(
@@ -80,15 +79,10 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
                 "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
         database.parse(true);
-        await().atMost(60, TimeUnit.SECONDS).until(() -> GraphDatabaseState.RUNNING.equals(database.getState()));
+        await().atMost(60, TimeUnit.SECONDS).until(() -> SlizaaDatabaseState.RUNNING.equals(database.getState()));
 
-        try {
-            database.setContentDefinitionProvider(
-                    "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
-                    "ant4eclipse:ant4eclipse:0.5.0.rc1");
-            Assert.fail();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
+        database.setContentDefinitionProvider(
+                "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+                "ant4eclipse:ant4eclipse:0.5.0.rc1");
     }
 }

@@ -23,11 +23,11 @@ import static org.awaitility.Awaitility.await;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import io.codekontor.slizaa.server.service.slizaa.GraphDatabaseState;
-import io.codekontor.slizaa.server.service.slizaa.IGraphDatabase;
 import io.codekontor.slizaa.server.service.slizaa.internal.AbstractSlizaaServiceTest;
 
 /**
@@ -38,7 +38,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
 
   public static final String STRUCTURE_DATABASE_NAME = "TEST_STRUCTURE_DATABASE";
 
-  private IGraphDatabase     database;
+  private ISlizaaDatabase database;
 
   @Before
   public void before() {
@@ -49,7 +49,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
   @After
   public void after() {
 
-    if (!GraphDatabaseState.TERMINATED.equals(database.getState())) {
+    if (!SlizaaDatabaseState.TERMINATED.equals(database.getState())) {
       database.terminate();
     }
 
@@ -63,7 +63,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
     database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
 
     assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(
-        IGraphDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, IGraphDatabase.GraphDatabaseAction.DELETE);
+        ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, ISlizaaDatabase.GraphDatabaseAction.DELETE);
   }
 
   @Test
@@ -75,8 +75,8 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
     database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
-    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(IGraphDatabase.GraphDatabaseAction.PARSE, IGraphDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION,
-        IGraphDatabase.GraphDatabaseAction.DELETE);
+    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.PARSE, ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION,
+        ISlizaaDatabase.GraphDatabaseAction.DELETE);
   }
 
   @Test
@@ -92,8 +92,8 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
 
     await().atMost(60, TimeUnit.SECONDS).until(() -> database.isRunning());
 
-    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(IGraphDatabase.GraphDatabaseAction.STOP,
-        IGraphDatabase.GraphDatabaseAction.DELETE);
+    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.STOP,
+        ISlizaaDatabase.GraphDatabaseAction.DELETE);
   }
 
   @Test
@@ -106,11 +106,11 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     database.parse(false);
-    await().atMost(60, TimeUnit.SECONDS).until(() -> GraphDatabaseState.NOT_RUNNING.equals(database.getState()));
+    await().atMost(60, TimeUnit.SECONDS).until(() -> SlizaaDatabaseState.NOT_RUNNING.equals(database.getState()));
 
-    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(IGraphDatabase.GraphDatabaseAction.START,
-        IGraphDatabase.GraphDatabaseAction.PARSE, IGraphDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION,
-        IGraphDatabase.GraphDatabaseAction.DELETE);
+    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.START,
+        ISlizaaDatabase.GraphDatabaseAction.PARSE, ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION,
+        ISlizaaDatabase.GraphDatabaseAction.DELETE);
   }
 
   @Test

@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.service.slizaa;
 
+import io.codekontor.slizaa.core.boltclient.IBoltClientFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingService;
 import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceDatabaseProperties;
 import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl;
@@ -24,6 +25,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.Executors;
 
 @Configuration
 @ComponentScan(basePackageClasses = {SlizaaServiceImpl.class})
@@ -33,5 +36,10 @@ public class SlizaaServiceModuleConfiguration {
   @Bean
   public IMappingService mappingService() {
     return IMappingService.createHierarchicalgraphMappingService();
+  }
+
+  @Bean
+  public IBoltClientFactory boltClientFactory() {
+    return IBoltClientFactory.newInstance(Executors.newFixedThreadPool(20));
   }
 }
