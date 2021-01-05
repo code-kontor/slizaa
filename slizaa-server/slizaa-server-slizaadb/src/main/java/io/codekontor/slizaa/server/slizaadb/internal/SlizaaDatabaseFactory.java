@@ -19,6 +19,7 @@ package io.codekontor.slizaa.server.slizaadb.internal;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.server.slizaadb.*;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.config.StateMachineFactory;
@@ -29,11 +30,13 @@ import java.io.File;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.google.common.base.Preconditions.checkState;
 
 @Component
-public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory {
+public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, InitializingBean {
 
     @Autowired
     private StateMachineFactory<SlizaaDatabaseState, SlizaaDatabaseTrigger> _stateMachineFactory;
@@ -43,7 +46,16 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory {
 
     private Map<StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger>, SlizaaDatabaseStateMachineContext> _stateMachine2StructureDatabaseContext = new HashMap<>();
 
-    private NamedLock _namedLock = new NamedLock();
+    private NamedLock _namedLock;
+
+    private ExecutorService _executorService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        _namedLock = new NamedLock();
+        // TODO: Config
+        _executorService = Executors.newFixedThreadPool(5);
+    }
 
     @Override
     public IInternalSlizaaDatabase newInstance(String id, int port, File databaseRootDirectory) {
@@ -80,12 +92,28 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory {
 
         //
         ModifiedState modifiedState = new ModifiedState();
-        if (SlizaaDatabaseState.RUNNING.equals(databaseConfiguration.getState())) {
-            modifiedState.modifiedState = SlizaaDatabaseState.NOT_RUNNING;
-            modifiedState.triggerStart = true;
-        } else {
-            modifiedState.modifiedState = databaseConfiguration.getState();
-            modifiedState.triggerStart = false;
+        switch (databaseConfiguration.getState()) {
+            case RUNNING:
+            case STARTING:
+            case CREATING_HIERARCHICAL_GRAPH:{
+                modifiedState.modifiedState = SlizaaDatabaseState.NOT_RUNNING;
+                modifiedState.triggerStart = true;
+                break;
+            }
+            case STOPPING: {
+                modifiedState.modifiedState = SlizaaDatabaseState.NOT_RUNNING;
+                modifiedState.triggerStart = false;
+                break;
+            }
+            case PARSING: {
+                modifiedState.modifiedState = SlizaaDatabaseState.CONFIGURED;
+                modifiedState.triggerStart = false;
+                break;
+            }
+            default: {
+                modifiedState.modifiedState = databaseConfiguration.getState();
+                modifiedState.triggerStart = false;
+            }
         }
 
         //
@@ -125,7 +153,7 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory {
         StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> statemachine = _stateMachineFactory.getStateMachine();
 
         // create the state machine context
-        SlizaaDatabaseStateMachineContext stateMachineContext =  new SlizaaDatabaseStateMachineContext(id, databaseDirectory, port, _graphDatabaseEnvironment, statemachine);
+        SlizaaDatabaseStateMachineContext stateMachineContext =  new SlizaaDatabaseStateMachineContext(id, databaseDirectory, port, _graphDatabaseEnvironment, _executorService, statemachine);
 
         // create the structure database
         SlizaaDatabaseImpl database = new SlizaaDatabaseImpl(statemachine, stateMachineContext, _graphDatabaseEnvironment);

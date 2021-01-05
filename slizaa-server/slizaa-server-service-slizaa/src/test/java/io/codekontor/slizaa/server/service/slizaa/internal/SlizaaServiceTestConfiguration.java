@@ -121,13 +121,13 @@ public class SlizaaServiceTestConfiguration {
 
     // IModelImporter.parse
     when(modelImporter.parse(any())).thenAnswer(inv -> {
-      sleep(2500);
+      sleep();
       return Collections.emptyList();
     });
 
     // IModelImporter.parse
     when(modelImporter.parse(any(), any())).thenAnswer(inv -> {
-      sleep(2500);
+      sleep();
       return Collections.emptyList();
     });
 
@@ -157,9 +157,9 @@ public class SlizaaServiceTestConfiguration {
     return cypherStatementRegistryMock;
   }
 
-  private static void sleep(long millis) {
+  private static void sleep() {
     try {
-      Thread.sleep(millis);
+      Thread.sleep(2500);
     } catch (Exception e) {
       // ignore
     }

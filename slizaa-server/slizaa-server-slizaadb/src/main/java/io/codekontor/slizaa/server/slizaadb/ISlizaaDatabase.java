@@ -21,6 +21,7 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProv
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * <p>
@@ -92,6 +93,8 @@ public interface ISlizaaDatabase extends IHierarchicalGraphContainer {
      */
     List<GraphDatabaseAction> getAvailableActions();
 
+    void awaitState(SlizaaDatabaseState databaseState, long timeToWait) throws TimeoutException;
+
     /**
      * Possible actions that can executed.
      *
@@ -102,6 +105,7 @@ public interface ISlizaaDatabase extends IHierarchicalGraphContainer {
         SET_CONTENT_DEFINITION("setContentDefinitionProvider"),
         PARSE("parse"),
         START("start"),
+        CREATE_HIERARCHICAL_GRAPH("createHierarchicalGraph"),
         STOP("stop"),
         DELETE("delete");
 

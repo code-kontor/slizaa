@@ -37,178 +37,293 @@ import java.util.function.Function;
 
 @EnableStateMachineFactory
 public class SlizaaDatabaseStateMachine
-    extends EnumStateMachineConfigurerAdapter<SlizaaDatabaseState, SlizaaDatabaseTrigger> {
+        extends EnumStateMachineConfigurerAdapter<SlizaaDatabaseState, SlizaaDatabaseTrigger> {
 
-  @Autowired
-  private SlizaaDatabaseFactory _slizaaDatabaseFactory;
+    public static final String TRIGGER_PARAM = "TRIGGER_PARAM";
 
-  @Override
-  public void configure(StateMachineConfigurationConfigurer<SlizaaDatabaseState, SlizaaDatabaseTrigger> config)
-      throws Exception {
+    @Autowired
+    private SlizaaDatabaseFactory _slizaaDatabaseFactory;
 
-    config.withConfiguration().taskExecutor(new SyncTaskExecutor()).autoStartup(false);
-  }
+    @Override
+    public void configure(StateMachineConfigurationConfigurer<SlizaaDatabaseState, SlizaaDatabaseTrigger> config)
+            throws Exception {
 
-  @Override
-  public void configure(StateMachineStateConfigurer<SlizaaDatabaseState, SlizaaDatabaseTrigger> states) throws Exception {
-
-    states
-    // @formatter:off
-        .withStates().initial(SlizaaDatabaseState.INITIAL).choice(SlizaaDatabaseState.PARSING)
-        .states(EnumSet.allOf(SlizaaDatabaseState.class));
-    // @formatter:on
-  }
-
-  @Override
-  public void configure(StateMachineTransitionConfigurer<SlizaaDatabaseState, SlizaaDatabaseTrigger> transitions)
-      throws Exception {
-
-    transitions
-    // @formatter:off
-      // INITIAL
-      .withExternal()
-        .source(SlizaaDatabaseState.INITIAL)
-        .target(SlizaaDatabaseState.NOT_RUNNING)
-        .guard(guardWithCtx(ctx -> ctx.hasContentDefinitionProvider() && ctx.hasPopulatedDatabaseDirectory()))
-        .and()
-      .withExternal()
-          .source(SlizaaDatabaseState.INITIAL)
-          .target(SlizaaDatabaseState.CONFIGURED)
-          .guard(guardWithCtx(ctx -> ctx.hasContentDefinitionProvider() && !ctx.hasPopulatedDatabaseDirectory()))
-          .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.INITIAL)
-        .target(SlizaaDatabaseState.CONFIGURED)
-        .event(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
-        .action(actionWithCtx((stateCtx, ctx) -> {
-          setContentDefinition(stateCtx, ctx);
-        }))
-        .and()
-      // CONFIGURED  
-      .withExternal()
-        .source(SlizaaDatabaseState.CONFIGURED)
-        .target(SlizaaDatabaseState.PARSING)
-        .event(SlizaaDatabaseTrigger.PARSE)
-        .action(actionWithCtx((stateCtx, ctx) -> ctx.parse(stateCtx.getMessageHeaders().get(SlizaaDatabaseImpl.START_DATABASE_AFTER_PARSING, Boolean.class))))
-        .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.CONFIGURED)
-        .target(SlizaaDatabaseState.CONFIGURED)
-        .event(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
-        .action(actionWithCtx((stateCtx, ctx) -> {
-          setContentDefinition(stateCtx, ctx);
-        }))
-        .and()
-      // PARSING
-      .withChoice()
-        .source(SlizaaDatabaseState.PARSING)
-        .first(SlizaaDatabaseState.RUNNING, guardWithCtx(ctx -> ctx.isRunning()))
-        .last(SlizaaDatabaseState.NOT_RUNNING)
-        .and()
-      // NOT_RUNNING
-      .withExternal()
-        .source(SlizaaDatabaseState.NOT_RUNNING)
-        .target(SlizaaDatabaseState.CONFIGURED)
-        .event(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
-        .action(actionWithCtx((stateCtx, ctx) -> {
-          setContentDefinition(stateCtx, ctx);
-        }))
-        .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.NOT_RUNNING)
-        .target(SlizaaDatabaseState.PARSING)
-        .event(SlizaaDatabaseTrigger.PARSE)
-        .action(actionWithCtx((stateCtx, ctx) -> ctx.parse(stateCtx.getMessageHeaders().get(SlizaaDatabaseImpl.START_DATABASE_AFTER_PARSING, Boolean.class))))
-        .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.NOT_RUNNING)
-        .target(SlizaaDatabaseState.RUNNING)
-        .event(SlizaaDatabaseTrigger.START)
-        .action(actionWithCtx(ctx -> ctx.start()))
-        .and()
-      // RUNNING  
-      .withExternal()
-        .source(SlizaaDatabaseState.RUNNING)
-        .target(SlizaaDatabaseState.NOT_RUNNING)
-        .event(SlizaaDatabaseTrigger.STOP)
-        .action(actionWithCtx(ctx -> ctx.stop()))
-        .and()
-      // TERMINATE
-      .withExternal()
-        .source(SlizaaDatabaseState.INITIAL)
-        .target(SlizaaDatabaseState.TERMINATED)
-        .event(SlizaaDatabaseTrigger.TERMINATE)
-        .action(actionWithCtx(ctx -> ctx.terminate()))
-        .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.CONFIGURED)
-        .target(SlizaaDatabaseState.TERMINATED)
-        .event(SlizaaDatabaseTrigger.TERMINATE)
-        .action(actionWithCtx(ctx -> ctx.terminate()))
-        .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.RUNNING)
-        .target(SlizaaDatabaseState.TERMINATED)
-        .event(SlizaaDatabaseTrigger.TERMINATE)
-        .action(actionWithCtx(ctx -> ctx.terminate()))
-        .and()
-      .withExternal()
-        .source(SlizaaDatabaseState.NOT_RUNNING)
-        .target(SlizaaDatabaseState.TERMINATED)
-        .event(SlizaaDatabaseTrigger.TERMINATE)
-        .action(actionWithCtx(ctx -> ctx.terminate()));
-      // @formatter:on
-  }
-
-  private void setContentDefinition(StateContext<SlizaaDatabaseState, SlizaaDatabaseTrigger> stateCtx,
-                                    SlizaaDatabaseStateMachineContext ctx) {
-
-    try {
-      ctx.setContentDefinition(stateCtx.getMessageHeaders().get(SlizaaDatabaseImpl.CONTENT_DEFINITION_PROVIDER, IContentDefinitionProvider.class));
-    } catch (Exception exception) {
-      exception.printStackTrace();
+        config.withConfiguration().taskExecutor(new SyncTaskExecutor()).autoStartup(false);
     }
-  }
 
-  private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> actionWithCtx(
-      Consumer<SlizaaDatabaseStateMachineContext> consumer) {
+    @Override
+    public void configure(StateMachineStateConfigurer<SlizaaDatabaseState, SlizaaDatabaseTrigger> states) throws Exception {
 
-    return new Action<SlizaaDatabaseState, SlizaaDatabaseTrigger>() {
-      @Override
-      public void execute(StateContext<SlizaaDatabaseState, SlizaaDatabaseTrigger> context) {
-        try {
-          consumer.accept(_slizaaDatabaseFactory.context(context.getStateMachine()));
-        } catch (Exception exception) {
-          exception.printStackTrace();
+        states
+                .withStates()
+                .initial(SlizaaDatabaseState.INITIAL)
+                .states(EnumSet.allOf(SlizaaDatabaseState.class));
+    }
+
+    @Override
+    public void configure(StateMachineTransitionConfigurer<SlizaaDatabaseState, SlizaaDatabaseTrigger> transitions)
+            throws Exception {
+
+        transitions
+
+                // INITIAL --> NOT_RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.INITIAL)
+                .target(SlizaaDatabaseState.NOT_RUNNING)
+                .guard(guardWithCtx(ctx -> ctx.hasContentDefinitionProvider() && ctx.hasPopulatedDatabaseDirectory()))
+                .and()
+                // INITIAL --> CONFIGURED
+                .withExternal()
+                .source(SlizaaDatabaseState.INITIAL)
+                .target(SlizaaDatabaseState.CONFIGURED)
+                .guard(guardWithCtx(ctx -> ctx.hasContentDefinitionProvider() && !ctx.hasPopulatedDatabaseDirectory()))
+                .and()
+                // INITIAL --> CONFIGURED
+                .withExternal()
+                .source(SlizaaDatabaseState.INITIAL)
+                .target(SlizaaDatabaseState.CONFIGURED)
+                .event(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
+                .action(setContentDefinition())
+                .and()
+
+                // CONFIGURED --> PARSING
+                .withExternal()
+                .source(SlizaaDatabaseState.CONFIGURED)
+                .target(SlizaaDatabaseState.PARSING)
+                .event(SlizaaDatabaseTrigger.PARSE)
+                .action(parse())
+                .and()
+                // CONFIGURED --> CONFIGURED
+                .withExternal()
+                .source(SlizaaDatabaseState.CONFIGURED)
+                .target(SlizaaDatabaseState.CONFIGURED)
+                .event(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
+                .action(setContentDefinition())
+                .and()
+
+                // PARSING --> RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.PARSING)
+                .target(SlizaaDatabaseState.RUNNING)
+                .event(SlizaaDatabaseTrigger.PARSE_WITH_START_SUCCEEDED)
+                .and()
+                // PARSING --> NOT_RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.PARSING)
+                .target(SlizaaDatabaseState.NOT_RUNNING)
+                .event(SlizaaDatabaseTrigger.PARSE_WITHOUT_START_SUCCEEDED)
+                .and()
+                // PARSING --> CONFIGURED
+                .withExternal()
+                .source(SlizaaDatabaseState.PARSING)
+                .target(SlizaaDatabaseState.CONFIGURED)
+                .event(SlizaaDatabaseTrigger.PARSE_FAILED)
+                .and()
+
+                // NOT_RUNNING --> CONFIGURED
+                .withExternal()
+                .source(SlizaaDatabaseState.NOT_RUNNING)
+                .target(SlizaaDatabaseState.CONFIGURED)
+                .event(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
+                .action(setContentDefinition())
+                .and()
+                // NOT_RUNNING --> PARSING
+                .withExternal()
+                .source(SlizaaDatabaseState.NOT_RUNNING)
+                .target(SlizaaDatabaseState.PARSING)
+                .event(SlizaaDatabaseTrigger.PARSE)
+                .action(parse())
+                .and()
+                // NOT_RUNNING --> STARTING
+                .withExternal()
+                .source(SlizaaDatabaseState.NOT_RUNNING)
+                .target(SlizaaDatabaseState.STARTING)
+                .event(SlizaaDatabaseTrigger.START)
+                .action(actionWithCtx(ctx -> ctx.start()))
+                .and()
+
+                // STARTING --> RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.STARTING)
+                .target(SlizaaDatabaseState.RUNNING)
+                .event(SlizaaDatabaseTrigger.START_SUCCEEDED)
+                .and()
+                // STARTING --> NOT_RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.STARTING)
+                .target(SlizaaDatabaseState.NOT_RUNNING)
+                .event(SlizaaDatabaseTrigger.START_FAILED)
+                .and()
+
+                // RUNNING --> STOPPING
+                .withExternal()
+                .source(SlizaaDatabaseState.RUNNING)
+                .target(SlizaaDatabaseState.STOPPING)
+                .event(SlizaaDatabaseTrigger.STOP)
+                .action(actionWithCtx(ctx -> ctx.stop()))
+                .and()
+                // RUNNING --> CREATING_HIERARCHICAL_GRAPH
+                .withExternal()
+                .source(SlizaaDatabaseState.RUNNING)
+                .target(SlizaaDatabaseState.CREATING_HIERARCHICAL_GRAPH)
+                .event(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH)
+                .action(createHierarchicalGraph())
+                .and()
+
+                // CREATING_HIERARCHICAL_GRAPH --> RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.CREATING_HIERARCHICAL_GRAPH)
+                .target(SlizaaDatabaseState.RUNNING)
+                .event(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH_SUCCEEDED)
+                .and()
+                // CREATING_HIERARCHICAL_GRAPH --> RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.CREATING_HIERARCHICAL_GRAPH)
+                .target(SlizaaDatabaseState.RUNNING)
+                .event(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH_FAILED)
+                .and()
+
+                // STOPPING --> NOT_RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.STOPPING)
+                .target(SlizaaDatabaseState.NOT_RUNNING)
+                .event(SlizaaDatabaseTrigger.STOP_SUCCEEDED)
+                .and()
+                // STOPPING --> RUNNING
+                .withExternal()
+                .source(SlizaaDatabaseState.STOPPING)
+                .target(SlizaaDatabaseState.RUNNING)
+                .event(SlizaaDatabaseTrigger.STOP_FAILED)
+                .and()
+
+                // INITIAL --> TERMINATED
+                .withExternal()
+                .source(SlizaaDatabaseState.INITIAL)
+                .target(SlizaaDatabaseState.TERMINATED)
+                .event(SlizaaDatabaseTrigger.TERMINATE)
+                .action(actionWithCtx(ctx -> ctx.terminate()))
+                .and()
+
+                // CONFIGURED --> TERMINATED
+                .withExternal()
+                .source(SlizaaDatabaseState.CONFIGURED)
+                .target(SlizaaDatabaseState.TERMINATED)
+                .event(SlizaaDatabaseTrigger.TERMINATE)
+                .action(actionWithCtx(ctx -> ctx.terminate()))
+                .and()
+
+                // RUNNING --> TERMINATED
+                .withExternal()
+                .source(SlizaaDatabaseState.RUNNING)
+                .target(SlizaaDatabaseState.TERMINATED)
+                .event(SlizaaDatabaseTrigger.TERMINATE)
+                .action(actionWithCtx(ctx -> ctx.terminate()))
+                .and()
+
+                // NOT_RUNNING --> TERMINATED
+                .withExternal()
+                .source(SlizaaDatabaseState.NOT_RUNNING)
+                .target(SlizaaDatabaseState.TERMINATED)
+                .event(SlizaaDatabaseTrigger.TERMINATE)
+                .action(actionWithCtx(ctx -> ctx.terminate()));
+    }
+
+    private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> createHierarchicalGraph() {
+        return actionWithCtx(
+                (stateCtx, ctx) -> {
+                    TriggerParameter_CreateHierarchicalGraph parameter = stateCtx.getMessageHeaders().get(TRIGGER_PARAM, TriggerParameter_CreateHierarchicalGraph.class);
+                    ctx.createHierarchicalGraph(parameter.getIdentifier());
+                }
+        );
+    }
+
+    private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> parse() {
+        return actionWithCtx(
+                (stateCtx, ctx) -> {
+                    TriggerParameter_Parse parameter = stateCtx.getMessageHeaders().get(TRIGGER_PARAM, TriggerParameter_Parse.class);
+                    ctx.parse(parameter.startDatabaseAfterParsing());
+                }
+        );
+    }
+
+    private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> setContentDefinition() {
+        return actionWithCtx(
+                (stateCtx, ctx) -> {
+                    try {
+                        TriggerParameter_SetContentDefinition parameter =
+                                stateCtx.getMessageHeaders().get(SlizaaDatabaseStateMachine.TRIGGER_PARAM, TriggerParameter_SetContentDefinition.class);
+                        ctx.setContentDefinition(parameter.getContentDefinitionProvider());
+                    } catch (Exception exception) {
+                        // TODO
+                        exception.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> actionWithCtx(
+            Consumer<SlizaaDatabaseStateMachineContext> consumer) {
+        return context -> {
+            try {
+                consumer.accept(_slizaaDatabaseFactory.context(context.getStateMachine()));
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        };
+    }
+
+    private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> actionWithCtx(
+            BiConsumer<StateContext<SlizaaDatabaseState, SlizaaDatabaseTrigger>, SlizaaDatabaseStateMachineContext> consumer) {
+        return context -> {
+            try {
+                consumer.accept(context, _slizaaDatabaseFactory.context(context.getStateMachine()));
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        };
+    }
+
+    private Guard<SlizaaDatabaseState, SlizaaDatabaseTrigger> guardWithCtx(
+            Function<SlizaaDatabaseStateMachineContext, Boolean> guard) {
+        return context -> guard.apply(_slizaaDatabaseFactory.context(context.getStateMachine()));
+    }
+
+    public static class TriggerParameter_Parse {
+
+        private boolean startDatabaseAfterParsing;
+
+        public TriggerParameter_Parse(boolean startDatabaseAfterParsing) {
+            this.startDatabaseAfterParsing = startDatabaseAfterParsing;
         }
-      }
-    };
-  }
 
-  private Action<SlizaaDatabaseState, SlizaaDatabaseTrigger> actionWithCtx(
-      BiConsumer<StateContext<SlizaaDatabaseState, SlizaaDatabaseTrigger>, SlizaaDatabaseStateMachineContext> consumer) {
-
-    return new Action<SlizaaDatabaseState, SlizaaDatabaseTrigger>() {
-      @Override
-      public void execute(StateContext<SlizaaDatabaseState, SlizaaDatabaseTrigger> context) {
-        try {
-          consumer.accept(context, _slizaaDatabaseFactory.context(context.getStateMachine()));
-        } catch (Exception exception) {
-          exception.printStackTrace();
+        public boolean startDatabaseAfterParsing() {
+            return startDatabaseAfterParsing;
         }
-      }
-    };
-  }
+    }
 
-  private Guard<SlizaaDatabaseState, SlizaaDatabaseTrigger> guardWithCtx(
-      Function<SlizaaDatabaseStateMachineContext, Boolean> guard) {
+    public static class TriggerParameter_SetContentDefinition {
 
-    return new Guard<SlizaaDatabaseState, SlizaaDatabaseTrigger>() {
-      @Override
-      public boolean evaluate(StateContext<SlizaaDatabaseState, SlizaaDatabaseTrigger> context) {
-        return guard.apply(_slizaaDatabaseFactory.context(context.getStateMachine()));
-      }
-    };
+        private IContentDefinitionProvider<?> contentDefinitionProvider;
 
-  }
+        public TriggerParameter_SetContentDefinition(IContentDefinitionProvider<?> contentDefinitionProvider) {
+            this.contentDefinitionProvider = contentDefinitionProvider;
+        }
+
+        public IContentDefinitionProvider<?> getContentDefinitionProvider() {
+            return contentDefinitionProvider;
+        }
+    }
+
+    public static class TriggerParameter_CreateHierarchicalGraph {
+
+        private String identifier;
+
+        public TriggerParameter_CreateHierarchicalGraph(String identifier) {
+            this.identifier = identifier;
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+    }
 }

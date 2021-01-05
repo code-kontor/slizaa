@@ -22,14 +22,29 @@ import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IModifiableBackendService;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.table.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public abstract class AbstractGraphDatabaseCommandComponent {
+
+  private static final Map<ISlizaaDatabase.GraphDatabaseAction, String> GRAPH_DATABASE_ACTION_MAP = new HashMap<ISlizaaDatabase.GraphDatabaseAction, String>() {{
+    put(ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, "setContentDefinitionProvider");
+    put(ISlizaaDatabase.GraphDatabaseAction.PARSE, "parseDB");
+    put(ISlizaaDatabase.GraphDatabaseAction.START, "startDB");
+    put(ISlizaaDatabase.GraphDatabaseAction.STOP, "stopDB");
+    put(ISlizaaDatabase.GraphDatabaseAction.DELETE, "deleteDB");
+    put(ISlizaaDatabase.GraphDatabaseAction.CREATE_HIERARCHICAL_GRAPH, "createHierarchicalGraph");
+  }};
+
+  protected static final long TIMEOUT = 120 * 1000;
 
   @Autowired
   private ISlizaaService            _slizaaService;
@@ -78,7 +93,7 @@ public abstract class AbstractGraphDatabaseCommandComponent {
         row[4] = db.getHierarchicalGraphs().stream().map(hierarchicalGraph -> {
           return hierarchicalGraph.getIdentifier();
         }).collect(Collectors.toList());
-        row[5] = db.getAvailableActions().stream().map(action -> action.getName()).collect(Collectors.toList());
+        row[5] = db.getAvailableActions().stream().map(action -> GRAPH_DATABASE_ACTION_MAP.get(action)).collect(Collectors.toList());
 
         rows.add(row);
       });
@@ -146,5 +161,19 @@ public abstract class AbstractGraphDatabaseCommandComponent {
   protected String formatExtension(IExtension extension) {
     return String.format(" - %1$s_%2$s (Symbolic name: %1$s, version: %2$s)\n", extension.getSymbolicName(),
         extension.getVersion());
+  }
+
+  protected void logException(Exception exception) {
+    // TODO
+    exception.printStackTrace();
+  }
+
+  protected <T> T execute(Callable<T> callable) {
+    try {
+      return callable.call();
+    } catch (Exception exception) {
+      logException(exception);
+      return null;
+    }
   }
 }

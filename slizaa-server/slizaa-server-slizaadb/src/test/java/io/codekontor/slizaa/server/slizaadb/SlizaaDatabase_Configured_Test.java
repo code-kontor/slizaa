@@ -18,9 +18,12 @@
 package io.codekontor.slizaa.server.slizaadb;
 
 import io.codekontor.slizaa.server.slizaadb.internal.Assertions;
+import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,7 +40,7 @@ public class SlizaaDatabase_Configured_Test extends AbstractSlizaaDatabaseTest {
     }
 
     @Test
-    public void testRestore() throws IOException {
+    public void testRestore() throws IOException, TimeoutException {
 
         ISlizaaDatabaseConfiguration databaseConfiguration = new SlizaaDatabaseConfiguration(
                 "test",
@@ -50,6 +53,9 @@ public class SlizaaDatabase_Configured_Test extends AbstractSlizaaDatabaseTest {
         Assertions.assertConfigured(graphDatabase);
 
         graphDatabase.parse(true);
+        Assertions.assertParsing(graphDatabase);
+
+        graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
         Assertions.assertRunning(graphDatabase);
     }
 }

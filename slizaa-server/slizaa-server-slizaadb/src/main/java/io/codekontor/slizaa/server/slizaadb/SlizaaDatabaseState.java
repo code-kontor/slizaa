@@ -18,5 +18,13 @@
 package io.codekontor.slizaa.server.slizaadb;
 
 public enum SlizaaDatabaseState {
-  INITIAL, CONFIGURED, PARSING, RUNNING, NOT_RUNNING, TERMINATED;
+  INITIAL,
+  CONFIGURED,
+  PARSING,
+  NOT_RUNNING,
+  STARTING,
+  RUNNING,
+  CREATING_HIERARCHICAL_GRAPH,
+  STOPPING,
+  TERMINATED;
 }

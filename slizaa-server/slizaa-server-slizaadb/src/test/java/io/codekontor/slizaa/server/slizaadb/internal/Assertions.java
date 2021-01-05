@@ -17,9 +17,12 @@
  */
 package io.codekontor.slizaa.server.slizaadb.internal;
 
+import io.codekontor.slizaa.server.slizaadb.AbstractSlizaaDatabaseTest;
 import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import org.junit.Assert;
+
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,7 +69,7 @@ public class Assertions {
      *
      * @param graphDatabase
      */
-    public static void assertRunning(ISlizaaDatabase graphDatabase) {
+    public static void assertRunning(ISlizaaDatabase graphDatabase) throws TimeoutException {
 
         assertThat(graphDatabase).isNotNull();
 
@@ -77,6 +80,7 @@ public class Assertions {
         assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasBoltClient()).isTrue();
 
         graphDatabase.newHierarchicalGraph("hg01");
+        graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, AbstractSlizaaDatabaseTest.TIMEOUT);
         graphDatabase.removeHierarchicalGraph("hg01");
 
         Assertions.assertIllegalStateException(() -> graphDatabase.start());
@@ -103,7 +107,20 @@ public class Assertions {
         Assertions.assertIllegalStateException(() -> graphDatabase.removeHierarchicalGraph("hg01"));
     }
 
+    public static void assertParsing(ISlizaaDatabase graphDatabase) {
+        assertThat(graphDatabase).isNotNull();
+        assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.PARSING);
+    }
 
+    public static void assertStarting(ISlizaaDatabase graphDatabase) {
+        assertThat(graphDatabase).isNotNull();
+        assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.STARTING);
+    }
+
+    public static void assertStopping(ISlizaaDatabase graphDatabase) {
+        assertThat(graphDatabase).isNotNull();
+        assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.STOPPING);
+    }
 
     static void assertIllegalStateException(Assertions.Action action) {
 
@@ -117,7 +134,6 @@ public class Assertions {
         }
         Assert.fail();
     }
-
 
     @FunctionalInterface
     interface Action {

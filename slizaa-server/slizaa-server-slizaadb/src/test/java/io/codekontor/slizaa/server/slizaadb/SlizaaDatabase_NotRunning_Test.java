@@ -18,36 +18,49 @@
 package io.codekontor.slizaa.server.slizaadb;
 
 import io.codekontor.slizaa.server.slizaadb.internal.Assertions;
+import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SlizaaDatabase_NotRunning_Test extends AbstractSlizaaDatabaseTest {
 
     @Test
-    public void testParseWithoutStart() throws IOException {
+    public void testParseWithoutStart() throws IOException, TimeoutException {
 
         ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
         assertThat(graphDatabase).isNotNull();
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
         graphDatabase.parse(false);
+        Assertions.assertParsing(graphDatabase);
 
+        graphDatabase.awaitState(SlizaaDatabaseState.NOT_RUNNING, 5000);
         Assertions.assertNotRunning(graphDatabase);
     }
 
     @Test
-    public void testStop() throws IOException {
+    public void testStop() throws IOException, TimeoutException {
 
         ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
         assertThat(graphDatabase).isNotNull();
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
         graphDatabase.parse(true);
+
+        Assertions.assertParsing(graphDatabase);
+        Awaitility.await().until(() -> SlizaaDatabaseState.RUNNING.equals(graphDatabase.getState()));
+        Assertions.assertRunning(graphDatabase);
+
+
         graphDatabase.stop();
 
+        Assertions.assertStopping(graphDatabase);
+        graphDatabase.awaitState(SlizaaDatabaseState.NOT_RUNNING, 5000);
         Assertions.assertNotRunning(graphDatabase);
     }
 

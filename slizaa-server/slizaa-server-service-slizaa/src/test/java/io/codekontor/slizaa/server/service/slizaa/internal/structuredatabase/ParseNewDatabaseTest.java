@@ -20,8 +20,10 @@ package io.codekontor.slizaa.server.service.slizaa.internal.structuredatabase;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,51 +52,50 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
   }
 
   @Test
-  public void parseWithStart() throws IOException {
+  public void parseWithStart() throws IOException, TimeoutException {
 
     // create a new database and parse with start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
     structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
-    structureDatabase.parse(true);
 
-    //
-    assertThat(structureDatabase.isRunning()).isTrue();
+    structureDatabase.parse(true);
+    structureDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
   }
 
   @Test
-  public void parseWithoutStart() throws IOException {
+  public void parseWithoutStart() throws IOException, TimeoutException {
 
     // create a new database and parse without start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
     structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
+
     structureDatabase.parse(false);
-
-    //
-    assertThat(structureDatabase.isRunning()).isFalse();
+    structureDatabase.awaitState(SlizaaDatabaseState.NOT_RUNNING, 5000);
   }
 
   @Test
-  public void parseWithStartAndStop() throws IOException {
+  public void parseWithStartAndStop() throws IOException, TimeoutException {
 
     // create a new database and parse without start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
     structureDatabase.setContentDefinitionProvider(
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
+
     structureDatabase.parse(true);
-    assertThat(structureDatabase.isRunning()).isTrue();
+    structureDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
 
     //
     structureDatabase.stop();
-    assertThat(structureDatabase.isRunning()).isFalse();
+    structureDatabase.awaitState(SlizaaDatabaseState.NOT_RUNNING, 5000);
   }
 
   @Test
-  public void parseWithStartAndStopAndStart() throws IOException {
+  public void parseWithStartAndStopAndStart() throws IOException, TimeoutException {
 
     // create a new database and parse without start
     structureDatabase = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
@@ -102,6 +103,7 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
         "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
     structureDatabase.parse(true);
+    structureDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
     assertThat(structureDatabase.isRunning()).isTrue();
 
     //

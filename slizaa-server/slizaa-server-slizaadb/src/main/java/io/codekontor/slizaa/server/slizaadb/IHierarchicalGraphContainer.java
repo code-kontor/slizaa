@@ -35,9 +35,8 @@ public interface IHierarchicalGraphContainer {
 	/**
 	 *
 	 * @param identifier
-	 * @return
-	 */
-	IHierarchicalGraph newHierarchicalGraph(String identifier);
+     */
+	void newHierarchicalGraph(String identifier);
 
 	/**
 	 *

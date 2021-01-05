@@ -18,6 +18,7 @@
 package io.codekontor.slizaa.server.slizaadb;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.CustomFactoryStandaloneSupport;
+import org.awaitility.Awaitility;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
@@ -27,6 +28,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
 @Import(SlizaaDatabaseTestConfiguration.class)
@@ -34,7 +36,10 @@ public abstract class AbstractSlizaaDatabaseTest {
 
     {
         CustomFactoryStandaloneSupport.registerCustomHierarchicalgraphFactory();
+        Awaitility.setDefaultPollDelay(200, TimeUnit.MILLISECONDS);
     }
+
+    public static final long TIMEOUT = 5000;
 
     @Autowired
     protected ISlizaaDatabaseFactory graphDatabaseFactory;

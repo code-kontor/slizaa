@@ -19,6 +19,7 @@ package io.codekontor.slizaa.server.service.slizaa.internal.hierarchicalgraph;
 
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -33,6 +34,7 @@ import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 @Ignore("DEPENDENCY ON EXTENSION!")
 public class HierarchicalGraphTest extends AbstractSlizaaServiceTest {
@@ -72,10 +74,12 @@ public class HierarchicalGraphTest extends AbstractSlizaaServiceTest {
   }
 
   @Test
-  public void hierarchicalGraphTest() {
+  public void hierarchicalGraphTest() throws TimeoutException {
 
-    IHierarchicalGraph hierarchicalGraph = _structureDatabase.newHierarchicalGraph("HG");
+    _structureDatabase.newHierarchicalGraph("HG");
+    _structureDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
 
+    IHierarchicalGraph hierarchicalGraph = _structureDatabase.getHierarchicalGraph("HG");
     HGRootNode rootNode = hierarchicalGraph.getRootNode();
 
     ILabelDefinitionProvider labelDefinitionProvider = rootNode.getExtension(ILabelDefinitionProvider.class);

@@ -19,16 +19,23 @@ package io.codekontor.slizaa.server.slizaadb.internal;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
-import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
+import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseEnvironment;
-import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.statemachine.listener.StateMachineListenerAdapter;
+import org.springframework.statemachine.state.State;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,10 +45,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class SlizaaDatabaseImpl implements ISlizaaDatabase {
 
-    public static final String START_DATABASE_AFTER_PARSING = "START_DATABASE_AFTER_PARSING";
-
-    public static final String CONTENT_DEFINITION_PROVIDER = "CONTENT_DEFINITION_PROVIDER";
-
     /* the state machine */
     private final StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> _stateMachine;
 
@@ -50,6 +53,9 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
 
     /* the database environments */
     private final ISlizaaDatabaseEnvironment _graphDatabaseEnvironment;
+
+    private final Lock _lock = new ReentrantLock();
+    private final Condition _stateCondition = _lock.newCondition();
 
     /**
      * @param stateMachine
@@ -64,6 +70,17 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
         this._graphDatabaseEnvironment = checkNotNull(graphDatabaseEnvironment);
 
         this._stateMachineContext.setGraphDatabase(this);
+        this._stateMachine.addStateListener(new StateMachineListenerAdapter<SlizaaDatabaseState, SlizaaDatabaseTrigger>() {
+            @Override
+            public void stateChanged(State from, State to) {
+                _lock.lock();
+                try {
+                    _stateCondition.signalAll(); // releases lock and waits until doSomethingElse is called
+                } finally {
+                    _lock.unlock();
+                }
+            }
+        });
     }
 
     @Override
@@ -87,9 +104,9 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
 
         //
         trigger(MessageBuilder
-                    .withPayload(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
-                    .setHeader(CONTENT_DEFINITION_PROVIDER, contentDefinitionProvider)
-                    .build());
+                .withPayload(SlizaaDatabaseTrigger.SET_CONTENT_DEFINITION)
+                .setHeader(SlizaaDatabaseStateMachine.TRIGGER_PARAM, new SlizaaDatabaseStateMachine.TriggerParameter_SetContentDefinition(contentDefinitionProvider))
+                .build());
     }
 
     /**
@@ -109,10 +126,16 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
     }
 
     @Override
-    public IHierarchicalGraph newHierarchicalGraph(String identifier) {
-        IHierarchicalGraph result = _stateMachineContext.createHierarchicalGraph(identifier);
+    public void newHierarchicalGraph(String identifier) {
+
+        //
+        trigger(MessageBuilder
+                .withPayload(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH)
+                .setHeader(SlizaaDatabaseStateMachine.TRIGGER_PARAM, new SlizaaDatabaseStateMachine.TriggerParameter_CreateHierarchicalGraph(identifier))
+                .build());
+
+        // IHierarchicalGraph result = _stateMachineContext.createHierarchicalGraph(identifier);
         _stateMachineContext.storeConfiguration();
-        return result;
     }
 
     @Override
@@ -133,8 +156,9 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
     @Override
     public void parse(boolean startDatabase) throws IOException {
         trigger(MessageBuilder
-                    .withPayload(SlizaaDatabaseTrigger.PARSE)
-                    .setHeader(START_DATABASE_AFTER_PARSING, startDatabase).build());
+                .withPayload(SlizaaDatabaseTrigger.PARSE)
+                .setHeader(SlizaaDatabaseStateMachine.TRIGGER_PARAM, new SlizaaDatabaseStateMachine.TriggerParameter_Parse(startDatabase))
+                .build());
     }
 
     @Override
@@ -171,8 +195,32 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
     public List<GraphDatabaseAction> getAvailableActions() {
         return _stateMachine.getTransitions().stream()
                 .filter(transition -> transition.getSource().equals(_stateMachine.getState()))
-                .map(transition -> transition.getTrigger()).filter(trigger -> trigger != null)
-                .map(trigger -> trigger.getEvent().getAction()).filter(action -> action != null).collect(Collectors.toList());
+                .map(transition -> transition.getTrigger())
+                .filter(trigger -> trigger != null)
+                .map(trigger -> trigger.getEvent().getAction())
+                .filter(action -> action != null)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void awaitState(final SlizaaDatabaseState databaseState, final long timeToWait) throws TimeoutException {
+        checkNotNull(databaseState);
+
+        boolean timedOut = false;
+        _lock.lock();
+        try {
+            while (!databaseState.equals(_stateMachine.getState().getId())) {
+                if (timedOut) {
+                    throw new TimeoutException();
+                }
+                timedOut = !_stateCondition.await(timeToWait, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException exception) {
+            throw new TimeoutException();
+        } finally {
+            _lock.unlock();
+        }
     }
 
     SlizaaDatabaseStateMachineContext stateMachineContext() {

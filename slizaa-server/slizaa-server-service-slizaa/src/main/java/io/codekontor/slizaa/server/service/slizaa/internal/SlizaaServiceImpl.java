@@ -22,6 +22,7 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingSe
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseFactory;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import io.codekontor.slizaa.server.slizaadb.SlizaaSocketUtils;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
@@ -56,6 +57,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Component
 public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallback {
+
+    private static final long TIMEOUT = 30 * 1000;
 
     {
         io.codekontor.slizaa.hierarchicalgraph.core.model.CustomFactoryStandaloneSupport
@@ -114,6 +117,10 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
                     ISlizaaDatabase graphDatabase = _structureDatabases.computeIfAbsent(dbConfig.getIdentifier(), id -> _graphDatabaseFactory
                             .newInstance(dbConfig, _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
+
+                    if (SlizaaDatabaseState.STARTING.equals(graphDatabase.getState())) {
+                        graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
+                    }
 
                     //
                     for (GraphDatabaseHierarchicalGraphConfiguration hierarchicalGraphCfg : dbConfig.getHierarchicalGraphs()) {

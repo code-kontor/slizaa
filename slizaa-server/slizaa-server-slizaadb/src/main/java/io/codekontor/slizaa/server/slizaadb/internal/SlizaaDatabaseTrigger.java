@@ -21,15 +21,27 @@ import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase.GraphDatabaseAction;
 
 public enum SlizaaDatabaseTrigger {
 
-  SET_CONTENT_DEFINITION(GraphDatabaseAction.SET_CONTENT_DEFINITION), PARSE(
-      GraphDatabaseAction.PARSE), PARSING_COMPLETED(null), START(
-          GraphDatabaseAction.START), STOP(GraphDatabaseAction.STOP), TERMINATE(GraphDatabaseAction.DELETE);
+  SET_CONTENT_DEFINITION(GraphDatabaseAction.SET_CONTENT_DEFINITION),
+  PARSE(GraphDatabaseAction.PARSE),
+  PARSE_FAILED(null),
+  PARSE_WITHOUT_START_SUCCEEDED(null),
+  PARSE_WITH_START_SUCCEEDED(null),
+  START(GraphDatabaseAction.START),
+  START_SUCCEEDED(null),
+  START_FAILED(null),
+  STOP(GraphDatabaseAction.STOP),
+  STOP_SUCCEEDED(null),
+  STOP_FAILED(null),
+  CREATE_HIERARCHICAL_GRAPH(GraphDatabaseAction.CREATE_HIERARCHICAL_GRAPH),
+  CREATE_HIERARCHICAL_GRAPH_SUCCEEDED(null),
+  CREATE_HIERARCHICAL_GRAPH_FAILED(null),
+  TERMINATE(GraphDatabaseAction.DELETE);
 
   public GraphDatabaseAction getAction() {
     return _action;
   }
 
-  private SlizaaDatabaseTrigger(GraphDatabaseAction action) {
+  SlizaaDatabaseTrigger(GraphDatabaseAction action) {
     _action = action;
   }
 

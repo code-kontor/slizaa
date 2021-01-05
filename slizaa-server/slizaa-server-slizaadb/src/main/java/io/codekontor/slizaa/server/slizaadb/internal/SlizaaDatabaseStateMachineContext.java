@@ -23,9 +23,9 @@ import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporter;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
-import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
-import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseEnvironment;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseEnvironment;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import io.codekontor.slizaa.server.slizaadb.SlizaaSocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -52,6 +53,8 @@ public class SlizaaDatabaseStateMachineContext {
     /* the state machine */
     private final StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> _stateMachine;
 
+    private final ExecutorService _executorService;
+
     private SlizaaDatabaseImpl _graphDatabase;
 
     private String _identifier;
@@ -59,8 +62,6 @@ public class SlizaaDatabaseStateMachineContext {
     private File _databaseDirectory;
 
     private int _port = -1;
-
-
 
     private IContentDefinitionProvider<?> _contentDefinitionProvider;
 
@@ -75,6 +76,7 @@ public class SlizaaDatabaseStateMachineContext {
             File databaseDirectory,
             int port,
             ISlizaaDatabaseEnvironment graphDatabaseEnvironment,
+            ExecutorService executorService,
             StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> stateMachine) {
 
         this._identifier = checkNotNull(identifier);
@@ -82,6 +84,7 @@ public class SlizaaDatabaseStateMachineContext {
         this._port = SlizaaSocketUtils.available(port) ? port : SlizaaSocketUtils.findAvailableTcpPort();
         this._graphDatabaseEnvironment = checkNotNull(graphDatabaseEnvironment);
         this._stateMachine = checkNotNull(stateMachine);
+        this._executorService = checkNotNull(executorService);
 
         _hierarchicalGraphs = new HashMap<>();
     }
@@ -172,36 +175,90 @@ public class SlizaaDatabaseStateMachineContext {
 
     public void start() {
 
-        recomputePort();
+        // execute async
+        _executorService.submit(() -> {
+            try {
 
-        _graphDb = executeWithCtxClassLoader(() -> {
-            return _graphDatabaseEnvironment.createGraphDb(getPort(), getDatabaseDirectory());
+                // start the database
+                recomputePort();
+                _graphDb = executeWithCtxClassLoader(() -> {
+                    return _graphDatabaseEnvironment.createGraphDb(getPort(), getDatabaseDirectory());
+                });
+
+                // connect the internal client
+                connectBoltClient();
+
+                // initialize the hierarchical graphs
+                _hierarchicalGraphs.values().forEach(hierarchicalGraph -> hierarchicalGraph.initialize(true));
+
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.START_SUCCEEDED);
+
+            } catch (Exception exception) {
+                // TODO LOG
+                exception.printStackTrace();
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.START_FAILED);
+            }
+
+            return null;
         });
-
-        connectBoltClient();
-
-        _hierarchicalGraphs.values().forEach(hierarchicalGraph -> hierarchicalGraph.initialize(true));
     }
 
     public void stop() {
 
-        _hierarchicalGraphs.values().forEach(hierarchicalGraph -> hierarchicalGraph.dispose());
+        // execute async
+        _executorService.submit(() -> {
+            try {
 
-        if (this._boltClient != null) {
-            this._boltClient.disconnect();
-            this._boltClient = null;
-        }
+                _hierarchicalGraphs.values().forEach(hierarchicalGraph -> hierarchicalGraph.dispose());
+                if (this._boltClient != null) {
+                    this._boltClient.disconnect();
+                    this._boltClient = null;
+                }
+                if (this._graphDb != null) {
+                    this._graphDb.shutdown();
+                    this._graphDb = null;
+                }
 
-        if (this._graphDb != null) {
-            this._graphDb.shutdown();
-            this._graphDb = null;
-        }
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.STOP_SUCCEEDED);
+
+            } catch (Exception exception) {
+                // TODO LOG
+                exception.printStackTrace();
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.STOP_FAILED);
+            }
+
+            return null;
+        });
+    }
+
+    public void parse(boolean startDatabase) {
+
+        _executorService.submit(() -> {
+
+            try {
+
+                boolean isRunning = _parse(startDatabase);
+
+                if (isRunning) {
+                    _stateMachine.sendEvent(SlizaaDatabaseTrigger.PARSE_WITH_START_SUCCEEDED);
+                } else {
+                    _stateMachine.sendEvent(SlizaaDatabaseTrigger.PARSE_WITHOUT_START_SUCCEEDED);
+                }
+
+            } catch (Exception exception) {
+                // TODO LOG
+                exception.printStackTrace();
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.PARSE_FAILED);
+            }
+
+            return null;
+        });
     }
 
     /**
      * @throws Exception
      */
-    public boolean parse(boolean startDatabase) {
+    private boolean _parse(boolean startDatabase) {
 
         // delete all contained files
         clearDatabaseDirectory();
@@ -254,30 +311,33 @@ public class SlizaaDatabaseStateMachineContext {
      * @param identifier
      * @return
      */
-    public IHierarchicalGraph createHierarchicalGraph(String identifier) {
+    public void createHierarchicalGraph(String identifier) {
+        _executorService.submit(() -> {
 
-        checkState(SlizaaDatabaseState.RUNNING.equals(this._stateMachine.getState().getId()), "Database must be RUNNING to create new hierarchical graph. Current state: %s.",
-                this._stateMachine.getState().getId());
+            try {
 
-        // TODO: move to start/stop
-        connectBoltClient();
+                // TODO: move to start/stop
+                connectBoltClient();
 
-        //
-        HierarchicalGraph hierarchicalGraph = new HierarchicalGraph(new HierarchicalGraphDefinition(identifier),
-                getGraphDatabase(), (def) -> {
+                //
+                HierarchicalGraph hierarchicalGraph = new HierarchicalGraph(new HierarchicalGraphDefinition(identifier),
+                        getGraphDatabase(), (def) -> _graphDatabaseEnvironment.mapHierarchicalGraph(def, this._boltClient));
 
-            return _graphDatabaseEnvironment.mapHierarchicalGraph(def, this._boltClient);
+                hierarchicalGraph.initialize(true);
 
+                _hierarchicalGraphs.put(identifier, hierarchicalGraph);
 
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH_SUCCEEDED);
+
+            } catch (Exception exception) {
+                // TODO LOG
+                exception.printStackTrace();
+                _stateMachine.sendEvent(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH_FAILED);
+            }
+
+            return null;
         });
-
-        hierarchicalGraph.initialize(true);
-
-        _hierarchicalGraphs.put(identifier, hierarchicalGraph);
-
-        return hierarchicalGraph;
     }
-
 
 
     void setGraphDatabase(SlizaaDatabaseImpl structureDatabase) {
@@ -309,7 +369,7 @@ public class SlizaaDatabaseStateMachineContext {
 
             // execute the action
             try {
-                T result =  action.call();
+                T result = action.call();
                 return result;
             } catch (Exception e) {
                 e.printStackTrace();

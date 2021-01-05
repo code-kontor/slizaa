@@ -22,6 +22,8 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactor
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporter;
 import io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -51,8 +53,11 @@ public class SlizaaDatabaseTestConfiguration {
         // IGraphDatabaseEnvironment.createModelImporter
         when(graphDatabaseEnvironment.createModelImporter(any(), any())).thenReturn(modelImporter);
 
-        // IGraphDatabaseEnvironment.createBoltClient
-        when(graphDatabaseEnvironment.createGraphDb(anyInt(), any())).thenReturn(graphDb);
+        // IGraphDatabaseEnvironment.createGraphDb
+        when(graphDatabaseEnvironment.createGraphDb(anyInt(), any())).thenAnswer(inv -> {
+            sleep();
+            return graphDb;
+        });
 
         // IGraphDatabaseEnvironment.createBoltClient
         when(graphDatabaseEnvironment.createBoltClient(any())).thenReturn(boltClient);
@@ -68,7 +73,15 @@ public class SlizaaDatabaseTestConfiguration {
 
     @Bean
     public IGraphDb graphDb() {
-       return mock(IGraphDb.class);
+
+        IGraphDb graphDb = mock(IGraphDb.class);
+
+        Mockito.doAnswer(inv -> {
+            sleep();
+            return null;
+        }).when(graphDb).shutdown();
+
+        return graphDb;
     }
 
     @Bean
@@ -88,22 +101,22 @@ public class SlizaaDatabaseTestConfiguration {
 
         // IModelImporter.parse
         when(modelImporter.parse(any())).thenAnswer(inv -> {
-            sleep(5000);
+            sleep();
             return Collections.emptyList();
         });
 
         // IModelImporter.parse
         when(modelImporter.parse(any(), any())).thenAnswer(inv -> {
-            sleep(5000);
+            sleep();
             return Collections.emptyList();
         });
 
         return modelImporter;
     }
 
-    private static void sleep(long millis) {
+    private static void sleep() {
         try {
-            Thread.sleep(millis);
+            Thread.sleep(1500);
         } catch (Exception e) {
             // ignore
         }

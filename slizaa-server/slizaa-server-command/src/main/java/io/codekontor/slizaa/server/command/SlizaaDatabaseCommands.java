@@ -18,12 +18,14 @@
 package io.codekontor.slizaa.server.command;
 
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 @ShellComponent
 @ShellCommandGroup("Slizaa Database Commands")
@@ -102,16 +104,12 @@ public class SlizaaDatabaseCommands extends AbstractGraphDatabaseCommandComponen
             return cannotExecuteCommand(String.format("The specified database '%s' does not exist.\n", databaseIdentifier));
         }
 
-        // TODO:
-        // slizaaService().getContentDefinitionProviderFactories();
-
         //
-        try {
+        execute(() -> {
             graphDatabase.parse(true);
-        } catch (IOException e) {
-            //TODO
-            e.printStackTrace();
-        }
+            graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
+            return null;
+        });
 
         // return the result
         return dumpGraphDatabases();
@@ -133,7 +131,11 @@ public class SlizaaDatabaseCommands extends AbstractGraphDatabaseCommandComponen
         }
 
         //
-        graphDatabase.start();
+        execute(() -> {
+            graphDatabase.start();
+            graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
+            return null;
+        });
 
         // return the result
         return dumpGraphDatabases();
@@ -155,7 +157,11 @@ public class SlizaaDatabaseCommands extends AbstractGraphDatabaseCommandComponen
         }
 
         //
-        graphDatabase.stop();
+        execute(() -> {
+            graphDatabase.stop();
+            graphDatabase.awaitState(SlizaaDatabaseState.NOT_RUNNING, TIMEOUT);
+            return null;
+        });
 
         // return the result
         return dumpGraphDatabases();

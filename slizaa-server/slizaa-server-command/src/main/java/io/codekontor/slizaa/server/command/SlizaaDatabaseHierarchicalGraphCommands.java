@@ -19,10 +19,14 @@ package io.codekontor.slizaa.server.command;
 
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.springframework.shell.standard.ShellCommandGroup;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 @ShellComponent
 @ShellCommandGroup("Slizaa Database Commands - Hierarchical Graphs")
@@ -52,6 +56,14 @@ public class SlizaaDatabaseHierarchicalGraphCommands extends AbstractGraphDataba
         // new hierarchical graph
         graphDatabase.newHierarchicalGraph(hierarchicalGraphIdentifier);
 
+        //
+        try {
+            graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
+        } catch (TimeoutException e ) {
+            //TODO
+            e.printStackTrace();
+        }
+
         // return the result
         return dumpGraphDatabases();
     }
@@ -79,6 +91,14 @@ public class SlizaaDatabaseHierarchicalGraphCommands extends AbstractGraphDataba
 
         // remove hierarchical graph
         graphDatabase.removeHierarchicalGraph(hierarchicalGraphIdentifier);
+
+        //
+        try {
+            graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
+        } catch (TimeoutException e ) {
+            //TODO
+            e.printStackTrace();
+        }
 
         // return the result
         return dumpGraphDatabases();
