@@ -21,14 +21,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import graphql.kickstart.tools.GraphQLResolver;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.graphql.hierarchicalgraph.HierarchicalGraph;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.coxautodev.graphql.tools.GraphQLResolver;
 
 /**
  * 

@@ -17,9 +17,8 @@
  */
 package io.codekontor.slizaa.server.graphql.graphdatabase;
 
+import graphql.kickstart.tools.GraphQLMutationResolver;
 import org.springframework.stereotype.Component;
-
-import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 
 import graphql.schema.DataFetchingEnvironment;
 

@@ -25,8 +25,14 @@ import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModul
 import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
 import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
 import io.codekontor.slizaa.service.admin.EnableAdminServiceModule;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
@@ -41,6 +47,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableSelectionServiceModule
 @EnableAdminServiceModule
 public class SlizaaServerConfiguration {
+
+    @Value("${graphql.url:/graphql}")
+    private String graphqlUrl;
+
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        source.registerCorsConfiguration(graphqlUrl, config);
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        bean.setOrder(0);
+        return bean;
+    }
 
     /**
      * @param args

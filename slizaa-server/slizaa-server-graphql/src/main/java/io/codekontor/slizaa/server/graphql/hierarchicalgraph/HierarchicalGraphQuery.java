@@ -17,11 +17,10 @@
  */
 package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
+import graphql.kickstart.tools.GraphQLQueryResolver;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 
 /**
  *

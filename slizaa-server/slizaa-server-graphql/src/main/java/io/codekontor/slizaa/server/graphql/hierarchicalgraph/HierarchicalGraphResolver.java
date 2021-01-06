@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import graphql.kickstart.tools.GraphQLResolver;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
@@ -31,8 +32,6 @@ import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelect
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.coxautodev.graphql.tools.GraphQLResolver;
 
 @Component
 public class HierarchicalGraphResolver implements GraphQLResolver<HierarchicalGraph> {
