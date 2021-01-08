@@ -17,15 +17,18 @@
  */
 package io.codekontor.slizaa.core.boltclient;
 
+
+import io.codekontor.slizaa.core.boltclient.internal.StatementResultToJsonConverter;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.types.Node;
-import org.neo4j.driver.v1.types.Relationship;
+import java.util.stream.Stream;
 
 /**
  * <p>
@@ -35,193 +38,206 @@ import org.neo4j.driver.v1.types.Relationship;
  */
 public interface IBoltClient {
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  String getName();
+    static Function<Result, String> jsonMappingFunction() {
+        return result -> StatementResultToJsonConverter.convertToJson(result);
+    }
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  String getDescription();
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    String getName();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  String getUri();
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    String getDescription();
 
-  /**
-   * <p>
-   * </p>
-   *
-   */
-  void connect();
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    String getUri();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  boolean isConnected();
+    /**
+     * <p>
+     * </p>
+     */
+    void connect();
 
-  /**
-   * <p>
-   * </p>
-   *
-   */
-  void disconnect();
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    boolean isConnected();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  List<String> getNodeLabels();
+    /**
+     * <p>
+     * </p>
+     */
+    void disconnect();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  List<String> getPropertyKeys();
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    List<String> getNodeLabels();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  List<String> getRelationshipTypes();
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    List<String> getPropertyKeys();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param nodeId
-   * @return
-   */
-  Node getNode(long nodeId);
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    List<String> getRelationshipTypes();
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param nodeId
-   * @return
-   */
-  Relationship getRelationship(long nodeId);
+    /**
+     *
+     * @param nodeId
+     * @return
+     */
+    String getNode(long nodeId);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @return
-   */
-  StatementResult syncExecCypherQuery(String cypherQuery);
+    /**
+     *
+     * @param nodeId
+     * @param mappingFunction
+     * @param <T>
+     * @return
+     */
+    <T> T getNode(long nodeId, Function<Node, T> mappingFunction);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param params
-   * @return
-   */
-  StatementResult syncExecCypherQuery(String cypherQuery, Map<String, Object> params);
+    void getNodeAndConsume(long nodeId, Consumer<Node> consumer);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @return
-   */
-  Future<StatementResult> asyncExecCypherQuery(String cypherQuery);
+    String getRelationship(long relationshipId);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param params
-   * @return
-   */
-  Future<StatementResult> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params);
+    <T> T getRelationship(long relationshipId, Function<Relationship, T> consumer);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param consumer
-   * @return
-   */
-  Future<Void> asyncExecCypherQuery(String cypherQuery, Consumer<StatementResult> consumer);
+    void getRelationshipAndConsume(long relationshipId, Consumer<Relationship> consumer);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param params
-   * @param consumer
-   * @return
-   */
-  Future<Void> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params, Consumer<StatementResult> consumer);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param consumer
-   * @return
-   */
-  Future<Void> asyncExecCypherQuery(String cypherQuery, IQueryResultConsumer consumer);
+    String syncExecCypherQuery(String cypherQuery);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param params
-   * @param consumer
-   * @return
-   */
-  Future<Void> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params, IQueryResultConsumer consumer);
+    /**
+     *
+     * @param cypherQuery
+     * @param mappingFunction
+     * @param <T>
+     * @return
+     */
+    <T> T syncExecCypherQuery(String cypherQuery, Function<Result, T> mappingFunction);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param consumer
-   * @return
-   */
-  <T> Future<T> asyncExecCypherQueryAndTransformResult(String cypherQuery, Function<StatementResult, T> consumer);
+    String syncExecCypherQuery(String cypherQuery, Map<String, Object> params);
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param cypherQuery
-   * @param params
-   * @param consumer
-   * @return
-   */
-  <T> Future<T> asyncExecCypherQueryAndTransformResult(String cypherQuery, Map<String, Object> params,
-      Function<StatementResult, T> consumer);
+    /**
+     *
+     * @param cypherQuery
+     * @param params
+     * @param mappingFunction
+     * @param <T>
+     * @return
+     */
+    <T> T syncExecCypherQuery(String cypherQuery, Map<String, Object> params, Function<Result, T> mappingFunction);
+
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @param consumer
+     * @return
+     */
+    void syncExecAndConsume(String cypherQuery, Consumer<Result> consumer);
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @param params
+     * @param consumer
+     * @return
+     */
+    void syncExecAndConsume(String cypherQuery, Map<String, Object> params, Consumer<Result> consumer);
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @return
+     */
+    Future<String> asyncExecCypherQuery(String cypherQuery);
+
+
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @return
+     */
+    <T> Future<T> asyncExecCypherQuery(String cypherQuery, Function<Result, T> mappingFunction);
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @param params
+     * @return
+     */
+    Future<String> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params);
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @param params
+     * @return
+     */
+    <T> Future<T> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params, Function<Result, T> mappingFunction);
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @param consumer
+     * @return
+     */
+    Future<Void> asyncExecAndConsume(String cypherQuery, Consumer<Result> consumer);
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param cypherQuery
+     * @param params
+     * @param consumer
+     * @return
+     */
+    Future<Void> asyncExecAndConsume(String cypherQuery, Map<String, Object> params, Consumer<Result> consumer);
 }

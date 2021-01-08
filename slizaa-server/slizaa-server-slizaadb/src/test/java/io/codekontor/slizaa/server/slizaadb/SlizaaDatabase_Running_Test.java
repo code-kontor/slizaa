@@ -45,7 +45,7 @@ public class SlizaaDatabase_Running_Test extends AbstractSlizaaDatabaseTest {
         graphDatabase.start();
 
         Assertions.assertStarting(graphDatabase);
-        Awaitility.await().until(() -> SlizaaDatabaseState.RUNNING.equals(graphDatabase.getState()));
+        graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
         Assertions.assertRunning(graphDatabase);
     }
 
@@ -77,6 +77,7 @@ public class SlizaaDatabase_Running_Test extends AbstractSlizaaDatabaseTest {
         ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance(databaseConfiguration, getDatabaseRootDirectory());
 
         Assertions.assertStarting(graphDatabase);
+
         graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
         Assertions.assertRunning(graphDatabase);
     }

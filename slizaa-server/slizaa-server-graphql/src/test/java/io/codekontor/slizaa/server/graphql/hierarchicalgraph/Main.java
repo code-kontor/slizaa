@@ -1,5 +1,5 @@
 /**
- * slizaa-core-boltclient - Slizaa Static Software Analysis Tools
+ * slizaa-server-graphql - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,29 +15,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.core.boltclient;
+package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
-/**
- * <p>
- * </p>
- *
- * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
- */
-public interface IBoltClientListener {
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @param adapter
-   */
-  void boltClientAdded(IBoltClient adapter);
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @param adapter
-   */
-  void boltClientRemoved(IBoltClient adapter);
+public class Main {
+    public static void main(String[] args) throws ClassNotFoundException {
+        System.out.println(Main.class.getClassLoader().loadClass("org.eclipse.jetty.util.ssl.SslContextFactory"));
+    }
 }

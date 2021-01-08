@@ -22,12 +22,12 @@ package io.codekontor.slizaa.core.boltclient.internal.gson;
 
 import java.lang.reflect.Type;
 
-import org.neo4j.driver.v1.types.Node;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.neo4j.driver.types.Node;
 
 /**
  * <p>

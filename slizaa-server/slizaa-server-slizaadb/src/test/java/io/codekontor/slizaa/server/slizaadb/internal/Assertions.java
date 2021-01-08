@@ -74,7 +74,7 @@ public class Assertions {
         assertThat(graphDatabase).isNotNull();
 
         assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.RUNNING);
-        assertThat(graphDatabase.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.DELETE, ISlizaaDatabase.GraphDatabaseAction.STOP);
+        assertThat(graphDatabase.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.DELETE, ISlizaaDatabase.GraphDatabaseAction.CREATE_HIERARCHICAL_GRAPH, ISlizaaDatabase.GraphDatabaseAction.STOP);
 
         assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasGraphDb()).isTrue();
         assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasBoltClient()).isTrue();

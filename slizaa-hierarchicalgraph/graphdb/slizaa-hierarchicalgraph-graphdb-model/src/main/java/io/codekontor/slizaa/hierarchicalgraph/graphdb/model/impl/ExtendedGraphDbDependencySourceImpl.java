@@ -23,12 +23,12 @@ import java.util.Optional;
 
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.util.EcoreEMap;
-import org.neo4j.driver.v1.types.Relationship;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphPackage;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.StringToStringMapImpl;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbHierarchicalgraphPackage;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbRootNodeSource;
+import org.neo4j.driver.types.Relationship;
 
 /**
  * <p>
@@ -67,8 +67,6 @@ public class ExtendedGraphDbDependencySourceImpl extends GraphDbDependencySource
    */
   public EMap<String, String> reloadProperties() {
 
-    Relationship relationship = getBoltClient().getRelationship((long) getIdentifier());
-
     // lazy init
     if (this.properties == null) {
       this.properties = new EcoreEMap<String, String>(HierarchicalgraphPackage.Literals.STRING_TO_STRING_MAP,
@@ -79,10 +77,14 @@ public class ExtendedGraphDbDependencySourceImpl extends GraphDbDependencySource
     // clear properties first
     this.properties.clear();
 
-    // re-populate
-    relationship.asMap().entrySet().forEach((e) -> {
-      this.properties.put(e.getKey(), e.getValue().toString());
+    getBoltClient().getRelationshipAndConsume((long) getIdentifier(), relationship -> {
+      // re-populate
+      relationship.asMap().entrySet().forEach((e) -> {
+        this.properties.put(e.getKey(), e.getValue().toString());
+      });
     });
+
+
 
     // return the result
     return this.properties;

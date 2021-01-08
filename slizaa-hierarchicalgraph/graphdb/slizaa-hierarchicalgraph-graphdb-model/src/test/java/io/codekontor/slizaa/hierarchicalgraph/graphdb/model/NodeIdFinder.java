@@ -21,8 +21,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.ExecutionException;
 
-import org.neo4j.driver.v1.exceptions.NoSuchRecordException;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
+import org.neo4j.driver.exceptions.NoSuchRecordException;
 
 /**
  * <p>
@@ -38,7 +38,6 @@ public class NodeIdFinder {
    *
    * @param boltClient
    * @return
-   * @throws NoSuchRecordException
    * @throws InterruptedException
    * @throws ExecutionException
    */
@@ -53,7 +52,6 @@ public class NodeIdFinder {
    *
    * @param boltClient
    * @return
-   * @throws NoSuchRecordException
    * @throws InterruptedException
    * @throws ExecutionException
    */
@@ -68,7 +66,6 @@ public class NodeIdFinder {
    *
    * @param boltClient
    * @return
-   * @throws NoSuchRecordException
    * @throws InterruptedException
    * @throws ExecutionException
    */
@@ -88,7 +85,7 @@ public class NodeIdFinder {
   private static long requestId(IBoltClient boltClient, String cypherQuery) {
 
     try {
-      return checkNotNull(boltClient).syncExecCypherQuery(checkNotNull(cypherQuery)).single().get(0).asLong();
+      return checkNotNull(boltClient).syncExecCypherQuery(checkNotNull(cypherQuery), result -> result.single().get(0).asLong());
     } catch (NoSuchRecordException e) {
       throw new RuntimeException(e);
     }

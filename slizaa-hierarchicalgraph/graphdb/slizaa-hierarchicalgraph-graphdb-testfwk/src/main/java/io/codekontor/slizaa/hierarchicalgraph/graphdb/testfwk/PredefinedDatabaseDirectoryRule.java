@@ -21,7 +21,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import javax.imageio.IIOException;
 import java.io.*;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
@@ -32,7 +31,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 /**
  *
@@ -41,6 +39,9 @@ public class PredefinedDatabaseDirectoryRule implements TestRule {
 
   //
   private File parent;
+  
+  //
+  private File databaseDirectory;
 
   //
   private InputStream inputStream;
@@ -51,6 +52,8 @@ public class PredefinedDatabaseDirectoryRule implements TestRule {
   public PredefinedDatabaseDirectoryRule(InputStream inputStream, File parent) {
     this.inputStream = checkNotNull(inputStream);
     this.parent = checkNotNull(parent);
+    
+    databaseDirectory = new File(parent, "databases/neo4j");
   }
 
   /**
@@ -67,6 +70,17 @@ public class PredefinedDatabaseDirectoryRule implements TestRule {
   public File getParentDirectory() {
     return parent;
   }
+  
+  /**
+   * 
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  public File getDatabaseDirectory() {
+    return databaseDirectory;
+  }
 
   /**
    * @param base
@@ -80,7 +94,7 @@ public class PredefinedDatabaseDirectoryRule implements TestRule {
 
       @Override
       public void evaluate() throws Throwable {
-        unzipDatabase(parent, inputStream);
+        unzipDatabase(databaseDirectory, inputStream);
 
         base.evaluate();
 
@@ -102,30 +116,25 @@ public class PredefinedDatabaseDirectoryRule implements TestRule {
   }
 
   /**
-   * @param parentDirectory
+   * @param databaseDirectory
    * @param zippedDatabaseStream
    * @return
    */
-  private static String unzipDatabase(File parentDirectory, InputStream zippedDatabaseStream) {
+  private static void unzipDatabase(File databaseDirectory, InputStream zippedDatabaseStream) {
 
     //
-    checkNotNull(parentDirectory);
+    checkNotNull(databaseDirectory);
     checkNotNull(zippedDatabaseStream);
 
-    //
-    File realDir = new File(parentDirectory, "databases/graph.db");
-
+    
     //
     //if (!realDir.exists()) {
       try {
-        unzip(zippedDatabaseStream, realDir);
+        unzip(zippedDatabaseStream, databaseDirectory);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }
     //}
-
-    //
-    return parentDirectory.getAbsolutePath();
   }
 
   /**
@@ -182,17 +191,6 @@ public class PredefinedDatabaseDirectoryRule implements TestRule {
       ex.printStackTrace();
     }
   }
-
-//  private static File createTempFileWithDirOldWay() {
-//    try {
-//      File tempDir = new File("D:\\sssss_hurz", "PredefinedDatabaseDirectoryRule_");
-//      if (!tempDir.exists() && !tempDir.mkdirs())
-//        throw new IIOException("Failed to create temporary directory " + tempDir);
-//      return tempDir;
-//    } catch (IOException e) {
-//      throw new RuntimeException(e);
-//    }
-//  }
 
   private static File createTempDirectory() {
     try {

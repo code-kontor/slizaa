@@ -20,19 +20,14 @@ package io.codekontor.slizaa.hierarchicalgraph.graphdb.model;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.EMap;
 import org.junit.*;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.harness.junit.Neo4jRule;
-import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.GraphDatabaseSetupRule;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.PredefinedDatabaseDirectoryRule;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutionException;
 
-import static org.neo4j.graphdb.factory.GraphDatabaseSettings.boltConnector;
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.createNewNode;
 import static io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactoryFunctions.createNewRootNode;

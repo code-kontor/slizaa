@@ -17,7 +17,6 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.internal;
 
-import org.neo4j.driver.v1.types.Node;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.core.progressmonitor.IProgressMonitor;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
@@ -26,6 +25,7 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IDependencyDef
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IProxyDependencyDefinition;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbDependencySource;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbHierarchicalgraphFactory;
+import org.neo4j.driver.types.Node;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -184,11 +184,6 @@ public class GraphFactoryFunctions {
                 Function<HGProxyDependency, List<Future<List<IDependencyDefinition>>>> resolveFunction = checkNotNull(
                         proxyDependencyDefinition.getResolveFunction());
 
-//                // TODO!
-//                if (proxyDependencyDefinition.getIdRel() == 1595205l) {
-//                  System.out.println("HAE!? : " + proxyDependencyDefinition);
-//                }
-                
                 //
                 HGCoreDependency slizaaProxyDependency = createDependency(proxyDependencyDefinition.getIdStart(),
                         proxyDependencyDefinition.getIdTarget(), proxyDependencyDefinition.getIdRel(), proxyDependencyDefinition.getType(), rootElement,
@@ -197,7 +192,6 @@ public class GraphFactoryFunctions {
                 //
                 if (slizaaProxyDependency != null) {
 
-                    // TODO: Should we really use the user object here?
                     ((GraphDbDependencySource) slizaaProxyDependency.getDependencySource())
                             .setUserObject(proxyDependencyDefinition.getResolveFunction());
 
@@ -208,21 +202,18 @@ public class GraphFactoryFunctions {
                 //
                 else {
 
-                    // TODO!
-
                     //
                     IBoltClient boltClient = rootElement.getExtension(IBoltClient.class);
-                    Node startNode = boltClient.getNode(proxyDependencyDefinition.getIdStart());
-                    Node targetNode = boltClient.getNode(proxyDependencyDefinition.getIdTarget());
+                    String startNode = boltClient.getNode(proxyDependencyDefinition.getIdStart());
+                    String targetNode = boltClient.getNode(proxyDependencyDefinition.getIdTarget());
 
                     // TODO!
-
                     System.out.println(String.format(
                             "Could not create proxy Dependency (%s -[%s]-> %s)): ", proxyDependencyDefinition.getIdStart(), proxyDependencyDefinition.getType(), proxyDependencyDefinition.getIdTarget()));
                     System.out.println("- Start HGNode: " + rootElement.lookupNode(proxyDependencyDefinition.getIdStart()));
                     System.out.println("- Target HGNode: " + rootElement.lookupNode(proxyDependencyDefinition.getIdTarget()));
-                    System.out.println("- Start DBNode:" + startNode.labels() + " : " + startNode.asMap());
-                    System.out.println("- Target DBNode:" + targetNode.labels() + " : " + targetNode.asMap());
+                    System.out.println("- Start DBNode:" + startNode);
+                    System.out.println("- Target DBNode:" + targetNode);
                 }
 
             }

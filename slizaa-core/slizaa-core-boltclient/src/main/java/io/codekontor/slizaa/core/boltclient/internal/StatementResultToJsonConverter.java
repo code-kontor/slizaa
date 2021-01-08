@@ -18,14 +18,14 @@
 /**
  *
  */
-package io.codekontor.slizaa.core.boltclient;
+package io.codekontor.slizaa.core.boltclient.internal;
 
-import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.internal.gson.BoltAwareGsonFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import org.neo4j.driver.Result;
 
 /**
  * <p>
@@ -45,7 +45,7 @@ public class StatementResultToJsonConverter {
    * @param statementResult
    * @return
    */
-  public static JsonArray convertToJsonArray(StatementResult statementResult) {
+  public static JsonArray convertToJsonArray(Result statementResult) {
 
     //
     JsonArray result = new JsonArray();
@@ -67,7 +67,7 @@ public class StatementResultToJsonConverter {
    * @param statementResult
    * @return
    */
-  public static String convertToJson(StatementResult statementResult) {
+  public static String convertToJson(Result statementResult) {
 
     //
     JsonArray result = new JsonArray();
@@ -80,6 +80,10 @@ public class StatementResultToJsonConverter {
 
     //
     return _gson.toJson(result);
+  }
+
+  public static String convertElementToJson(Object element) {
+    return _gson.toJson(element);
   }
 
   /**

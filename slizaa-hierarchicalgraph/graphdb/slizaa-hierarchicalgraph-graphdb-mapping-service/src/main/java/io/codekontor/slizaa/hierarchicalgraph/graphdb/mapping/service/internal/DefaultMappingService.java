@@ -38,7 +38,6 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.IMappingProvid
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbHierarchicalgraphFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbRootNodeSource;
-import org.osgi.service.component.annotations.Component;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +53,6 @@ import static io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.int
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-@Component
 public class DefaultMappingService implements IMappingService {
   
     /**

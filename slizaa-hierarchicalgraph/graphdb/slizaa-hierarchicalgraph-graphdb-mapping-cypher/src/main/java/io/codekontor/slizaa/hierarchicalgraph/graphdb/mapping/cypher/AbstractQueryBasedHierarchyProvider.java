@@ -42,19 +42,20 @@ public abstract class AbstractQueryBasedHierarchyProvider implements IHierarchyD
 
     checkNotNull(boltClient);
 
-    // TODO: concurrent!
-
     //
     this._toplevelNodeIds = new ArrayList<>();
     for (String query : toplevelNodeIdQueries()) {
-      this._toplevelNodeIds.addAll(boltClient.asyncExecCypherQuery(query).get().list(r -> r.get(0).asLong()));
+      boltClient.syncExecAndConsume(query, result -> {
+        result.forEachRemaining(record -> this._toplevelNodeIds.add(record.get(0).asLong()));
+      });
     }
 
     //
     this._parentChildNodeIdsQueries = new ArrayList<>();
     for (String query : parentChildNodeIdsQueries()) {
-      this._parentChildNodeIdsQueries.addAll(
-          boltClient.asyncExecCypherQuery(query).get().list(r -> new Long[] { r.get(0).asLong(), r.get(1).asLong() }));
+      boltClient.syncExecAndConsume(query, result -> {
+        result.forEachRemaining(record -> this._parentChildNodeIdsQueries.add(new Long[] { record.get(0).asLong(), record.get(1).asLong() }));
+      });
     }
   }
 

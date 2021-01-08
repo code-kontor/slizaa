@@ -23,7 +23,6 @@ package io.codekontor.slizaa.core.boltclient.internal.gson;
 import java.lang.reflect.Type;
 import java.util.Base64;
 
-import org.neo4j.driver.v1.Value;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -32,6 +31,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.neo4j.driver.Value;
 
 /**
  * <p>

@@ -17,26 +17,18 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.model.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.EMap;
-import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
-import org.eclipse.emf.ecore.util.EcoreEMap;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.types.Node;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphPackage;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.StringToStringMapImpl;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbHierarchicalgraphPackage;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbRootNodeSource;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.EMap;
+import org.eclipse.emf.ecore.util.EDataTypeUniqueEList;
+import org.eclipse.emf.ecore.util.EcoreEMap;
+import org.neo4j.driver.types.Node;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * <p>
@@ -101,14 +93,10 @@ public class ExtendedGraphDbNodeSourceTrait {
    * @return
    */
   public void reloadNodeAndProperties() {
-
-    Node node = getBoltClient().getNode((long) this._nodeSource.getIdentifier());
-
-    // request properties
-    setLabels(node);
-
-    // request properties
-    setProperties(node);
+    getBoltClient().getNodeAndConsume((long) this._nodeSource.getIdentifier(), node -> {
+      setLabels(node);
+      setProperties(node);
+    });
   }
 
   /**

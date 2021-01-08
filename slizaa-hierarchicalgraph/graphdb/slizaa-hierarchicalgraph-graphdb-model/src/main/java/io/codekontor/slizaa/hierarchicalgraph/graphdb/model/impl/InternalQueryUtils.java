@@ -20,11 +20,11 @@ package io.codekontor.slizaa.hierarchicalgraph.graphdb.model.impl;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.types.Node;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.types.Node;
 
 import java.util.*;
-import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,7 +32,7 @@ public class InternalQueryUtils {
 
     private static final String BATCH_UPDATE_QUERY = "MATCH (p) where id(p) in { ids } RETURN p";
 
-    private static final String SORT_NODES_QUERY = "MATCH (p) where id(p) in { ids } RETURN id(p) ORDER BY p.name";
+    private static final String SORT_NODES_QUERY = "MATCH (p) where id(p) in { ids } RETURN id(p) as id ORDER BY p.name";
 
 
     public static List<HGCoreDependency> sortCoreDependencies(Collection<HGCoreDependency> dependenciesToSort) {
@@ -49,16 +49,14 @@ public class InternalQueryUtils {
             // query
             Map<String, Object> params = new HashMap<>();
             params.put("ids", nodeIdsToDependencies.keySet());
-            StatementResult result = boltClient.syncExecCypherQuery(SORT_NODES_QUERY, params);
 
-            //
-            List<HGCoreDependency> orderedList = new ArrayList<>(dependenciesToSort.size());
-
-            //
-            result.forEachRemaining(record -> {
-                List<HGCoreDependency> dependencies = nodeIdsToDependencies.get(new Long(record.get(0).asLong()));
-                orderedList.addAll(dependencies);
-            });
+            List<HGCoreDependency> orderedList = new ArrayList<>();
+            boltClient.syncExecAndConsume(SORT_NODES_QUERY, params, result ->
+                    result.forEachRemaining(record -> {
+                        Long id = Long.valueOf(record.get("id").asLong());
+                        orderedList.addAll(nodeIdsToDependencies.get(id));
+                    })
+            );
 
             return orderedList;
         }
@@ -80,16 +78,16 @@ public class InternalQueryUtils {
             // query
             Map<String, Object> params = new HashMap<>();
             params.put("ids", nodes.keySet());
-            StatementResult result = boltClient.syncExecCypherQuery(SORT_NODES_QUERY, params);
+            List<Long> sortedIds = boltClient.syncExecCypherQuery(SORT_NODES_QUERY, params, result -> result.stream().map(record -> Long.valueOf(record.get("id").asLong())).collect(Collectors.toList()));
 
             //
             List<HGNode> orderedList = new ArrayList<>(nodesToSort.size());
-
-            //
-            result.forEachRemaining(record -> {
-                HGNode hgNode = nodes.get(new Long(record.get(0).asLong()));
-                orderedList.add(hgNode);
-            });
+            boltClient.syncExecAndConsume(SORT_NODES_QUERY, params, result ->
+                    result.forEachRemaining(record -> {
+                        Long id = Long.valueOf(record.get("id").asLong());
+                        orderedList.add(nodes.get(id));
+                    })
+            );
 
             return orderedList;
         }
@@ -117,16 +115,15 @@ public class InternalQueryUtils {
             // query
             Map<String, Object> params = new HashMap<>();
             params.put("ids", nodes.keySet());
-            StatementResult result = boltClient.syncExecCypherQuery(BATCH_UPDATE_QUERY, params);
+            boltClient.syncExecAndConsume(BATCH_UPDATE_QUERY, params, result -> {
+                result.forEachRemaining(record -> {
+                    Node node = record.get(0).asNode();
+                    HGNode hgNode = nodes.get(Long.valueOf(node.id()));
 
-            result.forEachRemaining(record -> {
-                Node node = record.get(0).asNode();
-                HGNode hgNode = nodes.get(new Long(node.id()));
-
-                // set the labels and properties
-                ((ExtendedGraphDbNodeSourceImpl) hgNode.getNodeSource()).getTrait().setLabels(node);
-                ((ExtendedGraphDbNodeSourceImpl) hgNode.getNodeSource()).getTrait().setProperties(node);
-
+                    // set the labels and properties
+                    ((ExtendedGraphDbNodeSourceImpl) hgNode.getNodeSource()).getTrait().setLabels(node);
+                    ((ExtendedGraphDbNodeSourceImpl) hgNode.getNodeSource()).getTrait().setProperties(node);
+                });
             });
         }
     }

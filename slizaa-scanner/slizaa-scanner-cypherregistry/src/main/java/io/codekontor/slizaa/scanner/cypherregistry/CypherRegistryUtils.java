@@ -72,7 +72,7 @@ public class CypherRegistryUtils {
 
       scanResult
           .getResourcesWithExtension("cypher")
-          .forEachByteArray((Resource res, byte[] fileContent) -> {
+          .forEachByteArrayIgnoringIOException((Resource res, byte[] fileContent) -> {
             DefaultCypherStatement cypherStatement = SlizaaCypherFileParser
                 .parse(res.getPathRelativeToClasspathElement(), new String(fileContent));
             cypherStatement.setRelativePath(res.getPathRelativeToClasspathElement());

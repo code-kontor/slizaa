@@ -93,6 +93,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
     await().atMost(60, TimeUnit.SECONDS).until(() -> database.isRunning());
 
     assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.STOP,
+        ISlizaaDatabase.GraphDatabaseAction.CREATE_HIERARCHICAL_GRAPH,
         ISlizaaDatabase.GraphDatabaseAction.DELETE);
   }
 

@@ -25,18 +25,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.neo4j.harness.junit.Neo4jRule;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
-import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 
 import com.google.common.collect.Lists;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.GraphDatabaseSetupRule;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.PredefinedDatabaseDirectoryRule;
 
 /**
  * <p>
@@ -84,7 +82,7 @@ public class ExtendedNeo4JRemoteRepository_GetNodeLabels_Test {
 
     IBoltClient boltClient = graphDatabaseSetup.getBoltClient();
 
-    List<String> labels = Lists.newArrayList(boltClient.getNode(_nodeIdProvider.apply(boltClient)).labels());
+    List<String> labels = boltClient.getNode(_nodeIdProvider.apply(boltClient), node -> ImmutableList.copyOf(node.labels()));
     assertThat(labels).containsExactlyElementsOf(_expectedLabels);
   }
 

@@ -19,7 +19,9 @@ package io.codekontor.slizaa.core.boltclient.testfwk;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.security.Provider;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 
 import org.junit.rules.ExternalResource;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
@@ -35,12 +37,8 @@ public class BoltClientConnectionRule extends ExternalResource {
 
   /** - */
   private IBoltClient _boltClient;
-
-  /** - */
-  private String      _host;
-
-  /** - */
-  private int         _port;
+  
+  private Supplier<String> _boltUriSupplier;
 
   /**
    * <p>
@@ -61,8 +59,11 @@ public class BoltClientConnectionRule extends ExternalResource {
    * @param port
    */
   public BoltClientConnectionRule(String host, int port) {
-    this._host = checkNotNull(host);
-    this._port = port;
+    this._boltUriSupplier = () -> String.format("bolt://%s:%s", host, port);
+  }
+  
+  public BoltClientConnectionRule(Supplier<String> boltUriSupplier) {
+   this._boltUriSupplier = checkNotNull(boltUriSupplier);
   }
 
   /**
@@ -78,7 +79,7 @@ public class BoltClientConnectionRule extends ExternalResource {
   @Override
   protected void before() throws Throwable {
     this._boltClient = IBoltClientFactory.newInstance(Executors.newFixedThreadPool(5))
-        .createBoltClient(String.format("bolt://%s:%s", this._host, this._port));
+        .createBoltClient(_boltUriSupplier.get());
     this._boltClient.connect();
   }
 

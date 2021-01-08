@@ -17,7 +17,11 @@
  */
 package io.codekontor.slizaa.core.boltclient.internal;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import io.codekontor.slizaa.core.boltclient.IBoltClient;
+import io.codekontor.slizaa.core.boltclient.internal.asynch.StatementCallable;
+import org.neo4j.driver.*;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -28,20 +32,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import org.neo4j.driver.v1.Config;
-import org.neo4j.driver.v1.Driver;
-import org.neo4j.driver.v1.GraphDatabase;
-import org.neo4j.driver.v1.Session;
-import org.neo4j.driver.v1.StatementResult;
-import org.neo4j.driver.v1.exceptions.Neo4jException;
-import org.neo4j.driver.v1.types.Node;
-import org.neo4j.driver.v1.types.Relationship;
-import io.codekontor.slizaa.core.boltclient.IBoltClient;
-import io.codekontor.slizaa.core.boltclient.IQueryResultConsumer;
-import io.codekontor.slizaa.core.boltclient.internal.asynch.StatementCallable;
-import io.codekontor.slizaa.core.boltclient.internal.asynch.StatementResultConsumerCallable;
-import io.codekontor.slizaa.core.boltclient.internal.osgi.ServiceRegistrator;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * <p>
@@ -51,348 +44,294 @@ import io.codekontor.slizaa.core.boltclient.internal.osgi.ServiceRegistrator;
  */
 public class BoltClientImpl implements IBoltClient {
 
-  /** - */
-  private final PropertyChangeSupport _propertyChangeSupport = new PropertyChangeSupport(this);
+    /**
+     * -
+     */
+    private final PropertyChangeSupport _propertyChangeSupport = new PropertyChangeSupport(this);
 
-  /** - */
-  private final ExecutorService       _executorService;
+    /**
+     * -
+     */
+    private final ExecutorService _executorService;
 
-  /** - */
-  private String                      _name;
+    /**
+     * -
+     */
+    private String _name;
 
-  /** - */
-  private String                      _description;
+    /**
+     * -
+     */
+    private String _description;
 
-  /** - */
-  private String                      _uri;
+    /**
+     * -
+     */
+    private String _uri;
 
-  /** - */
-  private Driver                      _driver;
+    /**
+     * -
+     */
+    private Driver _driver;
 
-  /** - */
-  private boolean                     _connected;
+    /**
+     * -
+     */
+    private boolean _connected;
 
-  /**
-   * <p>
-   * Creates a new instance of type {@link BoltClientImpl}.
-   * </p>
-   *
-   * @param uri
-   * @param name
-   * @param description
-   */
-  public BoltClientImpl(ExecutorService executorService, String uri, String name, String description) {
-    this._executorService = checkNotNull(executorService);
-    this._uri = checkNotNull(uri);
-    this._name = name;
-    this._description = description;
-  }
-
-  public void addPropertyChangeListener(PropertyChangeListener listener) {
-    this._propertyChangeSupport.addPropertyChangeListener(listener);
-  }
-
-  public void removePropertyChangeListener(PropertyChangeListener listener) {
-    this._propertyChangeSupport.removePropertyChangeListener(listener);
-  }
-
-  @Override
-  public String getName() {
-    return this._name;
-  }
-
-  @Override
-  public String getDescription() {
-    return this._description;
-  }
-
-  @Override
-  public boolean isConnected() {
-    return this._connected;
-  }
-
-  @Override
-  public String getUri() {
-    return this._uri;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void connect() {
-
-    //
-    Config config = Config.build().withoutEncryption().toConfig();
-    this._driver = GraphDatabase.driver(getUri(), config);
-
-    // register adapter
-    try {
-      ServiceRegistrator.registerAsOsgiService(this);
-    } catch (Exception e) {
-      // ignore
+    /**
+     * <p>
+     * Creates a new instance of type {@link BoltClientImpl}.
+     * </p>
+     *
+     * @param uri
+     * @param name
+     * @param description
+     */
+    public BoltClientImpl(ExecutorService executorService, String uri, String name, String description) {
+        this._executorService = checkNotNull(executorService);
+        this._uri = checkNotNull(uri);
+        this._name = name;
+        this._description = description;
     }
 
-    //
-    setConnected(true);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void disconnect() {
-
-    // unregister adapter
-    try {
-      ServiceRegistrator.unregisterAsOsgiService(this);
-    } catch (Exception e) {
-      // ignore
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this._propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    //
-    this._driver.close();
-
-    //
-    setConnected(false);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Relationship getRelationship(long nodeId) {
-
-    assertConnected();
-
-    try (Session session = this._driver.session()) {
-      StatementResult result = session.run(String.format("MATCH ()-[r]->() WHERE id(r) = %s RETURN r ", nodeId));
-      return result.single().get("r").asRelationship();
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        this._propertyChangeSupport.removePropertyChangeListener(listener);
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Node getNode(long nodeId) {
-
-    //
-    return syncExecCypherQuery(String.format("MATCH (n) WHERE id(n) = %s RETURN n ", nodeId)).single().get("n")
-        .asNode();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<String> getRelationshipTypes() {
-
-    //
-    return syncExecCypherQuery("CALL db.relationshipTypes").list(r -> r.get("relationshipType").asString());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<String> getNodeLabels() {
-
-    //
-    return syncExecCypherQuery("CALL db.labels").list(r -> r.get("label").asString());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public List<String> getPropertyKeys() {
-
-    //
-    return syncExecCypherQuery("CALL db.propertyKeys").list(r -> r.get("propertyKey").asString());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public StatementResult syncExecCypherQuery(String cypherQuery) {
-
-    checkNotNull(cypherQuery);
-    assertConnected();
-
-    try (Session session = this._driver.session()) {
-      return session.run(cypherQuery);
+    @Override
+    public String getName() {
+        return this._name;
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public StatementResult syncExecCypherQuery(String cypherQuery, Map<String, Object> params) {
-    checkNotNull(cypherQuery);
-    checkNotNull(params);
-    assertConnected();
-
-    try (Session session = this._driver.session()) {
-      return session.run(cypherQuery, params);
+    @Override
+    public String getDescription() {
+        return this._description;
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Future<StatementResult> asyncExecCypherQuery(String cypherQuery) {
-    return asyncExecCypherQuery(cypherQuery, (Map<String, Object>) null);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Future<StatementResult> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params) {
-
-    //
-    assertConnected();
-    checkNotNull(cypherQuery);
-
-    try (Session session = this._driver.session()) {
-
-      // create future task
-      FutureTask<StatementResult> futureTask = new FutureTask<StatementResult>(
-          new StatementCallable<StatementResult>(this._driver, checkNotNull(cypherQuery), params, result -> result));
-
-      // execute
-      this._executorService.execute(futureTask);
-
-      // return the running task
-      return futureTask;
+    @Override
+    public boolean isConnected() {
+        return this._connected;
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> Future<T> asyncExecCypherQueryAndTransformResult(String cypherQuery,
-      Function<StatementResult, T> function) {
-    return this.asyncExecCypherQueryAndTransformResult(cypherQuery, (Map<String, Object>) null, function);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public <T> Future<T> asyncExecCypherQueryAndTransformResult(String cypherQuery, Map<String, Object> params,
-      Function<StatementResult, T> function) {
-
-    //
-    assertConnected();
-    checkNotNull(cypherQuery);
-
-    try (Session session = this._driver.session()) {
-
-      // create future task
-      FutureTask<T> futureTask = new FutureTask<T>(
-          new StatementCallable<T>(this._driver, checkNotNull(cypherQuery), params, function));
-
-      // execute
-      this._executorService.execute(futureTask);
-
-      // return the running task
-      return futureTask;
+    @Override
+    public String getUri() {
+        return this._uri;
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Future<Void> asyncExecCypherQuery(String cypherQuery, IQueryResultConsumer consumer) {
-    return this.asyncExecCypherQuery(cypherQuery, (Map<String, Object>) null, consumer);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Future<Void> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params,
-      IQueryResultConsumer consumer) {
-
-    //
-    consumer.handleQueryStarted(cypherQuery);
-
-    //
-    Future<Void> future = asyncExecCypherQuery(cypherQuery, result -> {
-
-      //
-      try {
-
-        consumer.handleQueryResultReceived(cypherQuery, result);
-      } catch (Neo4jException e) {
-        consumer.handleError(cypherQuery, result, e);
-      }
-
-    });
-
-    //
-    return future;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Future<Void> asyncExecCypherQuery(String cypherQuery, Consumer<StatementResult> consumer) {
-    return asyncExecCypherQuery(cypherQuery, null, consumer);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Future<Void> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params,
-      Consumer<StatementResult> consumer) {
-
-    //
-    assertConnected();
-    checkNotNull(cypherQuery);
-
-    try (Session session = this._driver.session()) {
-
-      // create future task
-      FutureTask<Void> futureTask = new FutureTask<Void>(
-          new StatementResultConsumerCallable(this._driver, checkNotNull(cypherQuery), null, consumer, this));
-
-      // execute
-      this._executorService.execute(futureTask);
-
-      // return the running task
-      return futureTask;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void connect() {
+        Config config = Config.defaultConfig().builder().withoutEncryption().build();
+        this._driver = GraphDatabase.driver(getUri(), config);
+        setConnected(true);
     }
-  }
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param newConnected
-   */
-  protected void setConnected(boolean connected) {
-    boolean oldValue = this._connected;
-    this._connected = connected;
-    this._propertyChangeSupport.firePropertyChange("connected", oldValue, connected);
-  }
-
-  /**
-   * <p>
-   * </p>
-   */
-  private void assertConnected() {
-    if (!isConnected()) {
-      throw new RuntimeException("BoltClient is not connected.");
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disconnect() {
+        this._driver.close();
+        setConnected(false);
     }
-  }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getRelationshipTypes() {
+        return syncExecCypherQuery("CALL db.relationshipTypes", result -> result.stream().map(record -> record.get("relationshipType").asString()).collect(Collectors.toList()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getNodeLabels() {
+        return syncExecCypherQuery("CALL db.labels", result -> result.stream().map(record -> record.get("label").asString()).collect(Collectors.toList()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getPropertyKeys() {
+        return syncExecCypherQuery("CALL db.propertyKeys", result -> result.stream().map(record -> record.get("propertyKey").asString()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public String getNode(long nodeId) {
+        return getNode(nodeId, node -> StatementResultToJsonConverter.convertElementToJson(node));
+    }
+
+    @Override
+    public <T> T getNode(long nodeId, Function<Node, T> mappingFunction) {
+        return syncExecCypherQuery(String.format("MATCH (n) WHERE id(n) = %s RETURN n ", nodeId), r -> r.hasNext() ? mappingFunction.apply(r.single().get("n").asNode()) : null);
+    }
+
+    @Override
+    public void getNodeAndConsume(long nodeId, Consumer<Node> consumer) {
+        syncExecAndConsume(String.format("MATCH (n) WHERE id(n) = %s RETURN n ", nodeId), result -> {
+            if (result.hasNext()) {
+                consumer.accept(result.single().get("n").asNode());
+            }
+        });
+    }
+
+    @Override
+    public String getRelationship(long relationshipId) {
+        return getRelationship(relationshipId, node -> StatementResultToJsonConverter.convertElementToJson(node));
+    }
+
+    @Override
+    public <T> T getRelationship(long relationshipId, Function<Relationship, T> mappingFunction) {
+        return syncExecCypherQuery(String.format("MATCH ()-[r]->() WHERE id(r) = %s RETURN r ", relationshipId), r -> mappingFunction.apply(r.single().get("r").asRelationship()));
+    }
+
+    @Override
+    public void getRelationshipAndConsume(long relationshipId, Consumer<Relationship> consumer) {
+        syncExecAndConsume(String.format("MATCH ()-[r]->() WHERE id(r) = %s RETURN r ", relationshipId), result -> {
+            if (result.hasNext()) {
+                consumer.accept(result.single().get("r").asRelationship());
+            }
+        });
+    }
+
+    @Override
+    public String syncExecCypherQuery(String cypherQuery) {
+        return syncExecCypherQuery(cypherQuery, null, IBoltClient.jsonMappingFunction());
+    }
+
+    @Override
+    public <T> T syncExecCypherQuery(String cypherQuery, Function<Result, T> mappingFunction) {
+        return syncExecCypherQuery(cypherQuery, null, mappingFunction);
+    }
+
+    @Override
+    public String syncExecCypherQuery(String cypherQuery, Map<String, Object> params) {
+        return syncExecCypherQuery(cypherQuery, params, IBoltClient.jsonMappingFunction());
+    }
+
+    @Override
+    public <T> T syncExecCypherQuery(String cypherQuery, Map<String, Object> params, Function<Result, T> mappingFunction) {
+        checkNotNull(cypherQuery);
+        checkNotNull(mappingFunction);
+        assertConnected();
+
+        try (Session session = this._driver.session()) {
+            Result result = session.run(cypherQuery, params);
+            return mappingFunction.apply(result);
+        }
+    }
+
+    @Override
+    public void syncExecAndConsume(String cypherQuery, Consumer<Result> consumer) {
+        syncExecAndConsume(cypherQuery, null, consumer);
+    }
+
+    @Override
+    public void syncExecAndConsume(String cypherQuery, Map<String, Object> params, Consumer<Result> consumer) {
+        checkNotNull(cypherQuery);
+        assertConnected();
+
+        try (Session session = this._driver.session()) {
+            Result result = session.run(cypherQuery, params);
+            if (consumer != null) {
+                consumer.accept(result);
+            }
+        }
+    }
+
+    @Override
+    public Future<String> asyncExecCypherQuery(String cypherQuery) {
+        return asyncExecCypherQuery(cypherQuery, null, IBoltClient.jsonMappingFunction());
+    }
+
+    @Override
+    public Future<String> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params) {
+        return asyncExecCypherQuery(cypherQuery, params, IBoltClient.jsonMappingFunction());
+    }
+
+    @Override
+    public <T> Future<T> asyncExecCypherQuery(String cypherQuery, Function<Result, T> mappingFunction) {
+        return asyncExecCypherQuery(cypherQuery, null, mappingFunction);
+    }
+
+    @Override
+    public <T> Future<T> asyncExecCypherQuery(String cypherQuery, Map<String, Object> params, Function<Result, T> mappingFunction) {
+        assertConnected();
+        checkNotNull(cypherQuery);
+        checkNotNull(mappingFunction);
+
+        try (Session session = this._driver.session()) {
+
+            // create future task
+            FutureTask<T> futureTask = new FutureTask<T>(
+                    new StatementCallable<T>(this._driver, checkNotNull(cypherQuery), params, result -> mappingFunction.apply(result)));
+
+            // execute
+            this._executorService.execute(futureTask);
+
+            // return the running task
+            return futureTask;
+        }
+    }
+
+    @Override
+    public Future<Void> asyncExecAndConsume(String cypherQuery, Consumer<Result> consumer) {
+        return asyncExecAndConsume(cypherQuery, null, consumer);
+    }
+
+    @Override
+    public Future<Void> asyncExecAndConsume(String cypherQuery, Map<String, Object> params, Consumer<Result> consumer) {
+        assertConnected();
+        checkNotNull(cypherQuery);
+        checkNotNull(consumer);
+
+        try (Session session = this._driver.session()) {
+
+            // create future task
+            FutureTask<Void> futureTask = new FutureTask<Void>(
+                    new StatementCallable<Void>(this._driver, checkNotNull(cypherQuery), params, result -> {
+                        consumer.accept(result);
+                        return null;
+                    }));
+
+            // execute
+            this._executorService.execute(futureTask);
+
+            // return the running task
+            return futureTask;
+        }
+    }
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param connected
+     */
+    protected void setConnected(boolean connected) {
+        boolean oldValue = this._connected;
+        this._connected = connected;
+        this._propertyChangeSupport.firePropertyChange("connected", oldValue, connected);
+    }
+
+    /**
+     * <p>
+     * </p>
+     */
+    private void assertConnected() {
+        if (!isConnected()) {
+            throw new RuntimeException("BoltClient is not connected.");
+        }
+    }
 }

@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
@@ -59,20 +60,17 @@ public class BoltClientQueries {
       Function<HGProxyDependency, List<Future<List<IDependencyDefinition>>>> resolverFunction)
       throws InterruptedException, ExecutionException {
 
-    //
-    return checkNotNull(boltClient).asyncExecCypherQuery(checkNotNull(query)).get().list(r -> {
-
-      //
-      if (resolverFunction != null) {
-        return new ProxyDependencyDefinitionImpl(r.get(0).asLong(), r.get(1).asLong(), r.get(2).asLong(),
-            r.get(3).asString(), resolverFunction);
-      }
-      //
-      else {
-        return new DefaultDependencyDefinition(r.get(0).asLong(), r.get(1).asLong(), r.get(2).asLong(),
-            r.get(3).asString());
-      }
-
+    return checkNotNull(boltClient).syncExecCypherQuery(checkNotNull(query), result -> {
+      return result.stream().map(record -> {
+        if (resolverFunction != null) {
+          return new ProxyDependencyDefinitionImpl(record.get(0).asLong(), record.get(1).asLong(), record.get(2).asLong(),
+                  record.get(3).asString(), resolverFunction);
+        }
+        else {
+          return new DefaultDependencyDefinition(record.get(0).asLong(), record.get(1).asLong(), record.get(2).asLong(),
+                  record.get(3).asString());
+        }
+      }).collect(Collectors.toList());
     });
   }
 
@@ -155,27 +153,21 @@ public class BoltClientQueries {
     if (detailDependencyQueries != null && detailDependencyQueries.length > 0) {
 
       // create the result list
-      List<Future<List<IDependencyDefinition>>> result = new ArrayList<>();
+      List<Future<List<IDependencyDefinition>>> dependencyDefinitionsFuture = new ArrayList<>();
 
       // process all queries
       for (String cypherQuery : detailDependencyQueries) {
 
-        //
         Future<List<IDependencyDefinition>> dependencyDefinitions = boltClient
-            .asyncExecCypherQueryAndTransformResult(cypherQuery, params, statementResult -> {
-              return statementResult.list(r -> new DefaultDependencyDefinition(r.get(0).asLong(), r.get(1).asLong(),
-                  r.get(2).asLong(), r.get(3).asString()));
-            });
+            .asyncExecCypherQuery(cypherQuery, params, result -> result.list(record -> new DefaultDependencyDefinition(record.get(0).asLong(), record.get(1).asLong(),
+                record.get(2).asLong(), record.get(3).asString())));
 
-        //
-        result.add(dependencyDefinitions);
+        dependencyDefinitionsFuture.add(dependencyDefinitions);
       }
 
-      // return the result
-      return result;
+      return dependencyDefinitionsFuture;
     }
 
-    //
     return Collections.emptyList();
   }
 }

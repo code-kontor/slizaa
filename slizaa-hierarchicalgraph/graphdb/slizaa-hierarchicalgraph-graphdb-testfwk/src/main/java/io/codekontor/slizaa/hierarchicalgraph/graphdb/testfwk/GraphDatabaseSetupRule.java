@@ -17,24 +17,18 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk;
 
-import com.google.common.base.Preconditions;
-import org.junit.Rule;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-import org.neo4j.harness.junit.Neo4jRule;
 import io.codekontor.slizaa.core.boltclient.IBoltClient;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 
-import java.io.File;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.testcontainers.containers.Neo4jContainer;
+import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
-import java.nio.file.FileVisitOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,11 +37,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class GraphDatabaseSetupRule implements TestRule {
 
+  public static final String NEO4J_DOCKER_IMAGE = "neo4j:4.2.1";
   //
   private PredefinedDatabaseDirectoryRule _predefinedDatabaseDirectoryRule;
 
   //
-  private Neo4jRule _neo4jRule;
+  private Neo4jContainer _neo4jContainer;
 
   //
   private BoltClientConnectionRule _boltClientConnection;
@@ -61,18 +56,16 @@ public class GraphDatabaseSetupRule implements TestRule {
 
     try (InputStream inputStream = GraphDatabaseSetupRule.class.getResourceAsStream(databaseArchivePath)) {
 
-      //
-      int freePort = findFreePort();
-
       _predefinedDatabaseDirectoryRule = new PredefinedDatabaseDirectoryRule(
           GraphDatabaseSetupRule.class.getResourceAsStream(databaseArchivePath));
-      _predefinedDatabaseDirectoryRule.getParentDirectory().mkdirs();
+      _predefinedDatabaseDirectoryRule.getDatabaseDirectory().mkdirs();
+      
+      _neo4jContainer = new Neo4jContainer(DockerImageName.parse(NEO4J_DOCKER_IMAGE))
+          .withoutAuthentication()
+          .withNeo4jConfig("dbms.recovery.fail_on_missing_files", "false")
+          .withDatabase(MountableFile.forHostPath(_predefinedDatabaseDirectoryRule.getDatabaseDirectory().getAbsolutePath()));
 
-      _neo4jRule = new Neo4jRule()
-          .withConfig("dbms.directories.data", _predefinedDatabaseDirectoryRule.getParentDirectory().getAbsolutePath())
-          .withConfig("dbms.connector.bolt.listen_address", ":" + freePort);
-
-      _boltClientConnection = new BoltClientConnectionRule("localhost", freePort);
+      _boltClientConnection = new BoltClientConnectionRule(() -> _neo4jContainer.getBoltUrl());
 
     } catch (IOException e) {
       e.printStackTrace();
@@ -94,7 +87,7 @@ public class GraphDatabaseSetupRule implements TestRule {
       public void evaluate() throws Throwable {
 
         _predefinedDatabaseDirectoryRule.apply(
-            _neo4jRule.apply(
+            _neo4jContainer.apply(
                 _boltClientConnection.apply(base, description),
                 description),
             description).evaluate();
@@ -107,16 +100,5 @@ public class GraphDatabaseSetupRule implements TestRule {
    */
   public IBoltClient getBoltClient() {
     return _boltClientConnection.getBoltClient();
-  }
-
-  /**
-   * @return
-   */
-  private static int findFreePort() {
-    try (ServerSocket socket = new ServerSocket(0)) {
-      return socket.getLocalPort();
-    } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
   }
 }

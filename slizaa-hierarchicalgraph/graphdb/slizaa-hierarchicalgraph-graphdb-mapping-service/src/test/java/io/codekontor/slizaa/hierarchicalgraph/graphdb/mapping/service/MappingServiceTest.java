@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.ClassRule;
 import org.junit.Test;
-import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 import io.codekontor.slizaa.core.progressmonitor.DefaultProgressMonitor;
 import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
