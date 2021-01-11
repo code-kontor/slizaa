@@ -30,9 +30,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class InternalQueryUtils {
 
-    private static final String BATCH_UPDATE_QUERY = "MATCH (p) where id(p) in { ids } RETURN p";
+    private static final String BATCH_UPDATE_QUERY = "MATCH (p) where id(p) in $ids RETURN p";
 
-    private static final String SORT_NODES_QUERY = "MATCH (p) where id(p) in { ids } RETURN id(p) as id ORDER BY p.name";
+    private static final String SORT_NODES_QUERY = "MATCH (p) where id(p) in $ids RETURN id(p) as id ORDER BY p.name";
 
 
     public static List<HGCoreDependency> sortCoreDependencies(Collection<HGCoreDependency> dependenciesToSort) {

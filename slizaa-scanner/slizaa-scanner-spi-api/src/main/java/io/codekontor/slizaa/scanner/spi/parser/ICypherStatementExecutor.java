@@ -35,7 +35,7 @@ public interface ICypherStatementExecutor {
    *
    * @param cypherStatement
    */
-  IResult executeCypherStatement(String cypherStatement);
+  <T> T executeCypherStatement(String cypherStatement, Function<IResult, T> mappingFunction);
 
   /**
    * <p>
@@ -43,7 +43,7 @@ public interface ICypherStatementExecutor {
    *
    * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
    */
-  public static interface IResult {
+  interface IResult {
 
     /**
      * <p>

@@ -39,8 +39,8 @@ public class Assertions {
         assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.CONFIGURED);
         assertThat(graphDatabase.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.PARSE, ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, ISlizaaDatabase.GraphDatabaseAction.DELETE);
 
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasGraphDb()).isFalse();
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasBoltClient()).isFalse();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasGraphDb()).isFalse();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasBoltClient()).isFalse();
 
         assertIllegalStateException(() -> graphDatabase.start());
         assertIllegalStateException(() -> graphDatabase.stop());
@@ -56,8 +56,8 @@ public class Assertions {
         assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.NOT_RUNNING);
         assertThat(graphDatabase.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.PARSE, ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, ISlizaaDatabase.GraphDatabaseAction.DELETE, ISlizaaDatabase.GraphDatabaseAction.START);
 
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasGraphDb()).isFalse();
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasBoltClient()).isFalse();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasGraphDb()).isFalse();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasBoltClient()).isFalse();
 
         Assertions.assertIllegalStateException(() -> graphDatabase.stop());
 
@@ -76,8 +76,8 @@ public class Assertions {
         assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.RUNNING);
         assertThat(graphDatabase.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.DELETE, ISlizaaDatabase.GraphDatabaseAction.CREATE_HIERARCHICAL_GRAPH, ISlizaaDatabase.GraphDatabaseAction.STOP);
 
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasGraphDb()).isTrue();
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasBoltClient()).isTrue();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasGraphDb()).isTrue();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasBoltClient()).isTrue();
 
         graphDatabase.newHierarchicalGraph("hg01");
         graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, AbstractSlizaaDatabaseTest.TIMEOUT);
@@ -95,8 +95,8 @@ public class Assertions {
         assertThat(graphDatabase.getState()).isEqualTo(SlizaaDatabaseState.INITIAL);
         assertThat(graphDatabase.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, ISlizaaDatabase.GraphDatabaseAction.DELETE);
 
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasGraphDb()).isFalse();
-        assertThat((((IInternalSlizaaDatabase)graphDatabase).getStateMachineContext()).hasBoltClient()).isFalse();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasGraphDb()).isFalse();
+        assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasBoltClient()).isFalse();
 
         Assertions.assertIllegalStateException(() -> graphDatabase.start());
         Assertions.assertIllegalStateException(() -> graphDatabase.stop());

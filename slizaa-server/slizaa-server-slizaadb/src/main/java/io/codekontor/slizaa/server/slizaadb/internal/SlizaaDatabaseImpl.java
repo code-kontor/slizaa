@@ -54,8 +54,8 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
     /* the database environments */
     private final ISlizaaDatabaseEnvironment _graphDatabaseEnvironment;
 
-    private final Lock _lock = new ReentrantLock();
-    private final Condition _stateCondition = _lock.newCondition();
+    private final Lock _stateLock = new ReentrantLock();
+    private final Condition _stateCondition = _stateLock.newCondition();
 
     /**
      * @param stateMachine
@@ -73,11 +73,12 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
         this._stateMachine.addStateListener(new StateMachineListenerAdapter<SlizaaDatabaseState, SlizaaDatabaseTrigger>() {
             @Override
             public void stateChanged(State from, State to) {
-                _lock.lock();
+                _stateMachineContext.storeConfiguration();
+                _stateLock.lock();
                 try {
                     _stateCondition.signalAll(); // releases lock and waits until doSomethingElse is called
                 } finally {
-                    _lock.unlock();
+                    _stateLock.unlock();
                 }
             }
         });
@@ -133,9 +134,6 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
                 .withPayload(SlizaaDatabaseTrigger.CREATE_HIERARCHICAL_GRAPH)
                 .setHeader(SlizaaDatabaseStateMachine.TRIGGER_PARAM, new SlizaaDatabaseStateMachine.TriggerParameter_CreateHierarchicalGraph(identifier))
                 .build());
-
-        // IHierarchicalGraph result = _stateMachineContext.createHierarchicalGraph(identifier);
-        _stateMachineContext.storeConfiguration();
     }
 
     @Override
@@ -208,7 +206,7 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
         checkNotNull(databaseState);
 
         boolean timedOut = false;
-        _lock.lock();
+        _stateLock.lock();
         try {
             while (!databaseState.equals(_stateMachine.getState().getId())) {
                 if (timedOut) {
@@ -219,7 +217,7 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
         } catch (InterruptedException exception) {
             throw new TimeoutException();
         } finally {
-            _lock.unlock();
+            _stateLock.unlock();
         }
     }
 
@@ -232,12 +230,10 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
     }
 
     private void trigger(Message<SlizaaDatabaseTrigger> triggerMessage) {
-
         if (!this._stateMachine.sendEvent(triggerMessage)) {
             throw new IllegalStateException(String.format("Trigger '%s' not accepted in state '%s'.",
                     triggerMessage.getPayload(), this._stateMachine.getState().getId().name()));
         }
-        _stateMachineContext.storeConfiguration();
     }
 
     private void trigger(SlizaaDatabaseTrigger trigger) {
@@ -245,6 +241,5 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
             throw new IllegalStateException(String.format("Trigger '%s' not accepted in state '%s'.", trigger,
                     this._stateMachine.getState().getId().name()));
         }
-        _stateMachineContext.storeConfiguration();
     }
 }

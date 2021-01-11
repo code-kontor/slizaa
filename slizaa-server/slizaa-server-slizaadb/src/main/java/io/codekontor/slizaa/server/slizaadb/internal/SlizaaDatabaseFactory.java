@@ -46,19 +46,16 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
 
     private Map<StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger>, SlizaaDatabaseStateMachineContext> _stateMachine2StructureDatabaseContext = new HashMap<>();
 
-    private NamedLock _namedLock;
-
     private ExecutorService _executorService;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        _namedLock = new NamedLock();
         // TODO: Config
         _executorService = Executors.newFixedThreadPool(5);
     }
 
     @Override
-    public IInternalSlizaaDatabase newInstance(String id, int port, File databaseRootDirectory) {
+    public SlizaaDatabaseImpl newInstance(String id, int port, File databaseRootDirectory) {
 
         // create
         SlizaaDatabaseImpl result = createDatabaseImpl(id, port, databaseRootDirectory);
@@ -67,11 +64,11 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
         result.stateMachine().start();
 
         // finally return the result
-        return createProxy(result);
+        return result;
     }
 
     @Override
-    public IInternalSlizaaDatabase newInstance(ISlizaaDatabaseConfiguration databaseConfiguration, File databaseRootDirectory) {
+    public SlizaaDatabaseImpl newInstance(ISlizaaDatabaseConfiguration databaseConfiguration, File databaseRootDirectory) {
 
         // method internal helper structure
         class ModifiedState {
@@ -129,7 +126,7 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
         }
 
         //
-        return createProxy(result);
+        return result;
     }
 
     /**
@@ -167,12 +164,5 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
 
     SlizaaDatabaseStateMachineContext context(StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> stateMachine) {
         return _stateMachine2StructureDatabaseContext.get(stateMachine);
-    }
-
-    private IInternalSlizaaDatabase createProxy(SlizaaDatabaseImpl graphDatabase) {
-        return (IInternalSlizaaDatabase) Proxy.newProxyInstance(
-                SlizaaDatabaseFactory.class.getClassLoader(),
-                new Class[] { IInternalSlizaaDatabase.class },
-                new SynchronizedSlizaaDatabaseInvocationHandler(graphDatabase, _namedLock));
     }
 }
