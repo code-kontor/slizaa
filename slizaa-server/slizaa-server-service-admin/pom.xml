@@ -35,13 +35,8 @@
 
         <dependency>
             <groupId>io.codekontor.slizaa</groupId>
-            <artifactId>slizaa-server-service-slizaa</artifactId>
+            <artifactId>slizaa-server-service-provisioning</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
         </dependency>
 
         <!-- marshalling -->

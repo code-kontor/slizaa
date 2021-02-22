@@ -17,38 +17,47 @@
  */
 package io.codekontor.slizaa.service.admin;
 
-import io.codekontor.slizaa.service.admin.descr.GraphDatabaseDescr;
-import io.codekontor.slizaa.service.admin.descr.ServerExtensionDescr;
-import io.codekontor.slizaa.service.admin.descr.SlizaaServerDescr;
-
+import io.codekontor.slizaa.server.service.provisioning.IProvisioningService;
+import io.codekontor.slizaa.server.service.provisioning.model.descr.GraphDatabaseDescr;
+import io.codekontor.slizaa.server.service.provisioning.model.descr.ServerExtensionDescr;
+import io.codekontor.slizaa.server.service.provisioning.model.descr.SlizaaServerDescr;
+import io.codekontor.slizaa.server.service.provisioning.model.request.GraphDatabaseRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/slizaa-admin-rest")
 public class AdminRestController {
 
-	private static final String PREFIX_SLIZAA_ADMIN_REST = "/slizaa-admin-rest/";
-	
-  @Autowired
-	private IAdminService specService;
+    private static final String PREFIX_SLIZAA_ADMIN_REST = "/slizaa-admin-rest/";
 
-  @RequestMapping(value = PREFIX_SLIZAA_ADMIN_REST, method = RequestMethod.GET)
-	public SlizaaServerDescr description() {
-		return specService.fetchDescription();
-	}
+    @Autowired
+    private IProvisioningService specService;
 
-	@GetMapping(PREFIX_SLIZAA_ADMIN_REST + "serverExtensions")
-	public List<ServerExtensionDescr> serverExtensions() {
-		return specService.fetchDescription().getServerExtensions();
-	}
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public SlizaaServerDescr description() {
+        return specService.fetchServerDescription();
+    }
 
-	@GetMapping(PREFIX_SLIZAA_ADMIN_REST + "graphDatabases")
-	public List<GraphDatabaseDescr> graphDatabases() {
-		return specService.fetchDescription().getGraphDatabases();
+    @GetMapping("/serverExtensions")
+    public List<ServerExtensionDescr> serverExtensions() {
+        return specService.fetchServerDescription().getServerExtensions();
+    }
+
+    @GetMapping("/graphDatabases")
+    public List<GraphDatabaseDescr> graphDatabases() {
+        return specService.fetchServerDescription().getGraphDatabases();
+    }
+
+    @GetMapping("/graphDatabases/{id}")
+    public GraphDatabaseDescr graphDatabases(@PathVariable(value = "id") String id) {
+        return specService.fetchGraphDatabaseDescription(id);
+    }
+
+	@PostMapping(value = "/", consumes = "application/json", produces = "application/json")
+	public void graphDatabaseRequest(@RequestBody GraphDatabaseRequest graphDatabaseRequest) {
+		System.out.println(graphDatabaseRequest);
 	}
 }

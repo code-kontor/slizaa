@@ -20,8 +20,6 @@ package io.codekontor.slizaa.service.admin;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import io.codekontor.slizaa.service.admin.internal.AdminService;
-
 @Configuration
 @ComponentScan(basePackageClasses = { AdminServiceModuleConfiguration.class })
 public class AdminServiceModuleConfiguration {
