@@ -41,12 +41,13 @@
 		<module>slizaa-server-service-svg</module>
 		<module>slizaa-server-service-slizaa</module>
 		<module>slizaa-server-service-admin</module>
+		<module>slizaa-server-service-provisioning</module>
+        <module>slizaa-server-service-selection</module>
+        <module>slizaa-server-service-transformation</module>
 		<module>slizaa-server-staticcontent</module>
 		<module>slizaa-server-graphql</module>
 		<module>slizaa-server-main</module>
         <module>slizaa-server-command</module>
-        <module>slizaa-server-service-selection</module>
-        <module>slizaa-server-service-transformation</module>
 		<module>slizaa-server-slizaadb</module>
 	</modules>
 
