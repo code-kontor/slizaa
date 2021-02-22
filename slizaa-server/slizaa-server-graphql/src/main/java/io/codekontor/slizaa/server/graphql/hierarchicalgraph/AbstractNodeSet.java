@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
+package io.codekontor.slizaa.server.gql.hierarchicalgraph;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.NodeUtils;
+import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.NodeUtils;
 
 public abstract class AbstractNodeSet {
 

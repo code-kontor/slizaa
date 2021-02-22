@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.graphql.graphdatabase;
+package io.codekontor.slizaa.server.gql.graphdatabase;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
-import io.codekontor.slizaa.server.graphql.hierarchicalgraph.HierarchicalGraph;
+import io.codekontor.slizaa.server.gql.hierarchicalgraph.HierarchicalGraph;
 import org.springframework.stereotype.Component;
 
 /**

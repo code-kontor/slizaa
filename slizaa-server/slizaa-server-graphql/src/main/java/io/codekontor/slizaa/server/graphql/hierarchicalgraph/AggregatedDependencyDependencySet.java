@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
+package io.codekontor.slizaa.server.gql.hierarchicalgraph;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
@@ -25,8 +25,8 @@ import io.codekontor.slizaa.hierarchicalgraph.core.selection.IFilteredDependenci
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.INodeSelection;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphUtil;
-import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.NodeUtils;
-import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
+import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.NodeUtils;
+import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.Utils;
 import io.codekontor.slizaa.server.service.selection.IAggregatedDependencySelectionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
+package io.codekontor.slizaa.server.gql.hierarchicalgraph;
 
-import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
+import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.Utils;
 
 import java.util.Collections;
 import java.util.List;
