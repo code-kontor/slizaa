@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.gql.hierarchicalgraph;
+package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import com.google.common.base.Preconditions;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.AbstractHGDependency;

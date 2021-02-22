@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.gql.hierarchicalgraph;
+package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
-import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.ReferencedNodesResolver;
-import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.Utils;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.ReferencedNodesResolver;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
 
 import java.util.Collection;
 import java.util.List;

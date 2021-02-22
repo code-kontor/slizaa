@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.gql.hierarchicalgraph;
+package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import io.codekontor.slizaa.core.progressmonitor.DefaultProgressMonitor;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
@@ -24,7 +24,7 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingSe
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.GraphDatabaseSetupRule;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.testfwk.mapping.SimpleJTypeMappingProvider;
-import io.codekontor.slizaa.server.gql.hierarchicalgraph.internal.Utils;
+import io.codekontor.slizaa.server.graphql.hierarchicalgraph.internal.Utils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
