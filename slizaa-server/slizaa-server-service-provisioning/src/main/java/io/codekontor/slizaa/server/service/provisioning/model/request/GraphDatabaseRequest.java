@@ -17,10 +17,10 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model.request;
 
-import io.codekontor.slizaa.server.service.provisioning.model.descr.ContentDefinitionDescr;
-import io.codekontor.slizaa.server.service.provisioning.model.descr.HierarchicalGraphDescr;
+import io.codekontor.slizaa.server.service.provisioning.model.IGraphDatabaseDTO;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,49 +28,61 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class GraphDatabaseRequest {
+public class GraphDatabaseRequest implements IGraphDatabaseDTO {
 
-  /** - */
-  private String                       identifier;
-
-  /** - */
+  private String id;
   private ContentDefinitionRequest contentDefinition;
+  private List<HierarchicalGraphRequest> hierarchicalGraphs;
 
-  /** - */
-  private List<HierarchicalGraphDescr> hierarchicalGraphs;
+  public GraphDatabaseRequest() {
+    // default constructor
+  }
 
-  /** - */
-  private String                       state;
+  public GraphDatabaseRequest(String id, ContentDefinitionRequest contentDefinition, List<HierarchicalGraphRequest> hierarchicalGraphs) {
+    this.id = id;
+    this.contentDefinition = contentDefinition;
+    this.hierarchicalGraphs = hierarchicalGraphs;
+  }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = checkNotNull(identifier);
+  public void setId(String id) {
+    this.id = checkNotNull(id);
   }
 
   public void setContentDefinition(ContentDefinitionRequest contentDefinition) {
     this.contentDefinition = checkNotNull(contentDefinition);
   }
 
-  public void setHierarchicalGraphs(List<HierarchicalGraphDescr> hierarchicalGraphs) {
+  public void setHierarchicalGraphs(List<HierarchicalGraphRequest> hierarchicalGraphs) {
     this.hierarchicalGraphs = checkNotNull(hierarchicalGraphs);
   }
 
-  public void setState(String state) {
-    this.state = checkNotNull(state);
-  }
-
-  public String getIdentifier() {
-    return identifier;
+  public String getId() {
+    return id;
   }
 
   public ContentDefinitionRequest getContentDefinition() {
     return contentDefinition;
   }
 
-  public List<HierarchicalGraphDescr> getHierarchicalGraphs() {
+  public List<HierarchicalGraphRequest> getHierarchicalGraphs() {
     return hierarchicalGraphs;
   }
 
-  public String getState() {
-    return state;
+  @Override
+  public int hashCode() {
+    return Objects.hash(contentDefinition, hierarchicalGraphs, id);
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!IGraphDatabaseDTO.class.isAssignableFrom(obj.getClass()))
+      return false;
+    IGraphDatabaseDTO other = (IGraphDatabaseDTO) obj;
+    return Objects.equals(contentDefinition, other.getContentDefinition())
+        && Objects.equals(hierarchicalGraphs, other.getHierarchicalGraphs()) && Objects.equals(id, other.getId());
+  } 
 }

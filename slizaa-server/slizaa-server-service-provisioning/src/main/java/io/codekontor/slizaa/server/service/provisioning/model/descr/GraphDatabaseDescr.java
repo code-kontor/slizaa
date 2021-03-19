@@ -17,79 +17,87 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model.descr;
 
+import io.codekontor.slizaa.server.service.provisioning.model.IGraphDatabaseDTO;
+
 import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class GraphDatabaseDescr {
+public class GraphDatabaseDescr implements IGraphDatabaseDTO {
 
-  /** - */
-  private String                       identifier;
+    private String id;
+    private ContentDefinitionDescr contentDefinition;
+    private List<HierarchicalGraphDescr> hierarchicalGraphs;
+    private String state;
+    private int port;
+    private List<String> availableActions;
 
-  /** - */
-  private ContentDefinitionDescr contentDefinition;
+    /**
+     * <p>
+     * Creates a new instance of type {@link GraphDatabaseDescr}.
+     * </p>
+     *
+     * @param id
+     * @param contentDefinition
+     * @param hierarchicalGraphs
+     * @param state
+     * @param port
+     * @param availableActions
+     */
+    public GraphDatabaseDescr(String id, ContentDefinitionDescr contentDefinition,
+                              List<HierarchicalGraphDescr> hierarchicalGraphs, String state, int port, List<String> availableActions) {
 
-  /** - */
-  private List<HierarchicalGraphDescr> hierarchicalGraphs;
+        this.id = checkNotNull(id);
+        this.contentDefinition = checkNotNull(contentDefinition);
+        this.hierarchicalGraphs = checkNotNull(hierarchicalGraphs);
+        this.state = checkNotNull(state);
+        this.port = port;
+        this.availableActions = checkNotNull(availableActions);
+    }
 
-  /** - */
-  private String                       state;
+    public String getId() {
+        return id;
+    }
 
-  /** - */
-  private int                          port;
+    public ContentDefinitionDescr getContentDefinition() {
+        return contentDefinition;
+    }
 
-  /** - */
-  private List<String>                 availableActions;
+    public List<HierarchicalGraphDescr> getHierarchicalGraphs() {
+        return hierarchicalGraphs;
+    }
 
-  /**
-   * <p>
-   * Creates a new instance of type {@link GraphDatabaseDescr}.
-   * </p>
-   *
-   * @param identifier
-   * @param contentDefinition
-   * @param hierarchicalGraphs
-   * @param state
-   * @param port
-   * @param availableActions
-   */
-  public GraphDatabaseDescr(String identifier, ContentDefinitionDescr contentDefinition,
-      List<HierarchicalGraphDescr> hierarchicalGraphs, String state, int port, List<String> availableActions) {
+    public String getState() {
+        return state;
+    }
 
-    this.identifier = checkNotNull(identifier);
-    this.contentDefinition = checkNotNull(contentDefinition);
-    this.hierarchicalGraphs = checkNotNull(hierarchicalGraphs);
-    this.state = checkNotNull(state);
-    this.port = port;
-    this.availableActions = checkNotNull(availableActions);
-  }
+    public int getPort() {
+        return port;
+    }
 
-  public String getIdentifier() {
-    return identifier;
-  }
+    public List<String> getAvailableActions() {
+        return availableActions;
+    }
 
-  public ContentDefinitionDescr getContentDefinition() {
-    return contentDefinition;
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(contentDefinition, hierarchicalGraphs, id);
+    }
 
-  public List<HierarchicalGraphDescr> getHierarchicalGraphs() {
-    return hierarchicalGraphs;
-  }
-
-  public String getState() {
-    return state;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public List<String> getAvailableActions() {
-    return availableActions;
-  }
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!IGraphDatabaseDTO.class.isAssignableFrom(obj.getClass()))
+            return false;
+        IGraphDatabaseDTO other = (IGraphDatabaseDTO) obj;
+        return Objects.equals(contentDefinition, other.getContentDefinition())
+                && Objects.equals(hierarchicalGraphs, other.getHierarchicalGraphs()) && Objects.equals(id, other.getId());
+    }
 }

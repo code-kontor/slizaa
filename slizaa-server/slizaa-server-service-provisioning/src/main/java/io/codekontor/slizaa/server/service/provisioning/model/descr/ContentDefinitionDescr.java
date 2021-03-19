@@ -17,21 +17,20 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model.descr;
 
+import io.codekontor.slizaa.server.service.provisioning.model.IContentDefinitionDTO;
+
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Objects;
 
 /**
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class ContentDefinitionDescr {
+public class ContentDefinitionDescr implements IContentDefinitionDTO {
 
-  /** - */
   private String factoryId;
-
-  /** - */
   private String factoryIdShortForm;
-
-  /** - */
   private String definition;
 
   public String getFactoryId() {
@@ -50,5 +49,22 @@ public class ContentDefinitionDescr {
     this.factoryId = checkNotNull(factoryId);
     this.factoryIdShortForm = checkNotNull(factoryIdShortForm);
     this.definition = checkNotNull(definition);
+  }
+  
+  @Override
+  public int hashCode() {
+    return Objects.hash(definition, factoryIdShortForm);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!IContentDefinitionDTO.class.isAssignableFrom(obj.getClass()))
+      return false;
+    IContentDefinitionDTO other = (IContentDefinitionDTO) obj;
+    return Objects.equals(definition, other.getDefinition()) && Objects.equals(factoryIdShortForm, other.getFactoryIdShortForm());
   }
 }

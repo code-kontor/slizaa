@@ -32,10 +32,7 @@ import java.util.List;
 public class JobGroup {
 
   /** - */
-  private long                _environmentId;
-
-  /** - */
-  private String              _environmentComponentId;
+  private String              _id;
 
   /** - */
   private List<JobFutureTask> _jobTasks;
@@ -44,14 +41,11 @@ public class JobGroup {
    * <p>
    * Creates a new instance of type {@link JobGroup}.
    * </p>
-   *
-   * @param environmentId
    */
-  public JobGroup(long environmentId, String environmentComponentId, Job... jobs) {
+  public JobGroup(String id, Job... jobs) {
 
     //
-    _environmentId = environmentId;
-    _environmentComponentId = checkNotNull(environmentComponentId);
+    _id = checkNotNull(id);
     _jobTasks = new LinkedList<>();
 
     //
@@ -68,28 +62,8 @@ public class JobGroup {
    *
    * @return
    */
-  public long getEnvironmentId() {
-    return _environmentId;
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  public long getEnvironmentIdAsLong() {
-    return _environmentId;
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  public String getEnvironmentComponentId() {
-    return _environmentComponentId;
+  public String getId() {
+    return _id;
   }
 
   /**

@@ -38,25 +38,33 @@ public class Job implements Callable<Void> {
 
     private JobFutureTask _futureTask;
 
-    private Callable<Boolean> _action;
+    private JobTask _jobTask;
 
     /**
      * <p>
      * Creates a new instance of type {@link Job}.
      * </p>
      */
-    public Job(Callable<Boolean> action) {
-        _action = checkNotNull(action);
+    public Job(JobTask action) {
+        _jobTask = checkNotNull(action);
         _jobState = JobState.NEW;
         _ancestors = new ArrayList<>();
         _sharedLock = new Object();
     }
 
-    public Job(Callable<Boolean> action, Job... ancestors) {
+    public Job(JobTask action, Job... ancestors) {
         this(action);
         for (Job ancestor : ancestors) {
             _ancestors.add(ancestor);
         }
+    }
+
+    public JobTask getJobTask() {
+        return _jobTask;
+    }
+
+    public String getDescription() {
+        return _jobTask.getDescription();
     }
 
     /**
@@ -149,7 +157,7 @@ public class Job implements Callable<Void> {
             if (!getJobState().equals(JobState.ANCESTOR_FAILED)) {
 
                 setJobState(JobState.IN_PROGRESS);
-                if (onExecute()) {
+                if (_jobTask.call()) {
                     setJobState(JobState.SUCCESSFULLY_COMPLETED);
                 } else {
                     setJobState(JobState.SKIPPED);
@@ -165,15 +173,6 @@ public class Job implements Callable<Void> {
         }
 
         return null;
-    }
-
-    private boolean onExecute() {
-        try {
-            return _action.call();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            return false;
-        }
     }
 
     /**

@@ -17,10 +17,10 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model.request;
 
-import io.codekontor.slizaa.server.service.provisioning.model.descr.GraphDatabaseDescr;
-import io.codekontor.slizaa.server.service.provisioning.model.descr.ServerExtensionDescr;
+import io.codekontor.slizaa.server.service.provisioning.model.ISlizaaServerConfigurationDTO;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,12 +28,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class SlizaaServerRequest {
+public class SlizaaServerConfigurationRequest implements ISlizaaServerConfigurationDTO {
 
-  /** - */
-  private List<GraphDatabaseDescr> graphDatabases;
+  private List<GraphDatabaseRequest> graphDatabases;
 
-  public void setGraphDatabases(List<GraphDatabaseDescr> graphDatabases) {
+  public SlizaaServerConfigurationRequest() {
+    // default constructor
+  }
+
+  public SlizaaServerConfigurationRequest(List<GraphDatabaseRequest> graphDatabases) {
+    this.graphDatabases = graphDatabases;
+  }
+
+  public void setGraphDatabases(List<GraphDatabaseRequest> graphDatabases) {
     this.graphDatabases = checkNotNull(graphDatabases);
   }
 
@@ -43,7 +50,24 @@ public class SlizaaServerRequest {
    *
    * @return
    */
-  public List<GraphDatabaseDescr> getGraphDatabases() {
+  public List<GraphDatabaseRequest> getGraphDatabases() {
     return graphDatabases;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(graphDatabases);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!ISlizaaServerConfigurationDTO.class.isAssignableFrom(obj.getClass()))
+      return false;
+    ISlizaaServerConfigurationDTO other = (ISlizaaServerConfigurationDTO) obj;
+    return Objects.equals(graphDatabases, other.getGraphDatabases());
   }
 }

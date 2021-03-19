@@ -17,22 +17,25 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model.descr;
 
+import io.codekontor.slizaa.server.service.provisioning.model.IHierarchicalGraphDTO;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class HierarchicalGraphDescr {
+import java.util.Objects;
 
-  /** - */
-  private String identifier;
+public class HierarchicalGraphDescr implements IHierarchicalGraphDTO {
+
+  private String id;
 
   /**
    * <p>
    * Creates a new instance of type {@link HierarchicalGraphDescr}.
    * </p>
    *
-   * @param identifier
+   * @param id
    */
-  public HierarchicalGraphDescr(String identifier) {
-    this.identifier = checkNotNull(identifier);
+  public HierarchicalGraphDescr(String id) {
+    this.id = checkNotNull(id);
   }
 
   /**
@@ -41,7 +44,24 @@ public class HierarchicalGraphDescr {
    *
    * @return
    */
-  public String getIdentifier() {
-    return identifier;
+  public String getId() {
+    return id;
+  }
+  
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!IHierarchicalGraphDTO.class.isAssignableFrom(obj.getClass()))
+      return false;
+    IHierarchicalGraphDTO other = (IHierarchicalGraphDTO) obj;
+    return Objects.equals(id, other.getId());
   }
 }

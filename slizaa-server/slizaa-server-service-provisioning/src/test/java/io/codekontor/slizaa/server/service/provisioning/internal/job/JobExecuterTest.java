@@ -82,7 +82,7 @@ public class JobExecuterTest {
     Job job2 = new Job(simpleAction(2), job1);
     Job job3 = new Job(simpleAction(3), job2);
 
-    _currentJobGroup = new JobGroup(1, "test", job1, job2, job3);
+    _currentJobGroup = new JobGroup("test", job1, job2, job3);
 
     _jobExecuter.executeJobGroup(_currentJobGroup);
     Awaitility.await().until(() -> !_currentJobGroup.hasPendingJobs());
@@ -115,7 +115,7 @@ public class JobExecuterTest {
     Job job1 = new Job(new SimpleAction(1));
     Job job2 = new Job(new SimpleAction(2));
     Job job3 = new Job(new SimpleAction(3));
-    _currentJobGroup = new JobGroup(1, "test", job1, job2, job3);
+    _currentJobGroup = new JobGroup("test", job1, job2, job3);
 
     //
     _jobExecuter.executeJobGroup(_currentJobGroup);
@@ -125,8 +125,6 @@ public class JobExecuterTest {
     System.out.println(_result);
     assertThat(_result).containsOnly("Job started: 1", "Job stopped: 1", "Job started: 2", "Job stopped: 2",
         "Job started: 3", "Job stopped: 3");
-    assertThat(_result.get(4)).isEqualTo("Job started: 3");
-    assertThat(_result.get(5)).isEqualTo("Job stopped: 3");
 
     //
     assertThat(job1.getJobState()).isEqualTo(JobState.SUCCESSFULLY_COMPLETED);
@@ -134,51 +132,64 @@ public class JobExecuterTest {
     assertThat(job3.getJobState()).isEqualTo(JobState.SUCCESSFULLY_COMPLETED);
   }
 
-//  /**
-//   * <p>
-//   * </p>
-//   *
-//   * @throws Exception
-//   */
-//  @Test
-//  public void testFailedJob() throws Exception {
-//
-//    //
-//    Job job1 = new SimpleJob(1);
-//    Job job2 = new Job(() -> {throw new RuntimeException();});
-//    job2.addAncestor(job1);
-//    SimpleJob job3 = new SimpleJob(3);
-//    job3.addAncestor(job2);
-//    _currentJob = new JobGroup(1, "test", job1, job2, job3);
-//
-//    //
-//    _jobExecuter.executeJobGroup(_currentJob);
-//    Awaitility.await().until(() -> !_currentJob.hasPendingJobs());
-//
-//    //
-//    assertThat(_result).containsExactly("Job started: 1", "Job stopped: 1", "Job started: 2", "Job stopped: 2");
-//
-//    //
-//    assertThat(job1.getJobState()).isEqualTo(JobState.SUCCESSFULLY_COMPLETED);
-//    assertThat(job2.getJobState()).isEqualTo(JobState.FAILED);
-//    assertThat(job3.getJobState()).isEqualTo(JobState.ANCESTOR_FAILED);
-//  }
+  /**
+   * <p>
+   * </p>
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testFailedJob() throws Exception {
 
-  public Callable<Boolean> simpleAction(int jobId) {
-    return () -> {
-      _result.add("Job started: " + jobId);
-      Thread.sleep(250);
-      _result.add("Job stopped: " + jobId);
-      return true;
+    //
+    Job job1 = new Job(new SimpleAction(1));
+    Job job2 = new Job(new SimpleAction(2) {
+      @Override
+      public Boolean call() throws Exception {
+        _result.add("Job started: 2");
+        throw new RuntimeException();
+      }
+    });
+    job2.addAncestor(job1);
+    Job job3 = new Job(new SimpleAction(3));
+    job3.addAncestor(job2);
+    _currentJobGroup = new JobGroup("test", job1, job2, job3);
+
+    //
+    _jobExecuter.executeJobGroup(_currentJobGroup);
+    Awaitility.await().until(() -> !_currentJobGroup.hasPendingJobs());
+
+    //
+    assertThat(_result).containsExactly("Job started: 1", "Job stopped: 1", "Job started: 2");
+
+    //
+    assertThat(job1.getJobState()).isEqualTo(JobState.SUCCESSFULLY_COMPLETED);
+    assertThat(job2.getJobState()).isEqualTo(JobState.FAILED);
+    assertThat(job3.getJobState()).isEqualTo(JobState.ANCESTOR_FAILED);
+  }
+
+  public JobTask simpleAction(int jobId) {
+    return new SimpleAction(jobId) {
+      @Override
+      public Boolean call() throws Exception {
+        _result.add("Job started: " + jobId);
+        _result.add("Job stopped: " + jobId);
+        return true;
+      }
     };
   }
 
-  public class SimpleAction implements Callable<Boolean> {
+  public class SimpleAction implements JobTask {
 
     private int _jobId;
 
     public SimpleAction(int jobId) {
       _jobId = jobId;
+    }
+
+    @Override
+    public String getDescription() {
+      return "" + _jobId;
     }
 
     /**

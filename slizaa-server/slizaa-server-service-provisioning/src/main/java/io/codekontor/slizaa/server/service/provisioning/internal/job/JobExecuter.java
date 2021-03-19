@@ -56,7 +56,7 @@ public class JobExecuter implements InitializingBean, DisposableBean {
    * <p>
    * </p>
    *
-   * @param job
+   * @param jobGroup
    */
   public void executeJobGroup(JobGroup jobGroup) {
 
