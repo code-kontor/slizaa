@@ -23,7 +23,6 @@ import java.util.List;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
-import io.codekontor.slizaa.server.service.svg.ISvgService;
 
 /**
  * <p>
@@ -36,8 +35,6 @@ public interface ISlizaaService {
 //	IAggregatedDependencySelectionService getSelectionService();
 
 	IBackendService getBackendService();
-	
-	ISvgService getSvgService();
 
 	Collection<IContentDefinitionProviderFactory<?>> getContentDefinitionProviderFactories();
 

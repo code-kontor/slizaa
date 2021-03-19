@@ -20,6 +20,7 @@ package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 import graphql.kickstart.tools.GraphQLResolver;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
+import io.codekontor.slizaa.server.service.svg.ISvgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Component;
 public class NodeResolver implements GraphQLResolver<Node> {
 
   @Autowired
-  private ISlizaaService slizaaService;
+  private ISvgService _svgService;
 
   public String getIconIdentifier(Node node) {
 
@@ -38,13 +39,13 @@ public class NodeResolver implements GraphQLResolver<Node> {
         .getLabelDefinition(node.getHgNode());
 
     if (labelDefinition.isOverlayImage()) {
-      return slizaaService.getSvgService().createSvgAndReturnShortKey(labelDefinition.getBaseImagePath(),
+      return _svgService.createSvgAndReturnShortKey(labelDefinition.getBaseImagePath(),
           labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.TOP_LEFT),
           labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.TOP_RIGHT),
           labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.BOTTOM_LEFT),
           labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.BOTTOM_RIGHT));
     } else {
-      return slizaaService.getSvgService().createSvgAndReturnShortKey(labelDefinition.getBaseImagePath());
+      return _svgService.createSvgAndReturnShortKey(labelDefinition.getBaseImagePath());
     }
   }
 }

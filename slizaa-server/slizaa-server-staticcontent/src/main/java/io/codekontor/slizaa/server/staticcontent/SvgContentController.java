@@ -20,7 +20,7 @@ package io.codekontor.slizaa.server.staticcontent;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
+import io.codekontor.slizaa.server.service.svg.ISvgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SvgContentController {
 
   @Autowired
-  private ISlizaaService                    _slizaaService;
+  private ISvgService _svgService;
 
   // the resource cache
   private ConcurrentHashMap<String, byte[]> _resourceCache = new ConcurrentHashMap<>();
@@ -69,7 +69,7 @@ public class SvgContentController {
     headers.setCacheControl(CacheControl.noCache().getHeaderValue());
     // TODO
     headers.setContentType(MediaType.TEXT_XML);
-    String svgXml = _slizaaService.getSvgService().getSvg(shortKey);
+    String svgXml = _svgService.getSvg(shortKey);
     ResponseEntity<String> responseEntity = new ResponseEntity<>(svgXml, headers, HttpStatus.OK);
     return responseEntity;
   }

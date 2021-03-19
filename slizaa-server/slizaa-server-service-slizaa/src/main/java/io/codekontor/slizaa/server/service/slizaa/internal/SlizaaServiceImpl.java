@@ -33,7 +33,6 @@ import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import io.codekontor.slizaa.server.service.slizaa.internal.json.SlizaaDatabaseConfiguration;
 import io.codekontor.slizaa.server.service.slizaa.internal.json.GraphDatabaseHierarchicalGraphConfiguration;
 import io.codekontor.slizaa.server.service.slizaa.internal.json.SlizaaServiceConfiguration;
-import io.codekontor.slizaa.server.service.svg.ISvgService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +82,6 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     private IConfigurationService _configurationService;
 
     @Autowired
-    private ISvgService _svgService;
-
-    @Autowired
     private ISlizaaDatabaseFactory _graphDatabaseFactory;
 
     @Autowired
@@ -119,6 +115,14 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
                             .newInstance(dbConfig, _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
 
                     if (SlizaaDatabaseState.STARTING.equals(graphDatabase.getState())) {
+                        // TODO:
+//                        java.util.concurrent.TimeoutException
+//                        at io.codekontor.slizaa.server.slizaadb.internal.SlizaaDatabaseImpl.awaitState(SlizaaDatabaseImpl.java:213)
+//                        at io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl.initialize(SlizaaServiceImpl.java:118)
+//                        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//                        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+//                        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+//                        at java.base/java.lang.reflect.Method.invoke(Method.java:566)
                         graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
                     }
 
@@ -143,11 +147,6 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     @Override
     public IBackendService getBackendService() {
         return _backendService;
-    }
-
-    @Override
-    public ISvgService getSvgService() {
-        return _svgService;
     }
 
     @Override

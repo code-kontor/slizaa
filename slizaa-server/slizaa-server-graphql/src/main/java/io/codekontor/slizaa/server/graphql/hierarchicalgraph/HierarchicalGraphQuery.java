@@ -19,6 +19,7 @@ package io.codekontor.slizaa.server.graphql.hierarchicalgraph;
 
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
+import io.codekontor.slizaa.server.service.svg.ISvgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,14 +29,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class HierarchicalGraphQuery implements GraphQLQueryResolver {
 
-  //
   @Autowired
-  private ISlizaaService slizaaService;
+  private ISvgService _svgService;
 
   /**
    * @return
    */
   public String svg(String identifier) {
-    return slizaaService.getSvgService().getSvg(identifier);
+    return _svgService.getSvg(identifier);
   }
 }

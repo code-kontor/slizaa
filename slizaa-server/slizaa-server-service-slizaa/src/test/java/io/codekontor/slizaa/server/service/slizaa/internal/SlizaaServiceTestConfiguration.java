@@ -29,7 +29,6 @@ import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvid
 import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
 import io.codekontor.slizaa.server.service.selection.EnableSelectionServiceModule;
 import io.codekontor.slizaa.server.service.slizaa.EnableSlizaaServiceModule;
-import io.codekontor.slizaa.server.service.svg.EnableSvgServiceModule;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +44,6 @@ import static org.mockito.Mockito.when;
 @Configuration
 @EnableConfigurationModule
 @EnableSlizaaServiceModule
-@EnableSvgServiceModule
 @EnableSelectionServiceModule
 @EnableSlizaaDatabaseModule
 @TestConfiguration

@@ -53,6 +53,11 @@
 		</dependency>
 		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
+			<artifactId>slizaa-server-service-svg</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-hierarchicalgraph-core-algorithms</artifactId>
 			<version>${project.version}</version>
 		</dependency>
