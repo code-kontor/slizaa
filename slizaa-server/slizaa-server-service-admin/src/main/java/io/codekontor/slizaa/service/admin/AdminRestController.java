@@ -20,8 +20,9 @@ package io.codekontor.slizaa.service.admin;
 import io.codekontor.slizaa.server.service.provisioning.IProvisioningService;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.GraphDatabaseDescr;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.ServerExtensionDescr;
-import io.codekontor.slizaa.server.service.provisioning.model.descr.SlizaaServerDescr;
+import io.codekontor.slizaa.server.service.provisioning.model.descr.SlizaaServerConfigurationDescr;
 import io.codekontor.slizaa.server.service.provisioning.model.request.GraphDatabaseRequest;
+import io.codekontor.slizaa.server.service.provisioning.model.request.SlizaaServerConfigurationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,30 +35,30 @@ public class AdminRestController {
     private static final String PREFIX_SLIZAA_ADMIN_REST = "/slizaa-admin-rest/";
 
     @Autowired
-    private IProvisioningService specService;
+    private IProvisioningService _provisioningService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public SlizaaServerDescr description() {
-        return specService.fetchServerDescription();
+    public SlizaaServerConfigurationDescr description() {
+        return _provisioningService.fetchServerDescription();
     }
 
     @GetMapping("/serverExtensions")
     public List<ServerExtensionDescr> serverExtensions() {
-        return specService.fetchServerDescription().getServerExtensions();
+        return _provisioningService.fetchServerDescription().getServerExtensions();
     }
 
     @GetMapping("/graphDatabases")
     public List<GraphDatabaseDescr> graphDatabases() {
-        return specService.fetchServerDescription().getGraphDatabases();
+        return _provisioningService.fetchServerDescription().getGraphDatabases();
     }
 
     @GetMapping("/graphDatabases/{id}")
     public GraphDatabaseDescr graphDatabases(@PathVariable(value = "id") String id) {
-        return specService.fetchGraphDatabaseDescription(id);
+        return _provisioningService.fetchGraphDatabaseDescription(id);
     }
 
 	@PostMapping(value = "/", consumes = "application/json", produces = "application/json")
-	public void graphDatabaseRequest(@RequestBody GraphDatabaseRequest graphDatabaseRequest) {
-		System.out.println(graphDatabaseRequest);
+	public void graphDatabaseRequest(@RequestBody SlizaaServerConfigurationRequest slizaaServerConfigurationRequest) {
+        _provisioningService.provision(slizaaServerConfigurationRequest);
 	}
 }
