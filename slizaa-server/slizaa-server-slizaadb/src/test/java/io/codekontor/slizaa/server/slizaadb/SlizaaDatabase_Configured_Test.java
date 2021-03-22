@@ -18,11 +18,9 @@
 package io.codekontor.slizaa.server.slizaadb;
 
 import io.codekontor.slizaa.server.slizaadb.internal.Assertions;
-import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +30,7 @@ public class SlizaaDatabase_Configured_Test extends AbstractSlizaaDatabaseTest {
     @Test
     public void testSetContentDefinition() {
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration("test", 1234, getDatabaseRootDirectory());
         Assertions.assertInitial(graphDatabase);
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
@@ -49,7 +47,7 @@ public class SlizaaDatabase_Configured_Test extends AbstractSlizaaDatabaseTest {
                 "mvn",
                 "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance(databaseConfiguration, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration(databaseConfiguration, getDatabaseRootDirectory());
         Assertions.assertConfigured(graphDatabase);
 
         graphDatabase.parse(true);

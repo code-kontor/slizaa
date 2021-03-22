@@ -21,7 +21,7 @@ import java.io.File;
 
 public interface ISlizaaDatabaseFactory {
 
-    ISlizaaDatabase newInstance(String id, int port, File databaseRootDirectory);
+    ISlizaaDatabase newInstanceFromConfiguration(String id, int port, File databaseRootDirectory);
 
-    ISlizaaDatabase newInstance(ISlizaaDatabaseConfiguration databaseConfiguration, File databaseRootDirectory);
+    ISlizaaDatabase newInstanceFromConfiguration(ISlizaaDatabaseConfiguration databaseConfiguration, File databaseRootDirectory);
 }

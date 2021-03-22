@@ -17,200 +17,139 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.internal;
 
+import io.codekontor.slizaa.core.job.*;
 import io.codekontor.slizaa.server.service.provisioning.IProvisioningService;
-import io.codekontor.slizaa.server.service.provisioning.internal.job.Job;
-import io.codekontor.slizaa.server.service.provisioning.internal.job.JobExecuter;
-import io.codekontor.slizaa.server.service.provisioning.internal.job.JobGroup;
-import io.codekontor.slizaa.server.service.provisioning.internal.job.JobTask;
-import io.codekontor.slizaa.server.service.provisioning.internal.tasks.CreateHierarchicalGraphJobTask;
-import io.codekontor.slizaa.server.service.provisioning.internal.tasks.ParseGraphDatabaseJobTask;
-import io.codekontor.slizaa.server.service.provisioning.internal.tasks.StopGraphDatabaseJobTask;
-import io.codekontor.slizaa.server.service.provisioning.internal.tasks.TerminateGraphDatabaseJobTask;
+import io.codekontor.slizaa.server.service.provisioning.internal.tasks.*;
 import io.codekontor.slizaa.server.service.provisioning.model.IGraphDatabaseDTO;
 import io.codekontor.slizaa.server.service.provisioning.model.IHierarchicalGraphDTO;
+import io.codekontor.slizaa.server.service.provisioning.model.descr.ProvisioningPlanDescr;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.SlizaaServerConfigurationDescr;
 import io.codekontor.slizaa.server.service.provisioning.model.diff.IServerConfigurationDiff;
 import io.codekontor.slizaa.server.service.provisioning.model.diff.ServerConfigurationDiffCreator;
 import io.codekontor.slizaa.server.service.provisioning.model.request.SlizaaServerConfigurationRequest;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
-import org.springframework.beans.factory.DisposableBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static io.codekontor.slizaa.core.job.JobFactory.*;
 
 /**
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 @Component
-public class ProvisioningService extends AbstractServerDescriptionProviderService implements IProvisioningService, InitializingBean, DisposableBean {
+public class ProvisioningService extends AbstractServerDescriptionProviderService implements IProvisioningService, InitializingBean {
 
-    @Autowired
-    private JobExecuter _jobExecutor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProvisioningService.class);
 
-    private ConcurrentHashMap<String, JobGroup> _graphDatabase2JobGroupMap;
+    private IProvisioningPlanExecutorService _provisioningPlanExecutorService;
 
-    /**
-     * {@inheritDoc}
-     */
+    private IProvisioningPlanExecution _currentProvisioningPlanExecution;
+
     @Override
     public void afterPropertiesSet() throws Exception {
-        _graphDatabase2JobGroupMap = new ConcurrentHashMap<>();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() throws Exception {
-        _jobExecutor.destroy();
-        _jobExecutor = null;
-
-        _graphDatabase2JobGroupMap.clear();
-        _graphDatabase2JobGroupMap = null;
+        _provisioningPlanExecutorService = JobFactory.createProvisioningPlanExecutorService();
     }
 
     @Override
     public SlizaaServerConfigurationDescr fetchServerDescription() {
 
         SlizaaServerConfigurationDescr serverConfigurationDescr = super.fetchServerDescription();
-        serverConfigurationDescr.setJobGroups(_graphDatabase2JobGroupMap.values().stream().map(jobGroup -> convertToJobGroupDescription(jobGroup)).collect(Collectors.toList()));
+        if (_currentProvisioningPlanExecution != null) {
+            ProvisioningPlanDescr provisioningPlanDescr = new ProvisioningPlanDescr();
+            provisioningPlanDescr.setJobGroups(_currentProvisioningPlanExecution.getJobGroups().stream().map(jobGroup -> convertToJobGroupDescription(jobGroup)).collect(Collectors.toList()));
+            serverConfigurationDescr.setProvisioningPlanDescr(provisioningPlanDescr);
+        }
+        // TODO
+        //serverConfigurationDescr.setProvisioningPlanDescr(_graphDatabase2JobGroupMap.values().stream());
 
         return serverConfigurationDescr;
     }
 
     @Override
-    public void provision(SlizaaServerConfigurationRequest serverConfigurationRequest) {
+    public IProvisioningPlanExecution provision(SlizaaServerConfigurationRequest serverConfigurationRequest) {
+
         checkNotNull(serverConfigurationRequest);
+
+        LOGGER.info("Provision configuration request.");
 
         SlizaaServerConfigurationDescr currentConfiguration = this.fetchServerDescription();
 
+        LOGGER.info("Computing provisioning plan.");
+
         IServerConfigurationDiff<IGraphDatabaseDTO> graphDatabaseDiff = ServerConfigurationDiffCreator.createGraphDatabaseDiff(currentConfiguration, serverConfigurationRequest);
 
-        graphDatabaseDiff.getComponentsToRemove().forEach(graphDatabaseDTO -> removeGraphDatabase(graphDatabaseDTO));
-        graphDatabaseDiff.getComponentsToCreate().forEach(graphDatabaseDTO -> createGraphDatabase(graphDatabaseDTO));
-        graphDatabaseDiff.getComponentsToModify().forEach(dtoValueDifference -> modifyGraphDatabase(dtoValueDifference.leftValue(), dtoValueDifference.rightValue()));
+        LOGGER.info("Executing provisioning plan.");
+
+        List<IJobGroup> jobGroups = new ArrayList<>();
+        jobGroups.addAll(graphDatabaseDiff.getComponentsToRemove().stream().map(graphDatabaseDTO -> removeGraphDatabase(graphDatabaseDTO)).collect(Collectors.toList()));
+        jobGroups.addAll(graphDatabaseDiff.getComponentsToCreate().stream().map(graphDatabaseDTO -> createGraphDatabase(graphDatabaseDTO)).collect(Collectors.toList()));
+        jobGroups.addAll(graphDatabaseDiff.getComponentsToModify().stream().map(dtoValueDifference -> modifyGraphDatabase(dtoValueDifference.leftValue(), dtoValueDifference.rightValue())).collect(Collectors.toList()));
+
+
+        // TODO: ID
+        // TODO: WHAT SHOULD I SAVE?
+        IProvisioningPlan provisioningPlan = createProvisioningPlan("123", jobGroups);
+        _currentProvisioningPlanExecution = _provisioningPlanExecutorService.executeProvisioningPlan(provisioningPlan);
+        _currentProvisioningPlanExecution.registerCompletionCallback(e -> {
+            LOGGER.info("Provisioning plan executed.");
+            ProvisioningService.this.getSlizaaService().storeConfiguration();
+        });
+        return _currentProvisioningPlanExecution;
     }
 
-    @Override
-    public void cancelPendingJobs() {
-        for (JobGroup jobGroup : _graphDatabase2JobGroupMap.values()) {
-            jobGroup.cancelPendingJobs();
+    private IJobGroup modifyGraphDatabase(IGraphDatabaseDTO oldGraphDatabaseDTO, IGraphDatabaseDTO newGraphDatabaseDTO) {
+
+        checkNotNull(oldGraphDatabaseDTO);
+        checkNotNull(newGraphDatabaseDTO);
+        checkState(oldGraphDatabaseDTO.getId().equals(newGraphDatabaseDTO.getId()));
+
+        IJobGroup jobGroup = createJobGroup(newGraphDatabaseDTO.getId());
+
+        ISlizaaDatabase slizaaDatabase = this.getSlizaaService().getGraphDatabase(oldGraphDatabaseDTO.getId());
+        IJob stopGraphDatabaseJob = createJob(new StopGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase), jobGroup);
+
+        IJob parseGraphDatabaseJob = createJob(new ParseGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase, false), jobGroup, stopGraphDatabaseJob);
+
+        IJob startGraphDatabaseJob = createJob(new StartGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase), jobGroup, parseGraphDatabaseJob);
+
+        for (IHierarchicalGraphDTO hierarchicalGraph : newGraphDatabaseDTO.getHierarchicalGraphs()) {
+            createJob(new CreateHierarchicalGraphJobTask(this.getSlizaaService(), slizaaDatabase, hierarchicalGraph.getId()), jobGroup, startGraphDatabaseJob);
         }
+
+        return jobGroup;
     }
 
-    @Override
-    public boolean hasPendingJobs(String id) {
-        JobGroup jobGroup = _graphDatabase2JobGroupMap.get(checkNotNull(id));
-        return jobGroup != null && jobGroup.hasPendingJobs();
+    private IJobGroup removeGraphDatabase(IGraphDatabaseDTO graphDatabaseToRemove) {
+        IJobGroup jobGroup = createJobGroup(checkNotNull(graphDatabaseToRemove).getId());
+        createJob(new TerminateGraphDatabaseJobTask(this.getSlizaaService(), this.getSlizaaService().getGraphDatabase(graphDatabaseToRemove.getId())), jobGroup);
+        return jobGroup;
     }
 
-    @Override
-    public JobGroup getJobGroup(String id) {
-        return _graphDatabase2JobGroupMap.get(checkNotNull(id));
-    }
+    protected IJobGroup createGraphDatabase(IGraphDatabaseDTO graphDatabaseToCreate) {
 
-    @Override
-    public boolean hasJobGroup(String id) {
-        return _graphDatabase2JobGroupMap.containsKey(checkNotNull(id));
-    }
-
-    protected void removeGraphDatabase(IGraphDatabaseDTO graphDatabaseToRemove) {
-
-        checkNotNull(graphDatabaseToRemove);
-
-        // execute job
-        ISlizaaDatabase slizaaDatabase = this.getSlizaaService().getGraphDatabase(graphDatabaseToRemove.getId());
-        Job terminateGraphDatabaseJob = new Job(new TerminateGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase));
-        Job removeJobGroupJob = new Job(new RemoveJobGroupTask(graphDatabaseToRemove.getId()));
-        removeJobGroupJob.addAncestor(terminateGraphDatabaseJob);
-        JobGroup jobGroup = new JobGroup(graphDatabaseToRemove.getId(), terminateGraphDatabaseJob, removeJobGroupJob);
-
-        //
-        executeJobGroup(jobGroup);
-    }
-
-    protected void createGraphDatabase(IGraphDatabaseDTO graphDatabaseToCreate) {
-
-        checkNotNull(graphDatabaseToCreate);
+        IJobGroup jobGroup = createJobGroup(checkNotNull(graphDatabaseToCreate).getId());
 
         ISlizaaDatabase slizaaDatabase = getSlizaaService().newGraphDatabase(graphDatabaseToCreate.getId());
         slizaaDatabase.setContentDefinitionProvider(
                 graphDatabaseToCreate.getContentDefinition().getFactoryIdShortForm(),
                 graphDatabaseToCreate.getContentDefinition().getDefinition());
 
-        List<Job> jobList = new ArrayList<>();
+        IJob parseGraphDatabaseJob = createJob(new ParseGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase, false), jobGroup);
 
-        Job parseGraphDatabaseJob = new Job(new ParseGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase, true));
-        jobList.add(parseGraphDatabaseJob);
+        IJob startGraphDatabaseJob = createJob(new StartGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase), jobGroup, parseGraphDatabaseJob);
 
         for (IHierarchicalGraphDTO hierarchicalGraph : graphDatabaseToCreate.getHierarchicalGraphs()) {
-            Job createHierarchicalGraphJob = new Job(new CreateHierarchicalGraphJobTask(this.getSlizaaService(), slizaaDatabase, hierarchicalGraph.getId()));
-            createHierarchicalGraphJob.addAncestor(parseGraphDatabaseJob);
-            jobList.add(createHierarchicalGraphJob);
+            createJob(new CreateHierarchicalGraphJobTask(this.getSlizaaService(), slizaaDatabase, hierarchicalGraph.getId()), jobGroup, startGraphDatabaseJob);
         }
 
-        executeJobGroup(new JobGroup(graphDatabaseToCreate.getId(), jobList.toArray(new Job[0])));
-    }
-
-    protected void modifyGraphDatabase(IGraphDatabaseDTO oldGraphDatabaseDTO, IGraphDatabaseDTO newGraphDatabaseDTO) {
-
-        checkNotNull(oldGraphDatabaseDTO);
-        checkNotNull(newGraphDatabaseDTO);
-        checkState(oldGraphDatabaseDTO.getId().equals(newGraphDatabaseDTO.getId()));
-
-        List<Job> jobList = new ArrayList<>();
-
-        ISlizaaDatabase slizaaDatabase = this.getSlizaaService().getGraphDatabase(oldGraphDatabaseDTO.getId());
-        Job stopGraphDatabaseJob = new Job(new StopGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase));
-        jobList.add(stopGraphDatabaseJob);
-
-        Job parseGraphDatabaseJob = new Job(new ParseGraphDatabaseJobTask(this.getSlizaaService(), slizaaDatabase, true));
-        parseGraphDatabaseJob.addAncestor(stopGraphDatabaseJob);
-        jobList.add(parseGraphDatabaseJob);
-
-        for (IHierarchicalGraphDTO hierarchicalGraph : newGraphDatabaseDTO.getHierarchicalGraphs()) {
-            Job createHierarchicalGraphJob = new Job(new CreateHierarchicalGraphJobTask(this.getSlizaaService(), slizaaDatabase, hierarchicalGraph.getId()));
-            createHierarchicalGraphJob.addAncestor(parseGraphDatabaseJob);
-            jobList.add(createHierarchicalGraphJob);
-        }
-
-        executeJobGroup(new JobGroup(newGraphDatabaseDTO.getId(), jobList.toArray(new Job[0])));
-    }
-
-    private void executeJobGroup(JobGroup jobGroup) {
-
-        // add to map...
-        _graphDatabase2JobGroupMap.put(jobGroup.getId(), jobGroup);
-
-        // ...and execute
-        _jobExecutor.executeJobGroup(jobGroup);
-    }
-
-    class RemoveJobGroupTask implements JobTask {
-
-        private String _identifier;
-
-        public RemoveJobGroupTask(String identifier) {
-            this._identifier = identifier;
-        }
-
-        @Override
-        public String getDescription() {
-            return String.format("RemoveJobGroupTask [%s]", _identifier);
-        }
-
-        @Override
-        public Boolean call() throws Exception {
-            ProvisioningService.this._graphDatabase2JobGroupMap.remove(_identifier);
-            return true;
-        }
+        return jobGroup;
     }
 }

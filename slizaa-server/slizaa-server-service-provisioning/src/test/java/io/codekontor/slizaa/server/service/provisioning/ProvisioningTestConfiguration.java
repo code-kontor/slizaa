@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-slizaa - Slizaa Static Software Analysis Tools
+ * slizaa-server-service-provisioning - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify

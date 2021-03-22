@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model.descr;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.codekontor.slizaa.server.service.provisioning.model.ISlizaaServerConfigurationDTO;
 
 import java.util.Collection;
@@ -37,7 +38,8 @@ public class SlizaaServerConfigurationDescr implements ISlizaaServerConfiguratio
 
     private List<GraphDatabaseDescr> graphDatabases;
 
-    private Collection<JobGroupDescr> jobGroups;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private ProvisioningPlanDescr provisioningPlanDescr;
 
     /**
      * <p>
@@ -52,12 +54,12 @@ public class SlizaaServerConfigurationDescr implements ISlizaaServerConfiguratio
         this.graphDatabases = checkNotNull(graphDatabases);
     }
 
-    public void setJobGroups(Collection<JobGroupDescr> jobGroups) {
-        this.jobGroups = jobGroups;
+    public ProvisioningPlanDescr getProvisioningPlanDescr() {
+        return provisioningPlanDescr;
     }
 
-    public Collection<JobGroupDescr> getJobGroups() {
-        return jobGroups;
+    public void setProvisioningPlanDescr(ProvisioningPlanDescr provisioningPlanDescr) {
+        this.provisioningPlanDescr = provisioningPlanDescr;
     }
 
     /**

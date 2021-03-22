@@ -29,7 +29,7 @@ public class SlizaaDatabase_Initial_Test extends AbstractSlizaaDatabaseTest {
     @Test
     public void testInitial() {
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration("test", 1234, getDatabaseRootDirectory());
         Assertions.assertInitial(graphDatabase);
     }
 
@@ -43,7 +43,7 @@ public class SlizaaDatabase_Initial_Test extends AbstractSlizaaDatabaseTest {
                 null,
                 null);
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance(databaseConfiguration, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration(databaseConfiguration, getDatabaseRootDirectory());
         Assertions.assertInitial(graphDatabase);
     }
 }

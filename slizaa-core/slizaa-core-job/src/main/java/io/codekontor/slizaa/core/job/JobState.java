@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-provisioning - Slizaa Static Software Analysis Tools
+ * slizaa-core-job - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,43 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.provisioning.internal.job;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.concurrent.FutureTask;
+package io.codekontor.slizaa.core.job;
 
 /**
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class JobFutureTask extends FutureTask<Void> {
-
-  /** - */
-  private Job _abstractJob;
-
-  /**
-   * <p>
-   * Creates a new instance of type {@link JobFutureTask}.
-   * </p>
-   *
-   * @param vmJob
-   */
-  public JobFutureTask(Job job) {
-    super(job);
-
-    //
-    _abstractJob = checkNotNull(job);
-    _abstractJob.setFutureTask(this);
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  public Job getJob() {
-    return _abstractJob;
-  }
+public enum JobState {
+  NEW,
+  IN_PROGRESS,
+  SUCCESSFULLY_COMPLETED,
+  FAILED,
+  ANCESTOR_FAILED,
+  SKIPPED
 }

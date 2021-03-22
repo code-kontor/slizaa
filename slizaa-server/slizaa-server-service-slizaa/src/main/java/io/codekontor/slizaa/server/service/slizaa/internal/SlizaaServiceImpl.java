@@ -57,7 +57,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Component
 public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallback {
 
-    private static final long TIMEOUT = 30 * 1000;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlizaaServiceImpl.class);
+
+    private static final long TIMEOUT = 300 * 1000;
 
     {
         io.codekontor.slizaa.hierarchicalgraph.core.model.CustomFactoryStandaloneSupport
@@ -68,9 +70,6 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     }
 
     private static final String CONFIG_ID = "io.codekontor.slizaa.server.service.slizaa";
-
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(SlizaaServiceImpl.class);
 
     @Autowired
     private SlizaaServiceDatabaseProperties _slizaaServiceProperties;
@@ -112,19 +111,13 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
                 try {
 
                     ISlizaaDatabase graphDatabase = _structureDatabases.computeIfAbsent(dbConfig.getIdentifier(), id -> _graphDatabaseFactory
-                            .newInstance(dbConfig, _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
+                            .newInstanceFromConfiguration(dbConfig, _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
 
                     if (SlizaaDatabaseState.STARTING.equals(graphDatabase.getState())) {
-                        // TODO:
-//                        java.util.concurrent.TimeoutException
-//                        at io.codekontor.slizaa.server.slizaadb.internal.SlizaaDatabaseImpl.awaitState(SlizaaDatabaseImpl.java:213)
-//                        at io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl.initialize(SlizaaServiceImpl.java:118)
-//                        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-//                        at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-//                        at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-//                        at java.base/java.lang.reflect.Method.invoke(Method.java:566)
                         graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, TIMEOUT);
                     }
+
+                    LOGGER.info("Creating hierarchical graphs...");
 
                     //
                     for (GraphDatabaseHierarchicalGraphConfiguration hierarchicalGraphCfg : dbConfig.getHierarchicalGraphs()) {
@@ -161,12 +154,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
         //
         List<? extends ISlizaaDatabase> result = new ArrayList<>(_structureDatabases.values());
-        result.sort(new Comparator<ISlizaaDatabase>() {
-            @Override
-            public int compare(ISlizaaDatabase o1, ISlizaaDatabase o2) {
-                return o1.getIdentifier().compareTo(o2.getIdentifier());
-            }
-        });
+        result.sort(Comparator.comparing(o -> o.getIdentifier()));
         return result;
     }
 
@@ -187,10 +175,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
         // create the result
         ISlizaaDatabase result = _structureDatabases.computeIfAbsent(identifier, id -> _graphDatabaseFactory
-                .newInstance(identifier, SlizaaSocketUtils.findAvailableTcpPort(), _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
-
-        // store the configuration
-        storeConfig();
+                .newInstanceFromConfiguration(identifier, SlizaaSocketUtils.findAvailableTcpPort(), _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
 
         // and return the result
         return result;
@@ -208,7 +193,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
         }
     }
 
-    public void storeConfig() {
+    public void storeConfiguration() {
 
         SlizaaServiceConfiguration configuration = new SlizaaServiceConfiguration();
 
@@ -267,14 +252,6 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
 
         return result;
     }
-
-//    private IGraphDatabase createGraphDatabaseIfAbsent(String identifier, int port) {
-//
-//        File databaseDirectory = new File(_slizaaServiceProperties.getDatabaseRootDirectoryAsFile(), identifier);
-//
-//        return _structureDatabases.computeIfAbsent(identifier, id -> _graphDatabaseFactory
-//                .newInstance(identifier, port, databaseDirectory));
-//    }
 
     private void checkConfigured() {
         if (!this._backendService.hasInstalledExtensions()) {

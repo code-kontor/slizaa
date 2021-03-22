@@ -32,7 +32,7 @@ import io.codekontor.slizaa.server.service.backend.IBackendService;
  */
 public interface ISlizaaService {
 
-//	IAggregatedDependencySelectionService getSelectionService();
+	void storeConfiguration();
 
 	IBackendService getBackendService();
 

@@ -41,6 +41,7 @@
 		<module>slizaa-core-boltclient</module>
 		<module>slizaa-core-boltclient-testfwk</module>
 		<module>slizaa-core-progressmonitor</module>
-	</modules>
+        <module>slizaa-core-job</module>
+    </modules>
 
 </project>

@@ -15,30 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.provisioning.internal.job.sorter;
+package io.codekontor.slizaa.server.service.provisioning.model.descr;
 
-/**
- * <p>
- * Interface for a vertex renderer. A vertex renderer is used to create a custom string representation of a vertex for
- * further usage in an exception message.
- * </p>
- * 
- * @author Gerd W&uuml;therich (gerd@gerd-wuetherich.de)
- * 
- * @param <T>
- *          the type of the vertices
- */
-public interface VertexRenderer<T> {
+import java.util.Collection;
 
-  /**
-   * <p>
-   * Must return an not-null string that represents the given vertex.
-   * </p>
-   * 
-   * @param vertex
-   *          the vertex to render.
-   * @return must return an not-null string that represents the given vertex.
-   */
-  String renderVertex(T vertex);
+public class ProvisioningPlanDescr {
 
-} /* ENDINTERFACE */
+    private Collection<JobGroupDescr> jobGroups;
+
+    public void setJobGroups(Collection<JobGroupDescr> jobGroups) {
+        this.jobGroups = jobGroups;
+    }
+
+    public Collection<JobGroupDescr> getJobGroups() {
+        return jobGroups;
+    }
+}

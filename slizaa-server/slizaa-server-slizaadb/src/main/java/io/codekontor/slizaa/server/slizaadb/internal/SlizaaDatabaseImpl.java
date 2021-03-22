@@ -21,7 +21,7 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProv
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
-import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseEnvironment;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseSPI;
 import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -52,7 +52,7 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
     private final SlizaaDatabaseStateMachineContext _stateMachineContext;
 
     /* the database environments */
-    private final ISlizaaDatabaseEnvironment _graphDatabaseEnvironment;
+    private final ISlizaaDatabaseSPI _graphDatabaseEnvironment;
 
     private final Lock _stateLock = new ReentrantLock();
     private final Condition _stateCondition = _stateLock.newCondition();
@@ -63,7 +63,7 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
      */
     SlizaaDatabaseImpl(StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> stateMachine,
                        SlizaaDatabaseStateMachineContext stateMachineContext,
-                       ISlizaaDatabaseEnvironment graphDatabaseEnvironment) {
+                       ISlizaaDatabaseSPI graphDatabaseEnvironment) {
 
         this._stateMachine = checkNotNull(stateMachine);
         this._stateMachineContext = checkNotNull(stateMachineContext);
@@ -73,7 +73,6 @@ public class SlizaaDatabaseImpl implements ISlizaaDatabase {
         this._stateMachine.addStateListener(new StateMachineListenerAdapter<SlizaaDatabaseState, SlizaaDatabaseTrigger>() {
             @Override
             public void stateChanged(State from, State to) {
-                _stateMachineContext.storeConfiguration();
                 _stateLock.lock();
                 try {
                     _stateCondition.signalAll(); // releases lock and waits until doSomethingElse is called

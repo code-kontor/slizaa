@@ -29,7 +29,7 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProv
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
-import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseEnvironment;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseSPI;
 import io.codekontor.slizaa.server.slizaadb.internal.HierarchicalGraph;
 import io.codekontor.slizaa.server.slizaadb.internal.HierarchicalGraphDefinition;
 import io.codekontor.slizaa.server.service.selection.IModifiableAggregatedDependencySelectionService;
@@ -40,18 +40,13 @@ import java.io.File;
 import java.util.List;
 
 @Component
-public class SlizaaDatabaseEnvironment implements ISlizaaDatabaseEnvironment {
+public class SlizaaDatabaseEnvironment implements ISlizaaDatabaseSPI {
 
     @Autowired
     private SlizaaServiceImpl _slizaaService;
 
     @Autowired
     private IModifiableAggregatedDependencySelectionService _selectionService;
-
-    @Override
-    public void storeConfig() {
-        _slizaaService.storeConfig();
-    }
 
     @Override
     public IGraphDb createGraphDb(int port, File databaseDirectory) {

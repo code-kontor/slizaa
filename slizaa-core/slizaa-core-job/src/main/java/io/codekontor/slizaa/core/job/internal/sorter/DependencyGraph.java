@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-provisioning - Slizaa Static Software Analysis Tools
+ * slizaa-core-job - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,15 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.provisioning.internal.job.sorter;
+package io.codekontor.slizaa.core.job.internal.sorter;
+
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <p>

@@ -27,11 +27,11 @@ import io.codekontor.slizaa.server.slizaadb.internal.HierarchicalGraphDefinition
 
 import java.io.File;
 
-public interface ISlizaaDatabaseEnvironment {
+public interface ISlizaaDatabaseSPI {
 
-    void storeConfig();
+    // void storeConfig();
 
-   IGraphDb createGraphDb(int port, File databaseDirectory);
+    IGraphDb createGraphDb(int port, File databaseDirectory);
 
     void handleHierarchicalGraphRemoved(HierarchicalGraph hierarchicalGraph);
 

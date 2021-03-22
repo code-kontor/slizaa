@@ -32,8 +32,10 @@ public class SlizaaServerConfigurationRequest implements ISlizaaServerConfigurat
 
   private List<GraphDatabaseRequest> graphDatabases;
 
+  private String _configurationRequestId;
+
   public SlizaaServerConfigurationRequest() {
-    // default constructor
+    _configurationRequestId = "BUMM";
   }
 
   public SlizaaServerConfigurationRequest(List<GraphDatabaseRequest> graphDatabases) {

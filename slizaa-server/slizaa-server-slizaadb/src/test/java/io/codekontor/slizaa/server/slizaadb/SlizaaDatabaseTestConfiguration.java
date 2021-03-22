@@ -22,7 +22,6 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalgraphFactor
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.scanner.api.importer.IModelImporter;
 import io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -39,9 +38,9 @@ import static org.mockito.Mockito.when;
 public class SlizaaDatabaseTestConfiguration {
 
     @Bean
-    public ISlizaaDatabaseEnvironment graphDatabaseEnvironment() {
+    public ISlizaaDatabaseSPI graphDatabaseEnvironment() {
 
-        ISlizaaDatabaseEnvironment graphDatabaseEnvironment = mock(ISlizaaDatabaseEnvironment.class);
+        ISlizaaDatabaseSPI graphDatabaseEnvironment = mock(ISlizaaDatabaseSPI.class);
         IGraphDb graphDb = graphDb();
         IModelImporter modelImporter = modelImporter();
         IBoltClient boltClient = boltClient();

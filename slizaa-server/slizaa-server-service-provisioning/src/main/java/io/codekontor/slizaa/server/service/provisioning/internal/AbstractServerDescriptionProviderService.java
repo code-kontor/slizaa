@@ -17,28 +17,18 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.internal;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
+import io.codekontor.slizaa.core.job.IJobGroup;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.provisioning.IProvisioningService;
-import io.codekontor.slizaa.server.service.provisioning.internal.job.JobExecuter;
-import io.codekontor.slizaa.server.service.provisioning.internal.job.JobGroup;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.*;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
@@ -78,14 +68,13 @@ public abstract class AbstractServerDescriptionProviderService implements IProvi
         return _slizaaService;
     }
 
-    protected JobGroupDescr convertToJobGroupDescription(JobGroup jobGroup) {
+    protected JobGroupDescr convertToJobGroupDescription(IJobGroup jobGroup) {
         JobGroupDescr result = new JobGroupDescr(jobGroup.getId());
-        jobGroup.getJobTasks().stream()
-                .filter(jobFutureTask -> !(jobFutureTask.getJob().getJobTask() instanceof ProvisioningService.RemoveJobGroupTask))
-                .forEach(jobFutureTask -> {
+        jobGroup.getJobs().stream()
+                .forEach(job -> {
                     result.add(new JobDescr(
-                            jobFutureTask.getJob().getDescription(),
-                            jobFutureTask.getJob().getJobState().name()
+                            job.getDescription(),
+                            job.getJobState().name()
                     ));
                 }
         );

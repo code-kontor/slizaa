@@ -21,8 +21,8 @@ import io.codekontor.slizaa.server.slizaadb.internal.Assertions;
 import org.awaitility.Awaitility;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +32,7 @@ public class SlizaaDatabase_Running_Test extends AbstractSlizaaDatabaseTest {
     @Test
     public void testStart() throws IOException, TimeoutException {
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration("test", 1234, getDatabaseRootDirectory());
         assertThat(graphDatabase).isNotNull();
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
@@ -52,7 +52,7 @@ public class SlizaaDatabase_Running_Test extends AbstractSlizaaDatabaseTest {
     @Test
     public void parseWithStart() throws IOException, TimeoutException {
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration("test", 1234, getDatabaseRootDirectory());
         assertThat(graphDatabase).isNotNull();
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
@@ -74,11 +74,35 @@ public class SlizaaDatabase_Running_Test extends AbstractSlizaaDatabaseTest {
                 "mvn",
                 "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance(databaseConfiguration, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration(databaseConfiguration, getDatabaseRootDirectory());
 
         Assertions.assertStarting(graphDatabase);
 
         graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
         Assertions.assertRunning(graphDatabase);
+    }
+
+    @Test
+    public void startOnExisting() throws IOException, TimeoutException, InterruptedException {
+
+        ISlizaaDatabaseConfiguration databaseConfiguration = new SlizaaDatabaseConfiguration(
+                "test",
+                1234,
+                SlizaaDatabaseState.RUNNING,
+                "mvn",
+                "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
+
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration(databaseConfiguration, new File("C:\\Development\\slizaa\\repos\\slizaa\\slizaa-work\\databases\\masterFlitz"));
+        assertThat(graphDatabase).isNotNull();
+
+        graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
+        Assertions.assertRunning(graphDatabase);
+
+        Thread.sleep(10000L);
+
+//        IBoltClientFactory clientFactory = IBoltClientFactory.newInstance(Executors.newSingleThreadExecutor());
+//        IBoltClient boltClient = clientFactory.createBoltClient("bolt://localhost:" +  graphDatabase.getPort());
+//        boltClient.connect();
+//        boltClient.syncExecAndConsume("MATCH (t) RETURN count(t)", result -> System.out.println(result));
     }
 }

@@ -24,7 +24,7 @@ import io.codekontor.slizaa.scanner.api.importer.IModelImporter;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AbstractContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.server.slizaadb.IHierarchicalGraph;
-import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseEnvironment;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseSPI;
 import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 import io.codekontor.slizaa.server.slizaadb.SlizaaSocketUtils;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class SlizaaDatabaseStateMachineContext {
     private static Logger LOGGER = LoggerFactory
             .getLogger(SlizaaDatabaseStateMachineContext.class);
 
-    private final ISlizaaDatabaseEnvironment _graphDatabaseEnvironment;
+    private final ISlizaaDatabaseSPI _graphDatabaseEnvironment;
 
     /* the state machine */
     private final StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> _stateMachine;
@@ -75,7 +75,7 @@ public class SlizaaDatabaseStateMachineContext {
             String identifier,
             File databaseDirectory,
             int port,
-            ISlizaaDatabaseEnvironment graphDatabaseEnvironment,
+            ISlizaaDatabaseSPI graphDatabaseEnvironment,
             ExecutorService executorService,
             StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger> stateMachine) {
 
@@ -150,10 +150,6 @@ public class SlizaaDatabaseStateMachineContext {
             return null;
         }
         return _hierarchicalGraphs.get(identifier);
-    }
-
-    public void storeConfiguration() {
-        _graphDatabaseEnvironment.storeConfig();
     }
 
     protected void recomputePort() {

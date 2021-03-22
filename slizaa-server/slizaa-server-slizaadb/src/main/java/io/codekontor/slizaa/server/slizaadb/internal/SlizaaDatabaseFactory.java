@@ -19,6 +19,8 @@ package io.codekontor.slizaa.server.slizaadb.internal;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.server.slizaadb.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.statemachine.StateMachine;
@@ -27,22 +29,24 @@ import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.Preconditions.checkState;
 
 @Component
 public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, InitializingBean {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SlizaaDatabaseFactory.class);
+
     @Autowired
     private StateMachineFactory<SlizaaDatabaseState, SlizaaDatabaseTrigger> _stateMachineFactory;
 
     @Autowired
-    private ISlizaaDatabaseEnvironment _graphDatabaseEnvironment;
+    private ISlizaaDatabaseSPI _graphDatabaseEnvironment;
 
     private Map<StateMachine<SlizaaDatabaseState, SlizaaDatabaseTrigger>, SlizaaDatabaseStateMachineContext> _stateMachine2StructureDatabaseContext = new HashMap<>();
 
@@ -55,7 +59,7 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
     }
 
     @Override
-    public SlizaaDatabaseImpl newInstance(String id, int port, File databaseRootDirectory) {
+    public SlizaaDatabaseImpl newInstanceFromConfiguration(String id, int port, File databaseRootDirectory) {
 
         // create
         SlizaaDatabaseImpl result = createDatabaseImpl(id, port, databaseRootDirectory);
@@ -68,7 +72,7 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
     }
 
     @Override
-    public SlizaaDatabaseImpl newInstance(ISlizaaDatabaseConfiguration databaseConfiguration, File databaseRootDirectory) {
+    public SlizaaDatabaseImpl newInstanceFromConfiguration(ISlizaaDatabaseConfiguration databaseConfiguration, File databaseRootDirectory) {
 
         // method internal helper structure
         class ModifiedState {
@@ -76,15 +80,19 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
             boolean triggerStart;
         }
 
-        SlizaaDatabaseImpl result = createDatabaseImpl(databaseConfiguration.getIdentifier(), databaseConfiguration.getPort(), databaseRootDirectory);
+        LOGGER.info("Creating new slizaa database instance '{}'. ", databaseConfiguration.getIdentifier());
+
+        SlizaaDatabaseImpl slizaaDatabase = createDatabaseImpl(databaseConfiguration.getIdentifier(), databaseConfiguration.getPort(), databaseRootDirectory);
 
         //
         if (databaseConfiguration.hasContentDefinition()) {
 
+            LOGGER.info("Setting content definition for slizaa database '{}'. ", databaseConfiguration.getIdentifier());
+
             IContentDefinitionProvider<?> contentDefinitionProvider = _graphDatabaseEnvironment.createContentDefinitionProvider(
                     databaseConfiguration.getContentDefinitionFactoryId(), databaseConfiguration.getContentDefinitionExternalRepresentation());
 
-            result.stateMachineContext().setContentDefinition(contentDefinitionProvider);
+            slizaaDatabase.stateMachineContext().setContentDefinition(contentDefinitionProvider);
         }
 
         //
@@ -114,19 +122,27 @@ public class SlizaaDatabaseFactory implements ISlizaaDatabaseFactory, Initializi
         }
 
         //
-        result.stateMachine().getStateMachineAccessor().doWithAllRegions(access -> access
+        slizaaDatabase.stateMachine().getStateMachineAccessor().doWithAllRegions(access -> access
                 .resetStateMachine(new DefaultStateMachineContext<>(modifiedState.modifiedState, null, null, null)));
 
         // start
-        result.stateMachine().start();
+        slizaaDatabase.stateMachine().start();
 
         //
         if (modifiedState.triggerStart) {
-            result.start();
+            LOGGER.info("Starting slizaa database {}.", databaseConfiguration.getIdentifier());
+            slizaaDatabase.start();
+            try {
+                slizaaDatabase.awaitState(SlizaaDatabaseState.STARTING, 10000L);
+            } catch (TimeoutException e) {
+                LOGGER.error("Timeout while starting slizaa database {}.",  e.getMessage());
+            }
         }
 
+        LOGGER.info("Successfully created slizaa database {}.", databaseConfiguration.getIdentifier());
+
         //
-        return result;
+        return slizaaDatabase;
     }
 
     /**

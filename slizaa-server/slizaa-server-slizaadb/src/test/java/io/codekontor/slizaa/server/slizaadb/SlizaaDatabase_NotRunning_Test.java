@@ -22,7 +22,6 @@ import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +31,7 @@ public class SlizaaDatabase_NotRunning_Test extends AbstractSlizaaDatabaseTest {
     @Test
     public void testParseWithoutStart() throws IOException, TimeoutException {
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration("test", 1234, getDatabaseRootDirectory());
         assertThat(graphDatabase).isNotNull();
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
@@ -46,7 +45,7 @@ public class SlizaaDatabase_NotRunning_Test extends AbstractSlizaaDatabaseTest {
     @Test
     public void testStop() throws IOException, TimeoutException {
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance("test", 1234, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration("test", 1234, getDatabaseRootDirectory());
         assertThat(graphDatabase).isNotNull();
 
         graphDatabase.setContentDefinitionProvider("mvn", "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
@@ -74,7 +73,7 @@ public class SlizaaDatabase_NotRunning_Test extends AbstractSlizaaDatabaseTest {
                 "mvn",
                 "org.springframework:spring-core:jar:5.1.6.RELEASE,org.springframework:spring-beans:jar:5.1.6.RELEASE");
 
-        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstance(databaseConfiguration, getDatabaseRootDirectory());
+        ISlizaaDatabase graphDatabase = graphDatabaseFactory.newInstanceFromConfiguration(databaseConfiguration, getDatabaseRootDirectory());
         Assertions.assertNotRunning(graphDatabase);
     }
 }

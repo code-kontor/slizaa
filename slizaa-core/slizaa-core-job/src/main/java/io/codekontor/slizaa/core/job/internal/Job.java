@@ -1,5 +1,5 @@
 /**
- * slizaa-server-service-provisioning - Slizaa Static Software Analysis Tools
+ * slizaa-core-job - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,86 +15,66 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.server.service.provisioning.internal.job;
+package io.codekontor.slizaa.core.job.internal;
+
+
+import io.codekontor.slizaa.core.job.IJob;
+import io.codekontor.slizaa.core.job.IJobGroup;
+import io.codekontor.slizaa.core.job.IJobTask;
+import io.codekontor.slizaa.core.job.JobState;
+import io.codekontor.slizaa.core.job.internal.striped.StripedCallable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
-public class Job implements Callable<Void> {
+public class Job implements IJob, StripedCallable<Void> {
 
     private JobState _jobState;
 
     private List<Job> _ancestors;
 
-    private Object _sharedLock;
+    private IJobTask _jobTask;
 
-    private JobFutureTask _futureTask;
-
-    private JobTask _jobTask;
+    private JobGroup _jobGroup;
 
     /**
      * <p>
      * Creates a new instance of type {@link Job}.
      * </p>
      */
-    public Job(JobTask action) {
+    public Job(IJobTask action, IJobGroup jobGroup) {
         _jobTask = checkNotNull(action);
         _jobState = JobState.NEW;
+        _jobGroup = (JobGroup) jobGroup;
+        _jobGroup.addJob(this);
         _ancestors = new ArrayList<>();
-        _sharedLock = new Object();
     }
 
-    public Job(JobTask action, Job... ancestors) {
-        this(action);
-        for (Job ancestor : ancestors) {
-            _ancestors.add(ancestor);
-        }
-    }
-
-    public JobTask getJobTask() {
+    public IJobTask getJobTask() {
         return _jobTask;
     }
 
+    @Override
+    public String getId() {
+        return _jobGroup.getId();
+    }
+
+    @Override
     public String getDescription() {
         return _jobTask.getDescription();
     }
 
-    /**
-     * <p>
-     * </p>
-     *
-     * @param sharedLock
-     */
-    protected void setSharedLock(Object sharedLock) {
-        _sharedLock = checkNotNull(sharedLock);
-    }
-
-    /**
-     * <p>
-     * </p>
-     *
-     * @return
-     */
-    public JobFutureTask getFutureTask() {
-        return _futureTask;
-    }
-
-    /**
-     * <p>
-     * </p>
-     *
-     * @param futureTask
-     */
-    void setFutureTask(JobFutureTask futureTask) {
-        _futureTask = futureTask;
+    @Override
+    public Object getStripe() {
+        return this.getId();
     }
 
     /**
@@ -103,8 +83,9 @@ public class Job implements Callable<Void> {
      *
      * @param ancestor
      */
-    public void addAncestor(Job ancestor) {
-        _ancestors.add(ancestor);
+    public void addAncestor(IJob ancestor) {
+        checkState(_jobGroup.equals(((Job)ancestor)._jobGroup));
+        _ancestors.add((Job)ancestor);
     }
 
     /**
@@ -142,17 +123,6 @@ public class Job implements Callable<Void> {
     @Override
     public final Void call() throws Exception {
 
-        //
-        synchronized (_sharedLock) {
-            while (!isExecutable() && !getJobState().equals(JobState.ANCESTOR_FAILED)) {
-                try {
-                    _sharedLock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
         try {
             if (!getJobState().equals(JobState.ANCESTOR_FAILED)) {
 
@@ -166,12 +136,7 @@ public class Job implements Callable<Void> {
         } catch (Exception e) {
             setJobState(JobState.FAILED);
             throw e;
-        } finally {
-            synchronized (_sharedLock) {
-                _sharedLock.notifyAll();
-            }
         }
-
         return null;
     }
 
@@ -213,15 +178,5 @@ public class Job implements Callable<Void> {
 
         //
         return _jobState;
-    }
-
-    /**
-     * <p>
-     * </p>
-     *
-     * @return
-     */
-    public Object getSharedLock() {
-        return _sharedLock;
     }
 }

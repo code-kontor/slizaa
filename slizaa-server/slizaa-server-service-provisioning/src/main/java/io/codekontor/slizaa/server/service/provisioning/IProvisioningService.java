@@ -17,15 +17,10 @@
  */
 package io.codekontor.slizaa.server.service.provisioning;
 
-import io.codekontor.slizaa.server.service.provisioning.internal.job.JobGroup;
-import io.codekontor.slizaa.server.service.provisioning.model.IGraphDatabaseDTO;
+import io.codekontor.slizaa.core.job.IProvisioningPlanExecution;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.GraphDatabaseDescr;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.SlizaaServerConfigurationDescr;
-import io.codekontor.slizaa.server.service.provisioning.model.diff.IServerConfigurationDiff;
-import io.codekontor.slizaa.server.service.provisioning.model.diff.ServerConfigurationDiffCreator;
 import io.codekontor.slizaa.server.service.provisioning.model.request.SlizaaServerConfigurationRequest;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  *
@@ -37,13 +32,5 @@ public interface IProvisioningService {
 
     GraphDatabaseDescr fetchGraphDatabaseDescription(String identifier);
 
-    void provision(SlizaaServerConfigurationRequest serverConfigurationRequest);
-
-    void cancelPendingJobs();
-
-    boolean hasPendingJobs(String id);
-
-    JobGroup getJobGroup(String id);
-
-    boolean hasJobGroup(String id);
+    IProvisioningPlanExecution provision(SlizaaServerConfigurationRequest serverConfigurationRequest);
 }
