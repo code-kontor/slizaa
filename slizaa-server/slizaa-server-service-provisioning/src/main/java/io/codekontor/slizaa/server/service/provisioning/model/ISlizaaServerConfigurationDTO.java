@@ -20,8 +20,25 @@ package io.codekontor.slizaa.server.service.provisioning.model;
 import io.codekontor.slizaa.server.service.provisioning.model.descr.GraphDatabaseDescr;
 
 import java.util.List;
+import java.util.Objects;
 
 public interface ISlizaaServerConfigurationDTO {
 
     List<? extends IGraphDatabaseDTO> getGraphDatabases();
+
+    static int hashCode(ISlizaaServerConfigurationDTO thizz) {
+        return Objects.hash(thizz.getGraphDatabases());
+    }
+
+    static boolean equals(ISlizaaServerConfigurationDTO thizz, Object obj) {
+        if (thizz == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!ISlizaaServerConfigurationDTO.class.isAssignableFrom(obj.getClass()))
+            return false;
+        ISlizaaServerConfigurationDTO other = (ISlizaaServerConfigurationDTO) obj;
+        // TODO: check
+        return Objects.equals(thizz.getGraphDatabases(), other.getGraphDatabases());
+    }
 }

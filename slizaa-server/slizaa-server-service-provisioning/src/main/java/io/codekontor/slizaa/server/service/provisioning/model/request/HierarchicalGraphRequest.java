@@ -21,52 +21,42 @@ import io.codekontor.slizaa.server.service.provisioning.model.IHierarchicalGraph
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Objects;
-
 /**
- *
  * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
  */
 public class HierarchicalGraphRequest implements IHierarchicalGraphDTO {
 
-  private String id;
+    private String id;
 
-  public HierarchicalGraphRequest() {
-    // default constructor
-  }
+    public HierarchicalGraphRequest() {
+        // default constructor
+    }
 
-  public HierarchicalGraphRequest(String id) {
-    this.id = id;
-  }
+    public HierarchicalGraphRequest(String id) {
+        this.id = id;
+    }
 
-  public void setId(String id) {
-    this.id = checkNotNull(id);
-  }
+    public void setId(String id) {
+        this.id = checkNotNull(id);
+    }
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  public String getId() {
-    return id;
-  }
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    public String getId() {
+        return id;
+    }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id);
-  }
+    @Override
+    public int hashCode() {
+        return IHierarchicalGraphDTO.hashCode(this);
+    }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!IHierarchicalGraphDTO.class.isAssignableFrom(obj.getClass()))
-      return false;
-    IHierarchicalGraphDTO other = (IHierarchicalGraphDTO) obj;
-    return Objects.equals(id, other.getId());
-  }
+    @Override
+    public boolean equals(Object obj) {
+        return IHierarchicalGraphDTO.equals(this, obj);
+    }
 }

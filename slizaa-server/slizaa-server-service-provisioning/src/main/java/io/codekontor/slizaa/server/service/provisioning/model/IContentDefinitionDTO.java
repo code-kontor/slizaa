@@ -17,9 +17,26 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model;
 
+import java.util.Objects;
+
 public interface IContentDefinitionDTO {
 
     String getFactoryIdShortForm();
 
     String getDefinition();
+
+    static int hashCode(IContentDefinitionDTO contentDefinition) {
+        return Objects.hash(contentDefinition.getDefinition(), contentDefinition.getFactoryIdShortForm());
+    }
+
+    static boolean equals(IContentDefinitionDTO thizz, Object o) {
+        if (thizz == o)
+            return true;
+        if (o == null)
+            return false;
+        if (!IContentDefinitionDTO.class.isAssignableFrom(o.getClass()))
+            return false;
+        IContentDefinitionDTO other = (IContentDefinitionDTO) o;
+        return Objects.equals(thizz.getDefinition(), other.getDefinition()) && Objects.equals(thizz.getFactoryIdShortForm(), other.getFactoryIdShortForm());
+    }
 }

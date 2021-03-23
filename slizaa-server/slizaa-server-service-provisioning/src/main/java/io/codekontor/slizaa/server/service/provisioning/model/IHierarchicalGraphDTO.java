@@ -17,7 +17,24 @@
  */
 package io.codekontor.slizaa.server.service.provisioning.model;
 
+import java.util.Objects;
+
 public interface IHierarchicalGraphDTO {
 
     String getId();
+
+    static int hashCode(IHierarchicalGraphDTO thizz) {
+        return Objects.hash(thizz.getId());
+    }
+
+    static boolean equals(IHierarchicalGraphDTO thizz, Object obj) {
+        if (thizz == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!IHierarchicalGraphDTO.class.isAssignableFrom(obj.getClass()))
+            return false;
+        IHierarchicalGraphDTO other = (IHierarchicalGraphDTO) obj;
+        return Objects.equals(thizz.getId(), other.getId());
+    }
 }

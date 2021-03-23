@@ -85,19 +85,11 @@ public class GraphDatabaseDescr implements IGraphDatabaseDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(contentDefinition, hierarchicalGraphs, id);
+        return IGraphDatabaseDTO.hashCode(this);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!IGraphDatabaseDTO.class.isAssignableFrom(obj.getClass()))
-            return false;
-        IGraphDatabaseDTO other = (IGraphDatabaseDTO) obj;
-        return Objects.equals(contentDefinition, other.getContentDefinition())
-                && Objects.equals(hierarchicalGraphs, other.getHierarchicalGraphs()) && Objects.equals(id, other.getId());
+        return IGraphDatabaseDTO.equals(this, obj);
     }
 }

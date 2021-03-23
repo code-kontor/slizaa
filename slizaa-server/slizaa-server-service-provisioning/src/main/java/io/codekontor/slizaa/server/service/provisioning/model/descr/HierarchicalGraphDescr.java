@@ -47,21 +47,14 @@ public class HierarchicalGraphDescr implements IHierarchicalGraphDTO {
   public String getId() {
     return id;
   }
-  
+
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return IHierarchicalGraphDTO.hashCode(this);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!IHierarchicalGraphDTO.class.isAssignableFrom(obj.getClass()))
-      return false;
-    IHierarchicalGraphDTO other = (IHierarchicalGraphDTO) obj;
-    return Objects.equals(id, other.getId());
+    return IHierarchicalGraphDTO.equals(this, obj);
   }
 }

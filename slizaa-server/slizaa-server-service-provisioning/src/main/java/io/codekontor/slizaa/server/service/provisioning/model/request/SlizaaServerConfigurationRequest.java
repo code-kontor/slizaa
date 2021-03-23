@@ -58,18 +58,11 @@ public class SlizaaServerConfigurationRequest implements ISlizaaServerConfigurat
 
   @Override
   public int hashCode() {
-    return Objects.hash(graphDatabases);
+    return ISlizaaServerConfigurationDTO.hashCode(this);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!ISlizaaServerConfigurationDTO.class.isAssignableFrom(obj.getClass()))
-      return false;
-    ISlizaaServerConfigurationDTO other = (ISlizaaServerConfigurationDTO) obj;
-    return Objects.equals(graphDatabases, other.getGraphDatabases());
+    return ISlizaaServerConfigurationDTO.equals(this, obj);
   }
 }

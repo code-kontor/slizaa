@@ -59,18 +59,11 @@ public class ContentDefinitionRequest implements IContentDefinitionDTO {
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition, factoryIdShortForm);
+    return IContentDefinitionDTO.hashCode(this);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!IContentDefinitionDTO.class.isAssignableFrom(obj.getClass()))
-      return false;
-    IContentDefinitionDTO other = (IContentDefinitionDTO) obj;
-    return Objects.equals(definition, other.getDefinition()) && Objects.equals(factoryIdShortForm, other.getFactoryIdShortForm());
+    return IContentDefinitionDTO.equals(this, obj);
   }
 }

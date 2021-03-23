@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GraphDatabaseRequest implements IGraphDatabaseDTO {
 
   private String id;
+  private String state;
   private ContentDefinitionRequest contentDefinition;
   private List<HierarchicalGraphRequest> hierarchicalGraphs;
 
@@ -56,6 +57,15 @@ public class GraphDatabaseRequest implements IGraphDatabaseDTO {
     this.hierarchicalGraphs = checkNotNull(hierarchicalGraphs);
   }
 
+  @Override
+  public String getState() {
+    return this.state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
+  }
+
   public String getId() {
     return id;
   }
@@ -70,19 +80,11 @@ public class GraphDatabaseRequest implements IGraphDatabaseDTO {
 
   @Override
   public int hashCode() {
-    return Objects.hash(contentDefinition, hierarchicalGraphs, id);
+    return IGraphDatabaseDTO.hashCode(this);
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!IGraphDatabaseDTO.class.isAssignableFrom(obj.getClass()))
-      return false;
-    IGraphDatabaseDTO other = (IGraphDatabaseDTO) obj;
-    return Objects.equals(contentDefinition, other.getContentDefinition())
-        && Objects.equals(hierarchicalGraphs, other.getHierarchicalGraphs()) && Objects.equals(id, other.getId());
+   return IGraphDatabaseDTO.equals(this, obj);
   } 
 }
