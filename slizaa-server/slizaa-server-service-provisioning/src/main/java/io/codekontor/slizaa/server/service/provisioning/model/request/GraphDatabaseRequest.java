@@ -18,11 +18,16 @@
 package io.codekontor.slizaa.server.service.provisioning.model.request;
 
 import io.codekontor.slizaa.server.service.provisioning.model.IGraphDatabaseDTO;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  *
@@ -31,7 +36,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GraphDatabaseRequest implements IGraphDatabaseDTO {
 
   private String id;
-  private String state;
+  private String state = SlizaaDatabaseState.RUNNING.name();
   private ContentDefinitionRequest contentDefinition;
   private List<HierarchicalGraphRequest> hierarchicalGraphs;
 
@@ -42,7 +47,7 @@ public class GraphDatabaseRequest implements IGraphDatabaseDTO {
   public GraphDatabaseRequest(String id, ContentDefinitionRequest contentDefinition, List<HierarchicalGraphRequest> hierarchicalGraphs) {
     this.id = id;
     this.contentDefinition = contentDefinition;
-    this.hierarchicalGraphs = hierarchicalGraphs;
+    this.hierarchicalGraphs = hierarchicalGraphs != null ? hierarchicalGraphs : Collections.emptyList();
   }
 
   public void setId(String id) {
@@ -54,7 +59,7 @@ public class GraphDatabaseRequest implements IGraphDatabaseDTO {
   }
 
   public void setHierarchicalGraphs(List<HierarchicalGraphRequest> hierarchicalGraphs) {
-    this.hierarchicalGraphs = checkNotNull(hierarchicalGraphs);
+    this.hierarchicalGraphs = hierarchicalGraphs != null ? hierarchicalGraphs : Collections.emptyList();
   }
 
   @Override
@@ -75,7 +80,7 @@ public class GraphDatabaseRequest implements IGraphDatabaseDTO {
   }
 
   public List<HierarchicalGraphRequest> getHierarchicalGraphs() {
-    return hierarchicalGraphs;
+    return hierarchicalGraphs != null ? hierarchicalGraphs : Collections.emptyList();
   }
 
   @Override
@@ -86,5 +91,23 @@ public class GraphDatabaseRequest implements IGraphDatabaseDTO {
   @Override
   public boolean equals(Object obj) {
    return IGraphDatabaseDTO.equals(this, obj);
-  } 
+  }
+
+  public void validate() {
+    checkNotNull(id);
+
+    checkNotNull(state);
+    checkState(state.equals(SlizaaDatabaseState.RUNNING.name()) || state.equals(SlizaaDatabaseState.NOT_RUNNING.name()), "State must be either '%s' or '%s'.", SlizaaDatabaseState.RUNNING.name(), SlizaaDatabaseState.NOT_RUNNING.name());
+
+    checkNotNull(contentDefinition);
+    contentDefinition.validate();
+    hierarchicalGraphs.forEach(hg -> hg.validate());
+
+    checkNotNull(hierarchicalGraphs);
+    Set<String> items = new HashSet<>();
+    Set<HierarchicalGraphRequest> duplicateIds = hierarchicalGraphs.stream()
+            .filter(hg -> !items.add(hg.getId()))
+            .collect(Collectors.toSet());
+    checkState(duplicateIds.isEmpty(), "Duplicate IDs:  %s.", duplicateIds);
+  }
 }

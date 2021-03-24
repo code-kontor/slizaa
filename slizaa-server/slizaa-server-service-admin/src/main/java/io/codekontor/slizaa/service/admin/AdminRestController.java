@@ -59,6 +59,7 @@ public class AdminRestController {
 
 	@PostMapping(value = "/", consumes = "application/json", produces = "application/json")
 	public void graphDatabaseRequest(@RequestBody SlizaaServerConfigurationRequest slizaaServerConfigurationRequest) {
+        slizaaServerConfigurationRequest.validate();
         _provisioningService.provision(slizaaServerConfigurationRequest);
 	}
 }

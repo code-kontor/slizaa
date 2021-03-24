@@ -66,4 +66,9 @@ public class ContentDefinitionRequest implements IContentDefinitionDTO {
   public boolean equals(Object obj) {
     return IContentDefinitionDTO.equals(this, obj);
   }
+
+  public void validate() {
+    checkNotNull(factoryIdShortForm);
+    checkNotNull(definition);
+  }
 }

@@ -19,6 +19,7 @@ package io.codekontor.slizaa.server.service.provisioning.model.request;
 
 import io.codekontor.slizaa.server.service.provisioning.model.ISlizaaServerConfigurationDTO;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,12 +35,13 @@ public class SlizaaServerConfigurationRequest implements ISlizaaServerConfigurat
 
   private String _configurationRequestId;
 
+  // TODO
   public SlizaaServerConfigurationRequest() {
     _configurationRequestId = "BUMM";
   }
 
   public SlizaaServerConfigurationRequest(List<GraphDatabaseRequest> graphDatabases) {
-    this.graphDatabases = graphDatabases;
+    this.graphDatabases = graphDatabases != null ? graphDatabases : Collections.emptyList();
   }
 
   public void setGraphDatabases(List<GraphDatabaseRequest> graphDatabases) {
@@ -64,5 +66,10 @@ public class SlizaaServerConfigurationRequest implements ISlizaaServerConfigurat
   @Override
   public boolean equals(Object obj) {
     return ISlizaaServerConfigurationDTO.equals(this, obj);
+  }
+
+  public void validate() {
+    checkNotNull(graphDatabases);
+    graphDatabases.forEach(db -> db.validate());
   }
 }

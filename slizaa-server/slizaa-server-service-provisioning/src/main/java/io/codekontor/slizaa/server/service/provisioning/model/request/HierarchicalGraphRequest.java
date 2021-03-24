@@ -59,4 +59,8 @@ public class HierarchicalGraphRequest implements IHierarchicalGraphDTO {
     public boolean equals(Object obj) {
         return IHierarchicalGraphDTO.equals(this, obj);
     }
+
+    public void validate() {
+        checkNotNull(id);
+    }
 }

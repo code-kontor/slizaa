@@ -34,7 +34,7 @@ public class RemoveHierarchicalGraphJobTask extends AbstractJobTask {
 
         this._hierarchicalGraphId = hierarchicalGraphId;
 
-        setDescription(String.format("RemoveHierarchicalGraphTask [%s]", database.getIdentifier()));
+        setDescription(String.format("RemoveHierarchicalGraphTask [%s, %s]", database.getIdentifier(), hierarchicalGraphId));
     }
 
     @Override
