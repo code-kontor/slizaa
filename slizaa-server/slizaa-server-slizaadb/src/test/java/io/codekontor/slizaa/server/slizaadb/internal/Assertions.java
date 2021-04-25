@@ -79,9 +79,9 @@ public class Assertions {
         assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasGraphDb()).isTrue();
         assertThat((((SlizaaDatabaseImpl)graphDatabase).stateMachineContext()).hasBoltClient()).isTrue();
 
-        graphDatabase.newHierarchicalGraph("hg01");
+/*        graphDatabase.newHierarchicalGraph("hg01");
         graphDatabase.awaitState(SlizaaDatabaseState.RUNNING, AbstractSlizaaDatabaseTest.TIMEOUT);
-        graphDatabase.removeHierarchicalGraph("hg01");
+        graphDatabase.removeHierarchicalGraph("hg01");*/
 
         Assertions.assertIllegalStateException(() -> graphDatabase.start());
         Assertions.assertIllegalStateException(() -> graphDatabase.parse(true));
