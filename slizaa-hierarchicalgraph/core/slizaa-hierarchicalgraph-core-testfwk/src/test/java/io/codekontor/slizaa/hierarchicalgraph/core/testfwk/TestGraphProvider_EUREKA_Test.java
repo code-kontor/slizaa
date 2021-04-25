@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.core.testfwk;
 
+import org.assertj.core.api.Assertions;
 import org.junit.ClassRule;
 import org.junit.Test;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.HGNodeUtils;
@@ -30,7 +31,6 @@ public class TestGraphProvider_EUREKA_Test {
 
   @Test
   public void testOutgoingCoreDependencies() {
-
-    HGNodeUtils.dumpChildren(gp.rootNode());
+    Assertions.assertThat(gp.rootNode().getChildren()).hasSize(63);
   }
 }

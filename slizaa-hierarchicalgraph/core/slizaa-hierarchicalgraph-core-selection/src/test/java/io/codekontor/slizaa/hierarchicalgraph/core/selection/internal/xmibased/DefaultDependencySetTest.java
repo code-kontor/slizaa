@@ -77,11 +77,11 @@ public class DefaultDependencySetTest {
     @Test
     public void testFilteredDependencies() {
 
-        dependencySet.getUnfilteredCoreDependencies().forEach(dep -> System.out.printf("%s [%s] - %s [%s]\n",
-                dep.getFrom().getIdentifier(),
-                dep.getFrom().getPredecessors().stream().map(n -> n.getIdentifier()).collect(Collectors.toList()),
-                dep.getTo().getIdentifier(),
-                dep.getTo().getPredecessors().stream().map(n -> n.getIdentifier()).collect(Collectors.toList())));
+//        dependencySet.getUnfilteredCoreDependencies().forEach(dep -> System.out.printf("%s [%s] - %s [%s]\n",
+//                dep.getFrom().getIdentifier(),
+//                dep.getFrom().getPredecessors().stream().map(n -> n.getIdentifier()).collect(Collectors.toList()),
+//                dep.getTo().getIdentifier(),
+//                dep.getTo().getPredecessors().stream().map(n -> n.getIdentifier()).collect(Collectors.toList())));
 
         IFilteredDependencies filteredDependencies = dependencySet.getFilteredDependencies(INodeSelection.create(node(7193), SourceOrTarget.SOURCE));
 

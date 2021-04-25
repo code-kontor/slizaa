@@ -50,7 +50,7 @@ public class MappingServiceTest {
     IMappingService mappingService = MappingFactory.createMappingServiceForStandaloneSetup();
 
     HGRootNode rootNode = mappingService
-        .convert(new SimpleJTypeMappingProvider(), graphDatabaseSetup.getBoltClient(), new DefaultProgressMonitor("Mapping...", 100, DefaultProgressMonitor.consoleLogger()));
+        .convert(new SimpleJTypeMappingProvider(), graphDatabaseSetup.getBoltClient(), new DefaultProgressMonitor("Mapping...", 100, DefaultProgressMonitor.nullLogger()));
 
     assertThat(rootNode.getChildren()).hasSize(2);
 

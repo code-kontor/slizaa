@@ -147,12 +147,13 @@ public class DefaultMappingService implements IMappingService {
 
                 Optional<GraphDbNodeSource> nodeSource = node.getNodeSource(GraphDbNodeSource.class);
                 if (nodeSource.isPresent()) {
-                    // TODO
+                    // TODO!!
                     return nodeSource.get().getLabels().contains("Resource");
                 }
                 return false;
             });
 
+            // TODO!!
             /**************************************************/
             IGraphModifier graphModifier = new GraphModifier();
             graphModifier.modify(rootNode);

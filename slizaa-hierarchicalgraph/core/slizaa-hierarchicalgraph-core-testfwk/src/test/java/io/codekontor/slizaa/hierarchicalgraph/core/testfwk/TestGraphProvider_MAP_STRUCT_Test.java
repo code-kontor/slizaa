@@ -17,11 +17,14 @@
  */
 package io.codekontor.slizaa.hierarchicalgraph.core.testfwk;
 
+import org.assertj.core.api.Assertions;
 import org.junit.ClassRule;
 import org.junit.Test;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.HGNodeUtils;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedGraph;
 import io.codekontor.slizaa.hierarchicalgraph.core.testfwk.XmiBasedTestGraphProviderRule;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class TestGraphProvider_MAP_STRUCT_Test {
 
@@ -30,7 +33,6 @@ public class TestGraphProvider_MAP_STRUCT_Test {
 
   @Test
   public void testOutgoingCoreDependencies() {
-
-    HGNodeUtils.dumpChildren(gp.rootNode());
+    Assertions.assertThat(gp.rootNode().getChildren()).hasSize(2);
   }
 }

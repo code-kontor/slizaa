@@ -52,9 +52,6 @@ public class ExtensionNotification_Test {
     this._model.root().eAdapters().add(new AdapterImpl() {
       @Override
       public void notifyChanged(Notification msg) {
-        System.out.println(msg.getEventType());
-        System.out.println(msg.getFeature());
-        System.out.println(msg.getNewValue());
         ExtensionNotification_Test.this._notifcations.add(msg);
       }
     });

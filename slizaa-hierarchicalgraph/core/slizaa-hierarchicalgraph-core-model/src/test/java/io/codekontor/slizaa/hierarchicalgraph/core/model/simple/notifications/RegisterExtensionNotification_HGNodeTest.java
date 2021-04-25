@@ -64,7 +64,6 @@ public class RegisterExtensionNotification_HGNodeTest {
     this._adapter = new AdapterImpl() {
       @Override
       public void notifyChanged(Notification notification) {
-        System.out.println("Notification: " + notification);
         RegisterExtensionNotification_HGNodeTest.this._notifications.add(notification);
       }
     };

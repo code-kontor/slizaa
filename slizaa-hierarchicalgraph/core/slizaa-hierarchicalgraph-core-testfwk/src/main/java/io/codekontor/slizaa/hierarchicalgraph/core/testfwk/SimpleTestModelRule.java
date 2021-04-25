@@ -311,8 +311,6 @@ public class SimpleTestModelRule implements TestRule {
         @Override
         public IProxyDependencyResolverJob resolveProxyDependency(HGProxyDependency dependencyToResolve) {
 
-            logger.info("Resolving HGProxyDependency: {}", dependencyToResolve);
-
             _dep_a4_b4_core1 = createNewCoreDependency(_a4, _b4,
                     "NEW_USAGE_1", () -> HierarchicalgraphFactory.eINSTANCE.createDefaultDependencySource(), false);
 
