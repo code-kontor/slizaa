@@ -25,12 +25,14 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 
 @RunWith(SpringRunner.class)
 @Import(ProvisioningTestConfiguration.class)
+@DirtiesContext
 public abstract class AbstractProvisioningTest {
 
     @Autowired
