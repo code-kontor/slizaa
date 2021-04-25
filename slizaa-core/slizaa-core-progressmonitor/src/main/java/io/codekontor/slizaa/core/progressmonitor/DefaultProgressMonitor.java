@@ -90,6 +90,13 @@ public class DefaultProgressMonitor implements IProgressMonitor {
         return new ConsoleLogger();
     }
 
+    /**
+     * @return
+     */
+    public static Consumer<IProgressStatus> nullLogger() {
+        return new NullLogger();
+    }
+
     private static int scaleDown(long value) {
         return (int) (value / 1000L);
     }
@@ -343,6 +350,14 @@ public class DefaultProgressMonitor implements IProgressMonitor {
                 _lastLoggedPercentage = workDoneInPercentage;
                 System.out.println(String.format("%s%% (%s)", _lastLoggedPercentage, progressStatus.getCurrentStep()));
             }
+        }
+    }
+
+    private static class NullLogger implements Consumer<IProgressStatus> {
+
+        @Override
+        public void accept(IProgressStatus progressStatus) {
+            // ignore
         }
     }
 

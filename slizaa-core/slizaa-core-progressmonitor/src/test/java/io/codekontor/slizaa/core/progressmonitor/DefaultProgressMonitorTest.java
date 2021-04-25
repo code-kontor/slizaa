@@ -33,7 +33,7 @@ public class DefaultProgressMonitorTest {
     public void testDefaultProgressMonitor() {
 
         try (IProgressMonitor progressMonitor = new DefaultProgressMonitor("Master check", 250,
-                DefaultProgressMonitor.consoleLogger())) {
+                DefaultProgressMonitor.nullLogger())) {
 
             //
             assertThat(progressMonitor.getWorkDoneInTicks()).isEqualTo(0);
@@ -62,7 +62,7 @@ public class DefaultProgressMonitorTest {
     public void testSubMonitor() {
 
         try (IProgressMonitor progressMonitor = new DefaultProgressMonitor("Master check", 250,
-                DefaultProgressMonitor.consoleLogger())) {
+                DefaultProgressMonitor.nullLogger())) {
 
             IProgressMonitor submonitor = progressMonitor.subTask("Check 1")
                     .withParentConsumptionInPercentage(20)
@@ -98,7 +98,7 @@ public class DefaultProgressMonitorTest {
     public void testSubMonitor2() {
 
         try (IProgressMonitor progressMonitor = new DefaultProgressMonitor("Master check", 250,
-                DefaultProgressMonitor.consoleLogger())) {
+                DefaultProgressMonitor.nullLogger())) {
 
             IProgressMonitor submonitor = progressMonitor.subTask("Check 1")
                     .withParentConsumptionInWorkTicks(50)
@@ -134,7 +134,7 @@ public class DefaultProgressMonitorTest {
     public void testSubMonitor_3() {
 
         try (IProgressMonitor progressMonitor = new DefaultProgressMonitor("Master check", 250,
-                DefaultProgressMonitor.consoleLogger())) {
+                DefaultProgressMonitor.nullLogger())) {
 
             // sm 1
             try (IProgressMonitor submonitor = progressMonitor.subTask("Check 1")
@@ -159,9 +159,6 @@ public class DefaultProgressMonitorTest {
                         .create()) {
 
                     consumeSubmonitor(submonitor_2);
-
-                    //
-                    ((DefaultProgressMonitor) submonitor_2).dump();
                 }
 
                 assertThat(progressMonitor.getWorkDoneInTicks()).isEqualTo(175);
@@ -186,7 +183,7 @@ public class DefaultProgressMonitorTest {
     public void testSubMonitor_4() {
 
         try (IProgressMonitor progressMonitor = new DefaultProgressMonitor("Master check", 100,
-                DefaultProgressMonitor.consoleLogger())) {
+                DefaultProgressMonitor.nullLogger())) {
 
             // sm 1
             try (IProgressMonitor submonitor = progressMonitor.subTask("Check 1")
