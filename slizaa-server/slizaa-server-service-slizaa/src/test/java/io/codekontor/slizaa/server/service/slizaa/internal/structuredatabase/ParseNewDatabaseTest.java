@@ -46,8 +46,9 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
   }
 
   @After
-  public void after() {
+  public void after() throws TimeoutException {
     structureDatabase.terminate();
+    structureDatabase.awaitState(SlizaaDatabaseState.TERMINATED, 5000);
     assertThat(slizaaService().hasStructureDatabase(STRUCTURE_DATABASE_NAME)).isFalse();
   }
 
@@ -108,10 +109,12 @@ public class ParseNewDatabaseTest extends AbstractSlizaaServiceTest {
 
     //
     structureDatabase.stop();
+    structureDatabase.awaitState(SlizaaDatabaseState.NOT_RUNNING, 5000);
     assertThat(structureDatabase.isRunning()).isFalse();
 
     //
     structureDatabase.start();
+    structureDatabase.awaitState(SlizaaDatabaseState.RUNNING, 5000);
     assertThat(structureDatabase.isRunning()).isTrue();
   }
 }
