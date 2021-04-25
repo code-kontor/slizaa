@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Icon, Tree} from 'antd';
+import {Icon, Popover, Tree} from 'antd';
 import {AntTreeNode, AntTreeNodeExpandedEvent, AntTreeNodeSelectedEvent} from "antd/lib/tree";
 import * as React from 'react';
 import * as ReactDOM from "react-dom";
@@ -74,11 +74,14 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
             if (this.props.markedKeys !== undefined) {
                 className = this.props.markedKeys.indexOf(item.key) > -1 ? className + 'slizaa-tree-node-marked' : className + 'slizaa-tree-node-unmarked';
             }
+
             return (
                 <Tree.TreeNode
                     dataRef={item}
                     key={item.key}
-                    title={item.title}
+                    title={<Popover placement="right" content={<div>Content</div>} title={item.title} mouseEnterDelay={1.5} >
+                       {item.title}
+                    </Popover>}
                     icon={this.fetchIcon(item)}
                     isLeaf={!item.hasChildren}
                     className={className}
@@ -87,7 +90,6 @@ export class STree extends React.Component<ISTreeProps, ISTreeState> {
                     {childNodes}
                 </Tree.TreeNode>
             );
-            ;
         });
     }
 
