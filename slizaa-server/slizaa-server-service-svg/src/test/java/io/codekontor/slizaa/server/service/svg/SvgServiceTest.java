@@ -49,7 +49,8 @@ public class SvgServiceTest {
 
     String key = _svgService.createSvgAndReturnShortKey("icons/class_obj.svg", null, "icons/abstract_ovr.svg", null, "icons/private_ovr.svg");
     assertThat(key).isNotNull();
-    
-    System.out.println(_svgService.getSvg(key));
+
+    // TODO: Better assertion
+    assertThat(_svgService.getSvg(key)).isNotEmpty();
   }
 }

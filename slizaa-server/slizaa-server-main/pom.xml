@@ -67,10 +67,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.graphql-java-kickstart</groupId>
-			<artifactId>graphql-spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-server-staticcontent</artifactId>
 			<version>${project.version}</version>
