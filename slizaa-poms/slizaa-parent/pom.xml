@@ -547,6 +547,7 @@
 							<excludePackageNames>*.internal.*</excludePackageNames>
 							<failOnError>false</failOnError>
 							<doclint>none</doclint>
+							<release>11</release>
 						</configuration>
 						<executions>
 							<execution>
