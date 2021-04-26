@@ -91,7 +91,9 @@ public class ProvisioningTest {
 
         @Override
         public Boolean call() throws Exception {
-            _jobTasks.add(_description);
+            synchronized (_jobTasks) {
+                _jobTasks.add(_description);
+            }
             Thread.sleep(500L);
             return true;
         }
