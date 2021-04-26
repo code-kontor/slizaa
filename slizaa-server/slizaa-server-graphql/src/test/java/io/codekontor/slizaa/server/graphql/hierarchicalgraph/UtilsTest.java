@@ -48,7 +48,7 @@ public class UtilsTest {
         HGRootNode rootNode = mappingService
                 .convert(new SimpleJTypeMappingProvider(),
                         graphDatabaseSetup.getBoltClient(),
-                        new DefaultProgressMonitor("Mapping...", 100, DefaultProgressMonitor.consoleLogger()));
+                        new DefaultProgressMonitor("Mapping...", 100, DefaultProgressMonitor.nullLogger()));
 
         coreDependencies = rootNode.getAccumulatedOutgoingCoreDependencies();
     }

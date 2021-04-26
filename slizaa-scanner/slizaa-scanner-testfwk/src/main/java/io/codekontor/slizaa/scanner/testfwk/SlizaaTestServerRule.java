@@ -138,7 +138,7 @@ public class SlizaaTestServerRule extends AbstractSlizaaTestServerRule {
 
     //
     DefaultProgressMonitor progressMonitor = new DefaultProgressMonitor("Parse", 100,
-        DefaultProgressMonitor.consoleLogger());
+        DefaultProgressMonitor.nullLogger());
 
     //
     executeWithThreadContextClassLoader(testFwkBackEnd.getClassLoader(),
