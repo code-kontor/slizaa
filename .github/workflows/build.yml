@@ -15,13 +15,10 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # Value of the GPG private key to import
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
       - name: Build with Maven
-        run: mvn --batch-mode --no-transfer-progress --update-snapshots verify -P release
+        run: mvn --batch-mode --no-transfer-progress --update-snapshots verify
         env:
           TESTCONTAINERS_TRANSPORT_TYPE: httpclient5
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
   publish-snapshot:
     needs: build
