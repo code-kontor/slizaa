@@ -21,7 +21,7 @@ jobs:
         run: mvn --batch-mode --no-transfer-progress --update-snapshots verify -P release
         env:
           TESTCONTAINERS_TRANSPORT_TYPE: httpclient5
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
   publish-snapshot:
     needs: build
