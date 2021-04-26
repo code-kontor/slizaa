@@ -19,12 +19,19 @@ package io.codekontor.slizaa.server.service.provisioning;
 
 import io.codekontor.slizaa.core.job.IProvisioningPlanExecution;
 import org.awaitility.Awaitility;
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProvisioningTest extends AbstractProvisioningTest {
+
+    @After
+    public void afterTest() {
+        IProvisioningPlanExecution provisioningJob = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_nodb());
+        Awaitility.await().until(() -> !provisioningJob.hasPendingTasks());
+    }
 
     @Test
     @DirtiesContext
@@ -39,39 +46,39 @@ public class ProvisioningTest extends AbstractProvisioningTest {
         assertThat(slizaaService().getGraphDatabase("db01")).isNotNull();
     }
 
-   @Test
+    @Test
     @DirtiesContext
     public void testDeleteAndCreateGraphDatabase() {
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(0);
 
-       IProvisioningPlanExecution provisioningJob_1 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db01());
+        IProvisioningPlanExecution provisioningJob_1 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db01());
         Awaitility.await().until(() -> !provisioningJob_1.hasPendingTasks());
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(1);
         assertThat(slizaaService().getGraphDatabase("db01")).isNotNull();
 
-       IProvisioningPlanExecution provisioningJob_2 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db02_v1());
+        IProvisioningPlanExecution provisioningJob_2 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db02_v1());
         Awaitility.await().until(() -> !provisioningJob_2.hasPendingTasks());
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(1);
         assertThat(slizaaService().getGraphDatabase("db02")).isNotNull();
     }
 
-   @Test
+    @Test
     @DirtiesContext
     public void testDeleteGraphDatabase() {
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(0);
 
-       IProvisioningPlanExecution provisioningJob_1 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db01());
+        IProvisioningPlanExecution provisioningJob_1 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db01());
         Awaitility.await().until(() -> !provisioningJob_1.hasPendingTasks());
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(1);
         assertThat(slizaaService().getGraphDatabase("db01")).isNotNull();
 
-       IProvisioningPlanExecution provisioningJob_2 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db02_v1());
-       Awaitility.await().until(() -> !provisioningJob_2.hasPendingTasks());
+        IProvisioningPlanExecution provisioningJob_2 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db02_v1());
+        Awaitility.await().until(() -> !provisioningJob_2.hasPendingTasks());
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(1);
         assertThat(slizaaService().getGraphDatabase("db02")).isNotNull();
@@ -91,7 +98,7 @@ public class ProvisioningTest extends AbstractProvisioningTest {
         assertThat(slizaaService().getGraphDatabase("db02").getHierarchicalGraph("identifier_1")).isNotNull();
 
         IProvisioningPlanExecution provisioningJob_2 = provisioningService().provision(ServerConfigurationRequests.getServerConfigurationRequest_db02_v2());
-        Awaitility.await().until(() -> !provisioningJob_2.hasPendingTasks());;
+        Awaitility.await().until(() -> !provisioningJob_2.hasPendingTasks());
 
         assertThat(slizaaService().getGraphDatabases()).hasSize(1);
         assertThat(slizaaService().getGraphDatabase("db02")).isNotNull();

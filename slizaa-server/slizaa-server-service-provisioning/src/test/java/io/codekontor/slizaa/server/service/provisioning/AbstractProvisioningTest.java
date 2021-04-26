@@ -19,21 +19,25 @@ package io.codekontor.slizaa.server.service.provisioning;
 
 import io.codekontor.slizaa.server.service.provisioning.internal.ProvisioningService;
 import io.codekontor.slizaa.server.service.slizaa.internal.SlizaaServiceImpl;
+import org.awaitility.Awaitility;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringRunner.class)
 @Import(ProvisioningTestConfiguration.class)
-@DirtiesContext
 public abstract class AbstractProvisioningTest {
+
+    {
+        Awaitility.setDefaultTimeout(60L, TimeUnit.SECONDS);
+    }
 
     @Autowired
     public SlizaaServiceImpl _slizaaService;
@@ -66,11 +70,11 @@ public abstract class AbstractProvisioningTest {
 		return _provisioningService;
 	}
 
-    public static File getConfigurationRootDirectory() {
+    public File getConfigurationRootDirectory() {
         return configurationRootDirectory;
     }
 
-    public static File getDatabaseRootDirectory() {
+    public File getDatabaseRootDirectory() {
         return databaseRootDirectory;
     }
 }
