@@ -1,4 +1,5 @@
 target/
+.run/
 /.metadata/
 /.idea/workspace.xml
 /.project
