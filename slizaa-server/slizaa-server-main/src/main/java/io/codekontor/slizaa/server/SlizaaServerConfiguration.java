@@ -17,7 +17,6 @@
  */
 package io.codekontor.slizaa.server;
 
-import io.codekontor.slizaa.server.command.EnableSlizaaServerCommandModule;
 import io.codekontor.slizaa.server.graphql.EnableGraphqlModule;
 import io.codekontor.slizaa.server.service.backend.EnableBackendServiceModule;
 import io.codekontor.slizaa.server.service.configuration.EnableConfigurationModule;
@@ -43,7 +42,6 @@ import org.springframework.web.filter.CorsFilter;
 @EnableGraphqlModule
 @EnableConfigurationModule
 @EnableSvgServiceModule
-@EnableSlizaaServerCommandModule
 @EnableSelectionServiceModule
 @EnableAdminServiceModule
 public class SlizaaServerConfiguration {

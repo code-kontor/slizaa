@@ -47,7 +47,6 @@
 		<module>slizaa-server-staticcontent</module>
 		<module>slizaa-server-graphql</module>
 		<module>slizaa-server-main</module>
-        <module>slizaa-server-command</module>
 		<module>slizaa-server-slizaadb</module>
 	</modules>
 
