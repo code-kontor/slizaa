@@ -37,8 +37,8 @@ public class CreateGraphDatabaseJobCreator {
 
         IJobGroup jobGroup = createJobGroup(checkNotNull(graphDatabaseToCreate).getId());
 
-        ISlizaaDatabase slizaaDatabase = slizaaService.newGraphDatabase(graphDatabaseToCreate.getId());
-        slizaaDatabase.setContentDefinitionProvider(
+        ISlizaaDatabase slizaaDatabase = slizaaService.newGraphDatabase(
+                graphDatabaseToCreate.getId(),
                 graphDatabaseToCreate.getContentDefinition().getFactoryIdShortForm(),
                 graphDatabaseToCreate.getContentDefinition().getDefinition());
 

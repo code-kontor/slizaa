@@ -17,6 +17,7 @@
  */
 package io.codekontor.slizaa.service.admin;
 
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,18 @@ public class AdminRestResponseEntityExceptionHandler
       = { NullPointerException.class, IllegalStateException.class })
     protected ResponseEntity<Object> handleConflict(
       RuntimeException ex, WebRequest request) {
+        // TODO
+       // ex.printStackTrace();
         String bodyOfResponse = "Couldn't handle request: " + ex.getMessage();
         return handleExceptionInternal(ex, bodyOfResponse, 
           new HttpHeaders(), HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value= InvalidContentDefinitionException.class)
+    protected ResponseEntity<Object> handleInvalidContentDefinitionException(
+            InvalidContentDefinitionException ex, WebRequest request) {
+        String bodyOfResponse = "Invalid content definition: " + ex.getMessage();
+        return handleExceptionInternal(ex, bodyOfResponse,
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 }

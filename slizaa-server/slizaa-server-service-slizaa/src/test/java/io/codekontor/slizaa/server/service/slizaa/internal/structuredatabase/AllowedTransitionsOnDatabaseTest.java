@@ -57,22 +57,10 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
   }
 
   @Test
-  public void test_INITIAL() throws IOException {
-
-    // create a new database and parse with start
-    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-
-    assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(
-        ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION, ISlizaaDatabase.GraphDatabaseAction.DELETE);
-  }
-
-  @Test
   public void test_SET_CONTENT_DEFINITION() throws IOException {
 
     // create a new database and parse with start
-    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-
-    database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME,"io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     assertThat(database.getAvailableActions()).containsExactlyInAnyOrder(ISlizaaDatabase.GraphDatabaseAction.PARSE, ISlizaaDatabase.GraphDatabaseAction.SET_CONTENT_DEFINITION,
@@ -83,9 +71,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
   public void test_RUNNING() throws IOException {
 
     // create a new database and parse with start
-    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-
-    database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME,"io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     database.parse(true);
@@ -101,9 +87,7 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
   public void test_NOT_RUNNING() throws IOException {
 
     // create a new database and parse with start
-    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-
-    database.setContentDefinitionProvider("io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME,"io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
         "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     database.parse(false);
@@ -118,7 +102,8 @@ public class AllowedTransitionsOnDatabaseTest extends AbstractSlizaaServiceTest 
   public void test_TERMINATED() throws IOException {
 
     // create a new database and parse with start
-    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
+    database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME,"io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+            "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
     database.terminate();
 

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
+import io.codekontor.slizaa.scanner.spi.contentdefinition.InvalidContentDefinitionException;
 import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 
@@ -44,5 +45,6 @@ public interface ISlizaaService {
 
 	ISlizaaDatabase getGraphDatabase(String identifier);
 	
-	ISlizaaDatabase newGraphDatabase(String identifier);
+	ISlizaaDatabase newGraphDatabase(String identifier, String contentDefinitionFactoryId, String contentDefinition)
+			throws InvalidContentDefinitionException;
 }

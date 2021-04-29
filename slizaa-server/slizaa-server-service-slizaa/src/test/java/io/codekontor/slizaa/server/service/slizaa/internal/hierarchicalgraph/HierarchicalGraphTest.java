@@ -52,12 +52,10 @@ public class HierarchicalGraphTest extends AbstractSlizaaServiceTest {
     if (!_slizaaService.hasStructureDatabase(STRUCTURE_DATABASE_NAME)) {
 
       // create a new database
-      _structureDatabase = _slizaaService.newGraphDatabase(STRUCTURE_DATABASE_NAME);
-
-      // configure
-      _structureDatabase.setContentDefinitionProvider(
-          "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
-          "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
+      _structureDatabase = _slizaaService.newGraphDatabase(
+              STRUCTURE_DATABASE_NAME,
+              "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
+              "org.springframework.statemachine:spring-statemachine-core:2.0.3.RELEASE");
 
       // and parse
       _structureDatabase.parse(true);

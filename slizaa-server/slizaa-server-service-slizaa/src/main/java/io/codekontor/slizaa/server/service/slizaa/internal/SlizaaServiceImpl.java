@@ -20,19 +20,19 @@ package io.codekontor.slizaa.server.service.slizaa.internal;
 import io.codekontor.slizaa.core.boltclient.IBoltClientFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.IMappingService;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProviderFactory;
-import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
-import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseFactory;
-import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
-import io.codekontor.slizaa.server.slizaadb.SlizaaSocketUtils;
 import io.codekontor.slizaa.server.service.backend.IBackendService;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceCallback;
 import io.codekontor.slizaa.server.service.backend.IBackendServiceInstanceProvider;
 import io.codekontor.slizaa.server.service.backend.extensions.IExtension;
 import io.codekontor.slizaa.server.service.configuration.IConfigurationService;
 import io.codekontor.slizaa.server.service.slizaa.ISlizaaService;
-import io.codekontor.slizaa.server.service.slizaa.internal.json.SlizaaDatabaseConfiguration;
 import io.codekontor.slizaa.server.service.slizaa.internal.json.GraphDatabaseHierarchicalGraphConfiguration;
+import io.codekontor.slizaa.server.service.slizaa.internal.json.SlizaaDatabaseConfiguration;
 import io.codekontor.slizaa.server.service.slizaa.internal.json.SlizaaServiceConfiguration;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabase;
+import io.codekontor.slizaa.server.slizaadb.ISlizaaDatabaseFactory;
+import io.codekontor.slizaa.server.slizaadb.SlizaaDatabaseState;
+import io.codekontor.slizaa.server.slizaadb.SlizaaSocketUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +165,7 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
     }
 
     @Override
-    public ISlizaaDatabase newGraphDatabase(String identifier) {
+    public ISlizaaDatabase newGraphDatabase(String identifier, String contentDefinitionFactoryId, String contentDefinition) {
         checkConfigured();
         //
         if (_structureDatabases.containsKey(identifier)) {
@@ -174,8 +174,14 @@ public class SlizaaServiceImpl implements ISlizaaService, IBackendServiceCallbac
         }
 
         // create the result
-        ISlizaaDatabase result = _structureDatabases.computeIfAbsent(identifier, id -> _graphDatabaseFactory
-                .newInstanceFromConfiguration(identifier, SlizaaSocketUtils.findAvailableTcpPort(), _slizaaServiceProperties.getDatabaseRootDirectoryAsFile()));
+        ISlizaaDatabase result = _structureDatabases.computeIfAbsent(identifier, id -> {
+            ISlizaaDatabase slizaaDatabase = _graphDatabaseFactory.newInstanceFromConfiguration(
+                    identifier,
+                    SlizaaSocketUtils.findAvailableTcpPort(),
+                    _slizaaServiceProperties.getDatabaseRootDirectoryAsFile());
+            slizaaDatabase.setContentDefinitionProvider(contentDefinitionFactoryId, contentDefinition);
+            return slizaaDatabase;
+        });
 
         // and return the result
         return result;

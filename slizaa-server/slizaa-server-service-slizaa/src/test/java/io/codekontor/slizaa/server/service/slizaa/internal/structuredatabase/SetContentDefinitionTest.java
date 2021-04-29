@@ -59,9 +59,7 @@ public class SetContentDefinitionTest extends AbstractSlizaaServiceTest {
     public void test_SET_CONTENT_DEFINITION() throws IOException {
 
         // create a new database and parse with start
-        database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME);
-
-        database.setContentDefinitionProvider(
+        database = slizaaService().newGraphDatabase(STRUCTURE_DATABASE_NAME,
                 "io.codekontor.slizaa.scanner.contentdefinition.MvnBasedContentDefinitionProviderFactory",
                 "ant4eclipse:ant4eclipse:0.5.0.rc1");
 
