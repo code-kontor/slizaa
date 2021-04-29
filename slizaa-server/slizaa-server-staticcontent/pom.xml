@@ -39,6 +39,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.codekontor.slizaa</groupId>
             <artifactId>slizaa-server-service-svg</artifactId>
             <version>${project.version}</version>
