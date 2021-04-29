@@ -2,8 +2,3 @@
 type Query {
 
 }
-
-# The Mutation type
-type Mutation {
-
-}

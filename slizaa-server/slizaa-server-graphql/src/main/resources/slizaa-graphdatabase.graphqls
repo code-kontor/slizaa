@@ -47,21 +47,3 @@ extend type Query {
     
     hierarchicalGraph(databaseIdentifier: ID!, hierarchicalGraphIdentifier: ID!): HierarchicalGraph
 }
-
-# The Mutation type
-extend type Mutation {
-
-    createGraphDatabase(databaseId: ID!): GraphDatabase!
-    
-	parseGraphDatabase(databaseId: ID!): GraphDatabase!
-    
-    startGraphDatabase(databaseId: ID!): GraphDatabase!
-    
-    stopGraphDatabase(databaseId: ID!): GraphDatabase!
-    
-	deleteGraphDatabase(databaseId: ID!): GraphDatabase!
-
-    setGraphDatabaseContentDefinition(databaseId: ID!, contentDefinitionFactoryId: ID!, contentDefinition: String!): GraphDatabase!
-
-    createHierarchicalGraph(databaseId: ID!, hierarchicalGraphId: ID!): GraphDatabase!
-}
