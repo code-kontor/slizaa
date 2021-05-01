@@ -17,7 +17,6 @@
  */
 import {ElkExtendedEdge, ElkNode, ElkPoint} from 'elkjs/lib/elk.bundled.js'
 import * as React from "react";
-import {setupCanvas} from "../dsm/DpiFixer";
 import './DependencyGraph.css';
 import { IDependencyGraphCanvasProps } from './IDependencyGraphCanvasProps';
 
@@ -83,27 +82,26 @@ export class DependencyGraphCanvas extends React.Component<IDependencyGraphCanva
             this.markedDependencyLayerCanvasRef && this.markedDependencyLayerRenderingContext &&
             this.props.rootNode && this.props.rootNode.width && this.props.rootNode.height) {
 
-            const renderingContext = this.renderingContext;
-
             // setup the canvas
-            setupCanvas(this.canvasRef, this.renderingContext, this.props.rootNode.width, this.props.rootNode.height, this.scale());
-            setupCanvas(this.markedDependencyLayerCanvasRef, this.markedDependencyLayerRenderingContext, this.props.rootNode.width, this.props.rootNode.height, this.scale());
+            this.setupCanvas(this.canvasRef, this.renderingContext, this.props.rootNode.width, this.props.rootNode.height);
+            this.setupCanvas(this.markedDependencyLayerCanvasRef, this.markedDependencyLayerRenderingContext, this.props.rootNode.width, this.props.rootNode.height);
 
             // we have to "fix" the coordinates for edges
             this.postProcessLayout();
 
-            // draw the nodes
+            
+
+            // draw the nodes & edges
+            const ctx = this.renderingContext;
             if (this.props.rootNode.children) {
                 this.props.rootNode.children.forEach(node => {
-                        this.drawNode(renderingContext, node);
+                        this.drawNode(ctx, node);
                     }
                 )
             }
-
-            // draw the edges
             if (this.props.rootNode.edges) {
                 this.props.rootNode.edges.forEach(edge => {
-                        this.drawEdge(renderingContext, edge as ElkExtendedEdge,);
+                        this.drawEdge(ctx, edge as ElkExtendedEdge,);
                     }
                 )
             }
@@ -439,6 +437,27 @@ export class DependencyGraphCanvas extends React.Component<IDependencyGraphCanva
         return (startX < endX ? (startX - this.CLICKABLE_EDGE_RANGE <= pointX && pointX <= endX + this.CLICKABLE_EDGE_RANGE) : (endX - this.CLICKABLE_EDGE_RANGE <= pointX && pointX <= startX + this.CLICKABLE_EDGE_RANGE)) &&
             (startY < endY ? (startY - this.CLICKABLE_EDGE_RANGE <= pointY && pointY <= endY + this.CLICKABLE_EDGE_RANGE) : (endY - this.CLICKABLE_EDGE_RANGE <= pointY && pointY <= startY + this.CLICKABLE_EDGE_RANGE));
     }
+
+    private setupCanvas = (canvas: HTMLCanvasElement, renderingContext: CanvasRenderingContext2D, width: number, height: number) => {
+       
+        const deviceRatio = window.devicePixelRatio || 1;
+
+        const ctx : any = this.renderingContext
+        const bsRatio = ctx.webkitBackingStorePixelRatio ||
+        ctx.mozBackingStorePixelRatio ||
+        ctx.msBackingStorePixelRatio ||
+        ctx.oBackingStorePixelRatio ||
+        ctx.backingStorePixelRatio || 1;
+    
+        const ratio = (deviceRatio / bsRatio);
+        ctx.scale(ratio, ratio);  
+
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+        canvas.style.width = width + "px";
+        canvas.style.height = height  + "px";
+    }
+
 }
 
 
