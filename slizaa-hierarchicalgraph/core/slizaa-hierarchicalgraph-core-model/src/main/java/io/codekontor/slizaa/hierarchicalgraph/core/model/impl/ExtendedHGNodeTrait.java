@@ -404,36 +404,6 @@ public class ExtendedHGNodeTrait {
   /**
    * <p>
    * </p>
-   */
-  void onExpand() {
-
-    //
-    _hgNode.getNodeSource().onExpand();
-  }
-
-  /**
-   * <p>
-   * </p>
-   */
-  void onCollapse() {
-
-    //
-    _hgNode.getNodeSource().onCollapse();
-  }
-
-  /**
-   * <p>
-   * </p>
-   */
-  public void onSelect() {
-
-    //
-    _hgNode.getNodeSource().onSelect();
-  }
-
-  /**
-   * <p>
-   * </p>
    *
    * @return
    */

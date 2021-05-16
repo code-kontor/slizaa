@@ -40,12 +40,13 @@
 		<module>core/slizaa-hierarchicalgraph-core-model</module>
 		<module>core/slizaa-hierarchicalgraph-core-algorithms</module>
         <module>core/slizaa-hierarchicalgraph-core-selection</module>
+		<module>core/slizaa-hierarchicalgraph-core-transform</module>
 		<module>graphdb/slizaa-hierarchicalgraph-graphdb-mapping-cypher</module>
 		<module>graphdb/slizaa-hierarchicalgraph-graphdb-mapping-service</module>
 		<module>graphdb/slizaa-hierarchicalgraph-graphdb-mapping-spi</module>
 		<module>graphdb/slizaa-hierarchicalgraph-graphdb-mapping-testfwk</module>
 		<module>graphdb/slizaa-hierarchicalgraph-graphdb-model</module>
 		<module>graphdb/slizaa-hierarchicalgraph-graphdb-testfwk</module>
-    </modules>
+	</modules>
 	
 </project>

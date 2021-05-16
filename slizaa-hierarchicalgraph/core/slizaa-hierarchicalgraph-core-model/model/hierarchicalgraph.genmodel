@@ -66,10 +66,6 @@
     <genClasses image="false" ecoreClass="hierarchicalgraph.ecore#//INodeSource">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//INodeSource/identifier"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference hierarchicalgraph.ecore#//INodeSource/node"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//INodeSource/autoExpand"/>
-      <genOperations ecoreOperation="hierarchicalgraph.ecore#//INodeSource/onExpand"/>
-      <genOperations ecoreOperation="hierarchicalgraph.ecore#//INodeSource/onCollapse"/>
-      <genOperations ecoreOperation="hierarchicalgraph.ecore#//INodeSource/onSelect"/>
     </genClasses>
     <genClasses image="false" ecoreClass="hierarchicalgraph.ecore#//IDependencySource">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute hierarchicalgraph.ecore#//IDependencySource/identifier"/>

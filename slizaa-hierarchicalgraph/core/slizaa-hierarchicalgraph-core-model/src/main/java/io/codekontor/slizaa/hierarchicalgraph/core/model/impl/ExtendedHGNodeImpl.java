@@ -114,18 +114,6 @@ public class ExtendedHGNodeImpl extends HGNodeImpl {
   public String toString() {
     return _trait.toString(this.getClass());
   }
-
-  public void onExpand() {
-    _trait.onExpand();
-  }
-
-  public void onCollapse() {
-    _trait.onCollapse();
-  }
-
-  public void onSelect() {
-    _trait.onSelect();
-  }
   
   public void invalidateLocalCaches() {
     _trait.invalidateLocalCaches();

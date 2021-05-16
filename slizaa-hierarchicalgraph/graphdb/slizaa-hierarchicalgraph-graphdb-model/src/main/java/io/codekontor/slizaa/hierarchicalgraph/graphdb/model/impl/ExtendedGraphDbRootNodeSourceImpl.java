@@ -70,25 +70,4 @@ public class ExtendedGraphDbRootNodeSourceImpl extends GraphDbRootNodeSourceImpl
   public EList<String> reloadLabels() {
     return ECollections.emptyEList();
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void onExpand() {
-    this._trait.onExpand();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void onCollapse() {
-    this._trait.onCollapse();
-  }
-
-  @Override
-  public boolean isAutoExpand() {
-    return this._trait.isAutoExpand();
-  }
 }

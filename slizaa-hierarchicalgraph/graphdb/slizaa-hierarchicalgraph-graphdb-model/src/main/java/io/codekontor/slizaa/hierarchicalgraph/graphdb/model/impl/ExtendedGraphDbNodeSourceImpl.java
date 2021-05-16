@@ -68,24 +68,4 @@ public class ExtendedGraphDbNodeSourceImpl extends GraphDbNodeSourceImpl {
   // public EList<String> reloadLabels() {
   // return _trait.reloadLabels();
   // }
-
-  @Override
-  public void onExpand() {
-    this._trait.onExpand();
-  }
-
-  @Override
-  public void onCollapse() {
-    this._trait.onCollapse();
-  }
-
-  @Override
-  public void onSelect() {
-    this._trait.onSelect();
-  }
-
-  @Override
-  public boolean isAutoExpand() {
-    return this._trait.isAutoExpand();
-  }
 }

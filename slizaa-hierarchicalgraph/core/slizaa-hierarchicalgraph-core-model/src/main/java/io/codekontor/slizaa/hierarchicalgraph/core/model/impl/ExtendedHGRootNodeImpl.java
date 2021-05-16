@@ -302,14 +302,6 @@ public class ExtendedHGRootNodeImpl extends HGRootNodeImpl {
     return _trait.toString(this.getClass());
   }
 
-  public void onExpand() {
-    this._trait.onExpand();
-  }
-
-  public void onCollapse() {
-    this._trait.onCollapse();
-  }
-
   public Map<Object, HGNode> getIdToNodeMap() {
     return idToNodeMap();
   }

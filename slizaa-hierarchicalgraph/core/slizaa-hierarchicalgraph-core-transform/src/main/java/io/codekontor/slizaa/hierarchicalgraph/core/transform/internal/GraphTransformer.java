@@ -15,11 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.internal;
+package io.codekontor.slizaa.hierarchicalgraph.core.transform.internal;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.transform.IGraphTransformer;
+import io.codekontor.slizaa.hierarchicalgraph.core.transform.IHierarchicalGraphModification;
 
-public interface IGraphModifier {
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+
+/**
+ * <p>
+ * </p>
+ *
+ * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
+ */
+public class GraphTransformer implements IGraphTransformer {
 
   /**
    * <p>
@@ -28,5 +41,20 @@ public interface IGraphModifier {
    * @param rootNode
    * @return
    */
-  HGRootNode modify(HGRootNode rootNode);
+  @Override
+  public HGRootNode modify(HGRootNode rootNode, List<IHierarchicalGraphModification> graphModifications) {
+
+    checkNotNull(rootNode);
+    checkNotNull(graphModifications);
+
+    // invalidate the node cache
+    rootNode.invalidateNodeIdCache();
+    rootNode.invalidateAllCaches();
+
+    //
+    graphModifications.forEach(modification -> modification.execute());
+
+    // return the root node
+    return rootNode;
+  }
 }

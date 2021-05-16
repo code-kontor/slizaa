@@ -20,7 +20,6 @@
 package io.codekontor.slizaa.hierarchicalgraph.core.model.impl;
 
 import io.codekontor.slizaa.hierarchicalgraph.core.model.DefaultDependencySource;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.DefaultNodeSource;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGAggregatedDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
@@ -56,12 +55,6 @@ public class CustomHierarchicalgraphFactoryImpl extends HierarchicalgraphFactory
   public HGRootNode createHGRootNode() {
     HGRootNodeImpl hgRootNode = new ExtendedHGRootNodeImpl();
     return hgRootNode;
-  }
-
-  @Override
-  public DefaultNodeSource createDefaultNodeSource() {
-    DefaultNodeSourceImpl defaultNodeSource = new ExtendedDefaultNodeSourceImpl();
-    return defaultNodeSource;
   }
 
   @Override

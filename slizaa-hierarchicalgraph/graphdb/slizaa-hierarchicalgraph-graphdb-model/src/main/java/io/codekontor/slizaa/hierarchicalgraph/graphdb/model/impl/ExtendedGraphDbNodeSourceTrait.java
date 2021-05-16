@@ -131,17 +131,6 @@ public class ExtendedGraphDbNodeSourceTrait {
     return this._nodeSource.labels;
   }
 
-  public void onExpand() {
-    loadPropertiesAndLabelsForChildren();
-  }
-
-  public void onCollapse() {
-  }
-
-  public void onSelect() {
-
-  }
-
   /**
    * <p>
    * </p>
@@ -188,10 +177,5 @@ public class ExtendedGraphDbNodeSourceTrait {
     IBoltClient boltClient = rootNodeSource.getBoldClient();
     checkNotNull(boltClient, "No bolt client set.");
     return boltClient;
-  }
-
-  public boolean isAutoExpand() {
-    // TODO
-    return true;
   }
 }

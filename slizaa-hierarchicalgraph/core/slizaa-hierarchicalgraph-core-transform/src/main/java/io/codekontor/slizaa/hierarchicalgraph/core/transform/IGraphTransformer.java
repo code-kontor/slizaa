@@ -1,5 +1,5 @@
 /**
- * slizaa-hierarchicalgraph-core-model - Slizaa Static Software Analysis Tools
+ * slizaa-hierarchicalgraph-graphdb-mapping-service - Slizaa Static Software Analysis Tools
  * Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.hierarchicalgraph.core.model.spi;
+package io.codekontor.slizaa.hierarchicalgraph.core.transform;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 
-/**
- * <p>
- * </p>
- *
- * @author Gerd W&uuml;therich (gerd.wuetherich@codekontor.io)
- */
-public interface IAutoExpandInterceptor {
+import java.util.List;
+
+public interface IGraphTransformer {
 
   /**
    * <p>
    * </p>
    *
+   * @param rootNode
    * @return
    */
-  boolean preventAutoExpansion(HGNode node);
+  HGRootNode modify(HGRootNode rootNode, List<IHierarchicalGraphModification> graphModifications);
 }
