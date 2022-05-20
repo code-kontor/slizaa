@@ -76,7 +76,7 @@
 		<version-classgraph>4.8.90</version-classgraph>
 		<version-spring-boot>2.4.5</version-spring-boot>
 		<version-hibernate-validator>5.4.2.Final</version-hibernate-validator>
-		<version-gson>2.8.5</version-gson>
+		<version-gson>2.8.9</version-gson>
 		<version-mvnresolver-uber>1.0.0.RC1</version-mvnresolver-uber>
 		<version-neo4j-java-driver>4.2.0</version-neo4j-java-driver>
 	</properties>
