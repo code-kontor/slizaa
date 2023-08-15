@@ -35,7 +35,7 @@
 
 	<properties>
 		<resolverVersion>1.1.0</resolverVersion>
-		<mavenVersion>3.5.0</mavenVersion>
+		<mavenVersion>3.8.1</mavenVersion>
 		<aetherVersion>1.1.1</aetherVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
